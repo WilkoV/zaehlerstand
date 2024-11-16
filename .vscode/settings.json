@@ -1,10 +1,15 @@
 {
    "cSpell.words": [
+      "AUTOINCREMENT",
       "cupertino",
       "Cupertino",
       "dokument",
       "gsheets",
       "LTRB",
-      "Schyler"
+      "nodoc",
+      "nullable",
+      "Schyler",
+      "sqlite",
+      "upsert"
    ]
 }
