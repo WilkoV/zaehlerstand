@@ -4,7 +4,7 @@ import 'package:zaehlerstand/src/models/base/meter_reading.dart';
 
 void main() {
   setUp(() async {
-    await DatabaseHelper.deleteAllReadings(); // Reset database before each test
+    await DatabaseHelper.deleteAllMeterReadings(); // Reset database before each test
   });
 
   group('DatabaseHelper Tests', () {
@@ -67,12 +67,12 @@ void main() {
         await DatabaseHelper.insertMeterReading(reading1);
         await DatabaseHelper.insertMeterReading(reading2);
 
-        final years = await DatabaseHelper.getDistinctYears();
+        final years = await DatabaseHelper.getMeterReadingsDistinctYears();
         expect(years, [2023, 2024]);
       });
 
       test('should handle empty database gracefully', () async {
-        final years = await DatabaseHelper.getDistinctYears();
+        final years = await DatabaseHelper.getMeterReadingsDistinctYears();
         expect(years.isEmpty, true);
       });
     });
@@ -85,12 +85,12 @@ void main() {
         await DatabaseHelper.insertMeterReading(reading1);
         await DatabaseHelper.insertMeterReading(reading2);
 
-        final firstReading = await DatabaseHelper.getReadingForYear(2023);
+        final firstReading = await DatabaseHelper.getMeterReadingForYear(2023);
         expect(firstReading?.reading, 100);
       });
 
       test('should return null for a year with no readings', () async {
-        final firstReading = await DatabaseHelper.getReadingForYear(2023);
+        final firstReading = await DatabaseHelper.getMeterReadingForYear(2023);
         expect(firstReading, isNull);
       });
     });
@@ -102,12 +102,12 @@ void main() {
 
         await DatabaseHelper.insertMeterReading(reading);
 
-        final fetchedReading = await DatabaseHelper.getReadingDaysBefore(5);
+        final fetchedReading = await DatabaseHelper.getMeterReadingDaysBefore(5);
         expect(fetchedReading?.reading, 150);
       });
 
       test('should return null for a date with no readings', () async {
-        final fetchedReading = await DatabaseHelper.getReadingDaysBefore(5);
+        final fetchedReading = await DatabaseHelper.getMeterReadingDaysBefore(5);
         expect(fetchedReading, isNull);
       });
     });
@@ -120,7 +120,7 @@ void main() {
         await DatabaseHelper.insertMeterReading(reading1);
         await DatabaseHelper.insertMeterReading(reading2);
 
-        await DatabaseHelper.deleteAllReadings();
+        await DatabaseHelper.deleteAllMeterReadings();
 
         final readings = await DatabaseHelper.getMeterReadings();
         expect(readings.isEmpty, true);

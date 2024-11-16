@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:zaehlerstand/src/screens/zaehlerstand_screen.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();

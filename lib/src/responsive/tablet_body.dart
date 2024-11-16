@@ -9,7 +9,7 @@ class TabletBody extends StatelessWidget {
       backgroundColor: Colors.purple[300],
       appBar: AppBar(
         title: const Text('Zählerstand'),
-      ),
+      ), 
       body: Row(
         children: [
           Expanded(

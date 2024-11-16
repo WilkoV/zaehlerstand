@@ -1,26 +1,28 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:zaehlerstand/src/models/base/meter_reading.dart';
 
 class DatabaseHelper {
-  static late Database _db;
+  @visibleForTesting
+  static late Database db;
   static bool _isInitialized = false;
 
   // Singleton pattern to ensure only one instance of the database is used
   static Future<Database> get database async {
     if (!_isInitialized) {
-      _db = await _initDb();
+      db = await _initDb();
       _isInitialized = true;
     }
-    return _db;
+    return db;
   }
 
   // Initialize the database
   static Future<Database> _initDb() async {
     final db = sqlite3.open(await _getDbPath());
-    _createDb(db);
+    createDb(db);
     return db;
   }
 
@@ -40,7 +42,8 @@ class DatabaseHelper {
   }
 
   // Create the table for MeterReadings with a UNIQUE constraint on year, month, day
-  static void _createDb(Database db) {
+  @visibleForTesting
+  static void createDb(Database db) {
     db.execute('''
       CREATE TABLE IF NOT EXISTS meter_readings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -85,14 +88,14 @@ class DatabaseHelper {
   }
 
   // Fetch a list of distinct years
-  static Future<List<int>> getDistinctYears() async {
+  static Future<List<int>> getMeterReadingsDistinctYears() async {
     final db = await database;
     final result = db.select('SELECT DISTINCT year FROM meter_readings ORDER BY year');
     return result.map((row) => row['year'] as int).toList();
   }
 
   // Fetch the first reading for a specific year
-  static Future<MeterReading?> getReadingForYear(int year) async {
+  static Future<MeterReading?> getMeterReadingForYear(int year) async {
     final db = await database;
     final result = db.select(
       '''
@@ -117,7 +120,7 @@ class DatabaseHelper {
   }
 
   // Fetch the reading for a specific number of days before the current date
-  static Future<MeterReading?> getReadingDaysBefore(int daysBefore) async {
+  static Future<MeterReading?> getMeterReadingDaysBefore(int daysBefore) async {
     final db = await database;
     final targetDate = DateTime.now().subtract(Duration(days: daysBefore));
     final result = db.select(
@@ -142,7 +145,7 @@ class DatabaseHelper {
   }
 
   // Delete all readings
-  static Future<void> deleteAllReadings() async {
+  static Future<void> deleteAllMeterReadings() async {
     final db = await database;
     db.execute('DELETE FROM meter_readings');
   }
