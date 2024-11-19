@@ -6,8 +6,10 @@ void main() {
     test('should create a MeterReading instance with correct values', () {
       final date = DateTime(2023, 11, 16);
       const reading = 123;
+      const isGenerate = false;
+      const enteredReading = 123;
 
-      final meterReading = MeterReading(date: date, reading: reading);
+      final meterReading = MeterReading(date: date, reading: reading, isGenerated: isGenerate, enteredReading: enteredReading);
 
       expect(meterReading.date, date);
       expect(meterReading.reading, reading);
@@ -16,13 +18,17 @@ void main() {
     test('should convert MeterReading to JSON correctly', () {
       final date = DateTime(2023, 11, 16);
       const reading = 123;
+      const isGenerate = false;
+      const enteredReading = 123;
 
-      final meterReading = MeterReading(date: date, reading: reading);
+      final meterReading = MeterReading(date: date, reading: reading, isGenerated: isGenerate, enteredReading: enteredReading);
       final json = meterReading.toJson();
 
       expect(json, {
         'date': date.toIso8601String(),
         'reading': reading,
+        'isGenerated': false,
+        'enteredReading': 123,
       });
     });
 
@@ -30,6 +36,8 @@ void main() {
       final json = {
         'date': '2023-11-16T00:00:00.000',
         'reading': 123,
+        'isGenerated': false,
+        'enteredReading': 123,
       };
 
       final meterReading = MeterReading.fromJson(json);
@@ -41,9 +49,11 @@ void main() {
     test('should compare two MeterReading instances correctly', () {
       final date = DateTime(2023, 11, 16);
       const reading = 123;
+      const isGenerate = false;
+      const enteredReading = 123;
 
-      final meterReading1 = MeterReading(date: date, reading: reading);
-      final meterReading2 = MeterReading(date: date, reading: reading);
+      final meterReading1 = MeterReading(date: date, reading: reading, isGenerated: isGenerate, enteredReading: enteredReading);
+      final meterReading2 = MeterReading(date: date, reading: reading, isGenerated: isGenerate, enteredReading: enteredReading);
 
       expect(meterReading1, meterReading2);
     });

@@ -72,6 +72,8 @@ class DatabaseHelper {
         month INTEGER NOT NULL,
         day INTEGER NOT NULL,
         reading INTEGER NOT NULL,
+        is_generated INTEGER NOT NULL,
+        entered_reading INTEGER NOT NULL,
         UNIQUE(year, month, day)
       );
     ''');
@@ -84,14 +86,16 @@ class DatabaseHelper {
     final db = await database;
     _log.fine('Inserting or updating meter reading: $reading');
 
+    int generated = reading.isGenerated ? 1 : 0;
+
     db.execute(
       '''
-      INSERT INTO meter_readings (year, month, day, reading)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO meter_readings (year, month, day, reading, is_generated, entered_reading)
+      VALUES (?, ?, ?, ?, ?, ?)
       ON CONFLICT(year, month, day) DO UPDATE SET
         reading = excluded.reading;
       ''',
-      [reading.date.year, reading.date.month, reading.date.day, reading.reading],
+      [reading.date.year, reading.date.month, reading.date.day, reading.reading, generated, reading.enteredReading],
     );
 
     _log.fine('Meter reading inserted/updated successfully.');
@@ -114,6 +118,8 @@ class DatabaseHelper {
           12, // Set the time to 12:00
         ),
         reading: row['reading'] as int,
+        isGenerated: row['is_generated'] as int == 1 ? true : false,
+        enteredReading: row['entered_reading'] as int,
       );
     }).toList();
   }
@@ -154,12 +160,14 @@ class DatabaseHelper {
 
     return MeterReading(
       date: DateTime(
-        row['year'],
-        row['month'],
-        row['day'],
+        row['year'] as int,
+        row['month'] as int,
+        row['day'] as int,
         12, // Set the time to 12:00
       ),
-      reading: row['reading'],
+      reading: row['reading'] as int,
+      isGenerated: row['is_generated'] as int == 1 ? true : false,
+      enteredReading: row['entered_reading'] as int,
     );
   }
 
@@ -188,12 +196,14 @@ class DatabaseHelper {
 
     return MeterReading(
       date: DateTime(
-        row['year'],
-        row['month'],
-        row['day'],
+        row['year'] as int,
+        row['month'] as int,
+        row['day'] as int,
         12, // Set the time to 12:00
       ),
-      reading: row['reading'],
+      reading: row['reading'] as int,
+      isGenerated: row['is_generated'] as int == 1 ? true : false,
+      enteredReading: row['entered_reading'] as int,
     );
   }
 

@@ -19,7 +19,7 @@ void main() {
 
     group('insertMeterReading', () {
       test('should insert a new meter reading', () async {
-        final reading = MeterReading(date: DateTime(2023, 5, 15), reading: 250);
+        final reading = MeterReading(date: DateTime(2023, 5, 15), reading: 250, isGenerated: false, enteredReading: 250);
 
         await DatabaseHelper.insertMeterReading(reading);
 
@@ -29,8 +29,8 @@ void main() {
       });
 
       test('should upsert meter readings correctly', () async {
-        final initialReading = MeterReading(date: DateTime(2023, 5, 15), reading: 250);
-        final updatedReading = MeterReading(date: DateTime(2023, 5, 15), reading: 300);
+        final initialReading = MeterReading(date: DateTime(2023, 5, 15), reading: 250, isGenerated: false, enteredReading: 250);
+        final updatedReading = MeterReading(date: DateTime(2023, 5, 15), reading: 300, isGenerated: false, enteredReading: 300);
 
         await DatabaseHelper.insertMeterReading(initialReading);
         await DatabaseHelper.insertMeterReading(updatedReading);
@@ -43,8 +43,8 @@ void main() {
 
     group('getMeterReadings', () {
       test('should fetch all readings', () async {
-        final reading1 = MeterReading(date: DateTime(2023, 5, 15), reading: 250);
-        final reading2 = MeterReading(date: DateTime(2023, 6, 10), reading: 300);
+        final reading1 = MeterReading(date: DateTime(2023, 5, 15), reading: 250, isGenerated: false, enteredReading: 250);
+        final reading2 = MeterReading(date: DateTime(2023, 6, 10), reading: 300, isGenerated: false, enteredReading: 300);
 
         await DatabaseHelper.insertMeterReading(reading1);
         await DatabaseHelper.insertMeterReading(reading2);
@@ -61,8 +61,8 @@ void main() {
 
     group('getDistinctYears', () {
       test('should fetch distinct years', () async {
-        final reading1 = MeterReading(date: DateTime(2023, 5, 15), reading: 250);
-        final reading2 = MeterReading(date: DateTime(2024, 5, 15), reading: 300);
+        final reading1 = MeterReading(date: DateTime(2023, 5, 15), reading: 250, isGenerated: false, enteredReading: 250);
+        final reading2 = MeterReading(date: DateTime(2024, 5, 15), reading: 300, isGenerated: false, enteredReading: 300);
 
         await DatabaseHelper.insertMeterReading(reading1);
         await DatabaseHelper.insertMeterReading(reading2);
@@ -79,8 +79,8 @@ void main() {
 
     group('getReadingForYear', () {
       test('should fetch the first reading for a specific year', () async {
-        final reading1 = MeterReading(date: DateTime(2023, 1, 1), reading: 100);
-        final reading2 = MeterReading(date: DateTime(2023, 5, 15), reading: 200);
+        final reading1 = MeterReading(date: DateTime(2023, 1, 1), reading: 100, isGenerated: false, enteredReading: 100);
+        final reading2 = MeterReading(date: DateTime(2023, 5, 15), reading: 200, isGenerated: false, enteredReading: 200);
 
         await DatabaseHelper.insertMeterReading(reading1);
         await DatabaseHelper.insertMeterReading(reading2);
@@ -98,7 +98,7 @@ void main() {
     group('getReadingDaysBefore', () {
       test('should fetch the reading for a specific number of days before today', () async {
         final now = DateTime.now();
-        final reading = MeterReading(date: now.subtract(const Duration(days: 5)), reading: 150);
+        final reading = MeterReading(date: now.subtract(const Duration(days: 5)), reading: 150, isGenerated: false, enteredReading: 150);
 
         await DatabaseHelper.insertMeterReading(reading);
 
@@ -114,8 +114,8 @@ void main() {
 
     group('deleteAllReadings', () {
       test('should delete all readings', () async {
-        final reading1 = MeterReading(date: DateTime(2023, 1, 1), reading: 100);
-        final reading2 = MeterReading(date: DateTime(2023, 2, 1), reading: 200);
+        final reading1 = MeterReading(date: DateTime(2023, 1, 1), reading: 100, isGenerated: false, enteredReading: 100);
+        final reading2 = MeterReading(date: DateTime(2023, 2, 1), reading: 200, isGenerated: false, enteredReading: 200);
 
         await DatabaseHelper.insertMeterReading(reading1);
         await DatabaseHelper.insertMeterReading(reading2);

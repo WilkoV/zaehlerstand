@@ -44,6 +44,8 @@ void main() {
         final meterReading = MeterReading(
           date: DateTime(2023, 5, 12),
           reading: 150,
+          isGenerated: false,
+          enteredReading: 150,
         );
         await DatabaseHelper.insertMeterReading(meterReading);
 
@@ -60,8 +62,8 @@ void main() {
     group('fetchDistinctYears', () {
       test('Fetch distinct years', () async {
         // Arrange: Add some readings
-        final meterReading1 = MeterReading(date: DateTime(2023, 5, 12), reading: 150);
-        final meterReading2 = MeterReading(date: DateTime(2024, 5, 12), reading: 180);
+        final meterReading1 = MeterReading(date: DateTime(2023, 5, 12), reading: 150, isGenerated: false, enteredReading: 150);
+        final meterReading2 = MeterReading(date: DateTime(2024, 5, 12), reading: 180, isGenerated: false, enteredReading: 180);
         await DatabaseHelper.insertMeterReading(meterReading1);
         await DatabaseHelper.insertMeterReading(meterReading2);
 
@@ -77,7 +79,7 @@ void main() {
     group('fetchReadingForYear', () {
       test('Fetch reading for a specific year', () async {
         // Arrange: Add a reading for 2023
-        final meterReading = MeterReading(date: DateTime(2023, 5, 12), reading: 150);
+        final meterReading = MeterReading(date: DateTime(2023, 5, 12), reading: 150, isGenerated: false, enteredReading: 150);
         await DatabaseHelper.insertMeterReading(meterReading);
 
         // Act: Fetch reading for 2023
@@ -94,7 +96,7 @@ void main() {
       test('Fetch reading for a specific number of days before', () async {
         // Arrange: Add a reading for today
         var yesterday = DateTime.now().subtract(const Duration(days: 1));
-        final todayReading = MeterReading(date: yesterday, reading: 200);
+        final todayReading = MeterReading(date: yesterday, reading: 200, isGenerated: false, enteredReading: 200);
         await DatabaseHelper.insertMeterReading(todayReading);
 
         // Act: Fetch reading 1 day before
@@ -109,7 +111,7 @@ void main() {
     group('addMeterReading', () {
       test('Add new meter reading and refresh meter readings', () async {
         // Arrange: Create a meter reading to add
-        final meterReading = MeterReading(date: DateTime(2023, 7, 5), reading: 220);
+        final meterReading = MeterReading(date: DateTime(2023, 7, 5), reading: 220, isGenerated: false, enteredReading: 220);
 
         // Act: Add the reading and refresh the list
         await dataProvider.addMeterReading(meterReading);
@@ -124,8 +126,8 @@ void main() {
     group('deleteAllReadings', () {
       test('Delete all meter readings', () async {
         // Arrange: Add some readings
-        final meterReading1 = MeterReading(date: DateTime(2023, 6, 10), reading: 250);
-        final meterReading2 = MeterReading(date: DateTime(2023, 7, 5), reading: 270);
+        final meterReading1 = MeterReading(date: DateTime(2023, 6, 10), reading: 250, isGenerated: false, enteredReading: 250);
+        final meterReading2 = MeterReading(date: DateTime(2023, 7, 5), reading: 270, isGenerated: false, enteredReading: 270);
         await DatabaseHelper.insertMeterReading(meterReading1);
         await DatabaseHelper.insertMeterReading(meterReading2);
 
