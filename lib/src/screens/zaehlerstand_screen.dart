@@ -20,9 +20,15 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const ResponsiveLayout(
-      mobileBody: MobileBody(),
-      tabletBody: TabletBody(),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Zählerstand', style: TextStyle(fontSize: 30)),
+        centerTitle: true,
+      ),
+      body: const ResponsiveLayout(
+        mobileBody: MobileBody(),
+        tabletBody: TabletBody(),
+      ),
     );
   }
 }

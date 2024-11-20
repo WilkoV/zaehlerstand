@@ -7,9 +7,6 @@ class MobileBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.purple[300],
-      appBar: AppBar(
-        title: const Text('Zählerstand'),
-      ),
       body: Column(
         children: [
           Expanded(

@@ -6,10 +6,7 @@ class TabletBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.purple[300],
-      appBar: AppBar(
-        title: const Text('Zählerstand'),
-      ), 
+      backgroundColor: Colors.lightBlue[300],
       body: Row(
         children: [
           Expanded(
@@ -17,7 +14,7 @@ class TabletBody extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 6, 12),
               child: Container(
-                color: Colors.deepPurple[400],
+                color: Colors.blue[400],
               ),
             ),
           ),
@@ -26,7 +23,7 @@ class TabletBody extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(6, 12, 12, 12),
               child: Container(
-                color: Colors.deepPurple[400],
+                color: Colors.blue[400],
               ),
             ),
           ),
