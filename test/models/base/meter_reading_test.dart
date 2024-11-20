@@ -9,7 +9,7 @@ void main() {
       const isGenerate = false;
       const enteredReading = 123;
 
-      final meterReading = MeterReading(date: date, reading: reading, isGenerated: isGenerate, enteredReading: enteredReading);
+      final meterReading = MeterReading(date: date, reading: reading, isGenerated: isGenerate, enteredReading: enteredReading, isSynced: false);
 
       expect(meterReading.date, date);
       expect(meterReading.reading, reading);
@@ -21,7 +21,7 @@ void main() {
       const isGenerate = false;
       const enteredReading = 123;
 
-      final meterReading = MeterReading(date: date, reading: reading, isGenerated: isGenerate, enteredReading: enteredReading);
+      final meterReading = MeterReading(date: date, reading: reading, isGenerated: isGenerate, enteredReading: enteredReading, isSynced: false);
       final json = meterReading.toJson();
 
       expect(json, {
@@ -29,6 +29,7 @@ void main() {
         'reading': reading,
         'isGenerated': false,
         'enteredReading': 123,
+        'isSynced': false
       });
     });
 
@@ -38,6 +39,7 @@ void main() {
         'reading': 123,
         'isGenerated': false,
         'enteredReading': 123,
+        'isSynced': false
       };
 
       final meterReading = MeterReading.fromJson(json);
@@ -52,8 +54,8 @@ void main() {
       const isGenerate = false;
       const enteredReading = 123;
 
-      final meterReading1 = MeterReading(date: date, reading: reading, isGenerated: isGenerate, enteredReading: enteredReading);
-      final meterReading2 = MeterReading(date: date, reading: reading, isGenerated: isGenerate, enteredReading: enteredReading);
+      final meterReading1 = MeterReading(date: date, reading: reading, isGenerated: isGenerate, enteredReading: enteredReading, isSynced: false);
+      final meterReading2 = MeterReading(date: date, reading: reading, isGenerated: isGenerate, enteredReading: enteredReading, isSynced: false);
 
       expect(meterReading1, meterReading2);
     });

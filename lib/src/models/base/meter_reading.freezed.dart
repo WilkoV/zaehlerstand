@@ -24,6 +24,7 @@ mixin _$MeterReading {
   int get reading => throw _privateConstructorUsedError;
   bool get isGenerated => throw _privateConstructorUsedError;
   int get enteredReading => throw _privateConstructorUsedError;
+  bool get isSynced => throw _privateConstructorUsedError;
 
   /// Serializes this MeterReading to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -41,7 +42,12 @@ abstract class $MeterReadingCopyWith<$Res> {
           MeterReading value, $Res Function(MeterReading) then) =
       _$MeterReadingCopyWithImpl<$Res, MeterReading>;
   @useResult
-  $Res call({DateTime date, int reading, bool isGenerated, int enteredReading});
+  $Res call(
+      {DateTime date,
+      int reading,
+      bool isGenerated,
+      int enteredReading,
+      bool isSynced});
 }
 
 /// @nodoc
@@ -63,6 +69,7 @@ class _$MeterReadingCopyWithImpl<$Res, $Val extends MeterReading>
     Object? reading = null,
     Object? isGenerated = null,
     Object? enteredReading = null,
+    Object? isSynced = null,
   }) {
     return _then(_value.copyWith(
       date: null == date
@@ -81,6 +88,10 @@ class _$MeterReadingCopyWithImpl<$Res, $Val extends MeterReading>
           ? _value.enteredReading
           : enteredReading // ignore: cast_nullable_to_non_nullable
               as int,
+      isSynced: null == isSynced
+          ? _value.isSynced
+          : isSynced // ignore: cast_nullable_to_non_nullable
+              as bool,
     ) as $Val);
   }
 }
@@ -93,7 +104,12 @@ abstract class _$$MeterReadingImplCopyWith<$Res>
       __$$MeterReadingImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({DateTime date, int reading, bool isGenerated, int enteredReading});
+  $Res call(
+      {DateTime date,
+      int reading,
+      bool isGenerated,
+      int enteredReading,
+      bool isSynced});
 }
 
 /// @nodoc
@@ -113,6 +129,7 @@ class __$$MeterReadingImplCopyWithImpl<$Res>
     Object? reading = null,
     Object? isGenerated = null,
     Object? enteredReading = null,
+    Object? isSynced = null,
   }) {
     return _then(_$MeterReadingImpl(
       date: null == date
@@ -131,6 +148,10 @@ class __$$MeterReadingImplCopyWithImpl<$Res>
           ? _value.enteredReading
           : enteredReading // ignore: cast_nullable_to_non_nullable
               as int,
+      isSynced: null == isSynced
+          ? _value.isSynced
+          : isSynced // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -142,7 +163,8 @@ class _$MeterReadingImpl implements _MeterReading {
       {required this.date,
       required this.reading,
       required this.isGenerated,
-      required this.enteredReading});
+      required this.enteredReading,
+      required this.isSynced});
 
   factory _$MeterReadingImpl.fromJson(Map<String, dynamic> json) =>
       _$$MeterReadingImplFromJson(json);
@@ -155,10 +177,12 @@ class _$MeterReadingImpl implements _MeterReading {
   final bool isGenerated;
   @override
   final int enteredReading;
+  @override
+  final bool isSynced;
 
   @override
   String toString() {
-    return 'MeterReading(date: $date, reading: $reading, isGenerated: $isGenerated, enteredReading: $enteredReading)';
+    return 'MeterReading(date: $date, reading: $reading, isGenerated: $isGenerated, enteredReading: $enteredReading, isSynced: $isSynced)';
   }
 
   @override
@@ -171,13 +195,15 @@ class _$MeterReadingImpl implements _MeterReading {
             (identical(other.isGenerated, isGenerated) ||
                 other.isGenerated == isGenerated) &&
             (identical(other.enteredReading, enteredReading) ||
-                other.enteredReading == enteredReading));
+                other.enteredReading == enteredReading) &&
+            (identical(other.isSynced, isSynced) ||
+                other.isSynced == isSynced));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, date, reading, isGenerated, enteredReading);
+  int get hashCode => Object.hash(
+      runtimeType, date, reading, isGenerated, enteredReading, isSynced);
 
   /// Create a copy of MeterReading
   /// with the given fields replaced by the non-null parameter values.
@@ -200,7 +226,8 @@ abstract class _MeterReading implements MeterReading {
       {required final DateTime date,
       required final int reading,
       required final bool isGenerated,
-      required final int enteredReading}) = _$MeterReadingImpl;
+      required final int enteredReading,
+      required final bool isSynced}) = _$MeterReadingImpl;
 
   factory _MeterReading.fromJson(Map<String, dynamic> json) =
       _$MeterReadingImpl.fromJson;
@@ -213,6 +240,8 @@ abstract class _MeterReading implements MeterReading {
   bool get isGenerated;
   @override
   int get enteredReading;
+  @override
+  bool get isSynced;
 
   /// Create a copy of MeterReading
   /// with the given fields replaced by the non-null parameter values.

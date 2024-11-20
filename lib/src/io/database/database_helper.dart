@@ -74,6 +74,7 @@ class DatabaseHelper {
         reading INTEGER NOT NULL,
         is_generated INTEGER NOT NULL,
         entered_reading INTEGER NOT NULL,
+        is_synced INTEGER NOT NULL,
         UNIQUE(year, month, day)
       );
     ''');
@@ -90,12 +91,12 @@ class DatabaseHelper {
 
     db.execute(
       '''
-      INSERT INTO meter_readings (year, month, day, reading, is_generated, entered_reading)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO meter_readings (year, month, day, reading, is_generated, entered_reading, is_synced)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(year, month, day) DO UPDATE SET
         reading = excluded.reading;
       ''',
-      [reading.date.year, reading.date.month, reading.date.day, reading.reading, generated, reading.enteredReading],
+      [reading.date.year, reading.date.month, reading.date.day, reading.reading, generated, reading.enteredReading, reading.isSynced],
     );
 
     _log.fine('Meter reading inserted/updated successfully.');
@@ -120,6 +121,7 @@ class DatabaseHelper {
         reading: row['reading'] as int,
         isGenerated: row['is_generated'] as int == 1 ? true : false,
         enteredReading: row['entered_reading'] as int,
+        isSynced: row['is_synced'] as int == 1 ? true : false,
       );
     }).toList();
   }
@@ -168,6 +170,7 @@ class DatabaseHelper {
       reading: row['reading'] as int,
       isGenerated: row['is_generated'] as int == 1 ? true : false,
       enteredReading: row['entered_reading'] as int,
+      isSynced: row['is_synced'] as int == 1 ? true : false,
     );
   }
 
@@ -204,6 +207,7 @@ class DatabaseHelper {
       reading: row['reading'] as int,
       isGenerated: row['is_generated'] as int == 1 ? true : false,
       enteredReading: row['entered_reading'] as int,
+      isSynced: row['is_synced'] as int == 1 ? true : false,
     );
   }
 
@@ -215,5 +219,46 @@ class DatabaseHelper {
 
     db.execute('DELETE FROM meter_readings');
     _log.fine('All meter readings deleted successfully.');
+  }
+
+  // Bulk import meter readings
+  static Future<void> bulkImport(List<MeterReading> readings) async {
+    final db = await database;
+    _log.fine('Bulk importing ${readings.length} meter readings.');
+
+    // Begin a transaction
+    db.execute('BEGIN TRANSACTION');
+    try {
+      for (final reading in readings) {
+        int generated = reading.isGenerated ? 1 : 0;
+
+        db.execute(
+          '''
+          INSERT INTO meter_readings (year, month, day, reading, is_generated, entered_reading, is_synced)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
+          ON CONFLICT(year, month, day) DO UPDATE SET
+            reading = excluded.reading;
+          ''',
+          [
+            reading.date.year,
+            reading.date.month,
+            reading.date.day,
+            reading.reading,
+            generated,
+            reading.enteredReading,
+            reading.isSynced
+          ],
+        );
+      }
+      
+      // Commit the transaction
+      db.execute('COMMIT');
+      _log.fine('Bulk import completed successfully.');
+    } catch (e) {
+      // Rollback in case of an error
+      db.execute('ROLLBACK');
+      _log.severe('Error during bulk import: $e');
+      rethrow;
+    }
   }
 }

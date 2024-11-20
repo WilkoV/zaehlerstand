@@ -46,6 +46,7 @@ void main() {
           reading: 150,
           isGenerated: false,
           enteredReading: 150,
+          isSynced: false,
         );
         await DatabaseHelper.insertMeterReading(meterReading);
 
@@ -62,8 +63,8 @@ void main() {
     group('fetchDistinctYears', () {
       test('Fetch distinct years', () async {
         // Arrange: Add some readings
-        final meterReading1 = MeterReading(date: DateTime(2023, 5, 12), reading: 150, isGenerated: false, enteredReading: 150);
-        final meterReading2 = MeterReading(date: DateTime(2024, 5, 12), reading: 180, isGenerated: false, enteredReading: 180);
+        final meterReading1 = MeterReading(date: DateTime(2023, 5, 12), reading: 150, isGenerated: false, enteredReading: 150, isSynced: false);
+        final meterReading2 = MeterReading(date: DateTime(2024, 5, 12), reading: 180, isGenerated: false, enteredReading: 180, isSynced: false);
         await DatabaseHelper.insertMeterReading(meterReading1);
         await DatabaseHelper.insertMeterReading(meterReading2);
 
@@ -79,7 +80,7 @@ void main() {
     group('fetchReadingForYear', () {
       test('Fetch reading for a specific year', () async {
         // Arrange: Add a reading for 2023
-        final meterReading = MeterReading(date: DateTime(2023, 5, 12), reading: 150, isGenerated: false, enteredReading: 150);
+        final meterReading = MeterReading(date: DateTime(2023, 5, 12), reading: 150, isGenerated: false, enteredReading: 150, isSynced: false);
         await DatabaseHelper.insertMeterReading(meterReading);
 
         // Act: Fetch reading for 2023
@@ -96,7 +97,7 @@ void main() {
       test('Fetch reading for a specific number of days before', () async {
         // Arrange: Add a reading for today
         var yesterday = DateTime.now().subtract(const Duration(days: 1));
-        final todayReading = MeterReading(date: yesterday, reading: 200, isGenerated: false, enteredReading: 200);
+        final todayReading = MeterReading(date: yesterday, reading: 200, isGenerated: false, enteredReading: 200, isSynced: false);
         await DatabaseHelper.insertMeterReading(todayReading);
 
         // Act: Fetch reading 1 day before
@@ -111,7 +112,7 @@ void main() {
     group('addMeterReading', () {
       test('Add new meter reading and refresh meter readings', () async {
         // Arrange: Create a meter reading to add
-        final meterReading = MeterReading(date: DateTime(2023, 7, 5), reading: 220, isGenerated: false, enteredReading: 220);
+        final meterReading = MeterReading(date: DateTime(2023, 7, 5), reading: 220, isGenerated: false, enteredReading: 220, isSynced: false);
 
         // Act: Add the reading and refresh the list
         await dataProvider.addMeterReading(meterReading);
@@ -126,8 +127,8 @@ void main() {
     group('deleteAllReadings', () {
       test('Delete all meter readings', () async {
         // Arrange: Add some readings
-        final meterReading1 = MeterReading(date: DateTime(2023, 6, 10), reading: 250, isGenerated: false, enteredReading: 250);
-        final meterReading2 = MeterReading(date: DateTime(2023, 7, 5), reading: 270, isGenerated: false, enteredReading: 270);
+        final meterReading1 = MeterReading(date: DateTime(2023, 6, 10), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
+        final meterReading2 = MeterReading(date: DateTime(2023, 7, 5), reading: 270, isGenerated: false, enteredReading: 270, isSynced: false);
         await DatabaseHelper.insertMeterReading(meterReading1);
         await DatabaseHelper.insertMeterReading(meterReading2);
 
@@ -136,6 +137,25 @@ void main() {
 
         // Assert: Ensure the readings list is empty after deletion
         expect(dataProvider.meterReadings, isEmpty);
+      });
+    });
+
+    // Test: Bulk import meter readings
+    group('bulkImportMeterReadings', () {
+      test('Import multiple meter readings in bulk', () async {
+        // Arrange: Create a list of meter readings
+        final meterReadings = [
+          MeterReading(date: DateTime(2023, 5, 12), reading: 150, isGenerated: false, enteredReading: 150, isSynced: false),
+          MeterReading(date: DateTime(2023, 6, 15), reading: 200, isGenerated: false, enteredReading: 200, isSynced: false),
+          MeterReading(date: DateTime(2023, 7, 20), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false),
+        ];
+
+        // Act: Perform bulk import
+        await dataProvider.bulkImportMeterReadings(meterReadings);
+
+        // Assert: Verify the readings in the provider and database
+        expect(dataProvider.meterReadings.length, equals(3));
+        expect(dataProvider.meterReadings.map((r) => r.reading), containsAll([150, 200, 250]));
       });
     });
   });

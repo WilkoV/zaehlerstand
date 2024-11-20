@@ -10,6 +10,7 @@ class MeterReading with _$MeterReading {
     required int reading,
     required bool isGenerated,
     required int enteredReading,
+    required bool isSynced,
   }) = _MeterReading;
 
   factory MeterReading.fromJson(Map<String, dynamic> json) => _$MeterReadingFromJson(json);

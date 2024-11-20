@@ -12,6 +12,7 @@ _$MeterReadingImpl _$$MeterReadingImplFromJson(Map<String, dynamic> json) =>
       reading: (json['reading'] as num).toInt(),
       isGenerated: json['isGenerated'] as bool,
       enteredReading: (json['enteredReading'] as num).toInt(),
+      isSynced: json['isSynced'] as bool,
     );
 
 Map<String, dynamic> _$$MeterReadingImplToJson(_$MeterReadingImpl instance) =>
@@ -20,4 +21,5 @@ Map<String, dynamic> _$$MeterReadingImplToJson(_$MeterReadingImpl instance) =>
       'reading': instance.reading,
       'isGenerated': instance.isGenerated,
       'enteredReading': instance.enteredReading,
+      'isSynced': instance.isSynced,
     };

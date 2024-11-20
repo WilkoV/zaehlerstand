@@ -67,8 +67,17 @@ class DataProvider extends ChangeNotifier {
 
   Future<void> deleteAllReadings() async {
     _log.fine('Deleting all meter readings');
-    
+
     await DatabaseHelper.deleteAllMeterReadings();
     await fetchMeterReadings(); // Refresh the list
+  }
+
+  Future<void> bulkImportMeterReadings(List<MeterReading> readings) async {
+    _log.fine('Bulk importing ${readings.length} meter readings');
+
+    await DatabaseHelper.bulkImport(readings);
+    await fetchMeterReadings(); // Refresh the list
+
+    _log.fine('Bulk import completed');
   }
 }
