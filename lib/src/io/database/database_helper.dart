@@ -190,6 +190,47 @@ class DatabaseHelper {
     );
   }
 
+  // Fetch the reading for a specific number of days before the current date
+  static Future<MeterReading?> getMeterReadingDaysBefore(int daysBefore) async {
+    final db = await database;
+
+    // Calculate target date
+    final targetDate = DateTime.now().subtract(Duration(days: daysBefore));
+    _log.fine('Fetching meter reading for date: $targetDate');
+    
+      // Query for the earliest reading in the calculated day.
+    final result = db.select(
+      '''
+    SELECT * FROM meter_readings 
+    WHERE year = ? AND month = ? AND day = ? 
+    LIMIT 1
+    ''',
+      [targetDate.year, targetDate.month, targetDate.day],
+    );
+    if (result.isEmpty) {
+      _log.fine('No meter reading found for date: $targetDate.');
+
+      return null;
+    }
+
+    // Get row from result set
+    final row = result.first;
+    _log.fine('Meter reading for date $targetDate fetched successfully.');
+
+    return MeterReading(
+      date: DateTime(
+        row['year'] as int,
+        row['month'] as int,
+        row['day'] as int,
+        12, // Set the time to 12:00
+      ),
+      reading: row['reading'] as int,
+      isGenerated: row['is_generated'] as int == 1 ? true : false,
+      enteredReading: row['entered_reading'] as int,
+      isSynced: row['is_synced'] as int == 1 ? true : false,
+    );
+  }  
+
   // Deletes all meter readings from the database.
   static Future<void> deleteAllMeterReadings() async {
     final db = await database;
