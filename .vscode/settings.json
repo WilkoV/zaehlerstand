@@ -1,16 +1,23 @@
 {
    "cSpell.words": [
+      "allprojects",
       "AUTOINCREMENT",
+      "buildlog",
       "cupertino",
       "Cupertino",
       "dokument",
+      "googlesheets",
       "gsheets",
+      "kotlin",
       "LTRB",
       "mockito",
       "nodoc",
       "nullable",
       "Schyler",
       "sqlite",
-      "upsert"
+      "subprojects",
+      "Symbolication",
+      "upsert",
+      "upserts"
    ]
 }

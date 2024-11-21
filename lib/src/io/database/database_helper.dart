@@ -94,7 +94,10 @@ class DatabaseHelper {
       INSERT INTO meter_readings (year, month, day, reading, is_generated, entered_reading, is_synced)
       VALUES (?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(year, month, day) DO UPDATE SET
-        reading = excluded.reading;
+        reading = excluded.reading, 
+        entered_reading = excluded.entered_reading,
+        is_generated = excluded.is_generated,
+        is_synced = excluded.is_synced;
       ''',
       [reading.date.year, reading.date.month, reading.date.day, reading.reading, generated, reading.enteredReading, reading.isSynced],
     );
@@ -237,20 +240,15 @@ class DatabaseHelper {
           INSERT INTO meter_readings (year, month, day, reading, is_generated, entered_reading, is_synced)
           VALUES (?, ?, ?, ?, ?, ?, ?)
           ON CONFLICT(year, month, day) DO UPDATE SET
-            reading = excluded.reading;
+            reading = excluded.reading, 
+            entered_reading = excluded.entered_reading,
+            is_generated = excluded.is_generated,
+            is_synced = excluded.is_synced;
           ''',
-          [
-            reading.date.year,
-            reading.date.month,
-            reading.date.day,
-            reading.reading,
-            generated,
-            reading.enteredReading,
-            reading.isSynced
-          ],
+          [reading.date.year, reading.date.month, reading.date.day, reading.reading, generated, reading.enteredReading, reading.isSynced],
         );
       }
-      
+
       // Commit the transaction
       db.execute('COMMIT');
       _log.fine('Bulk import completed successfully.');
@@ -261,4 +259,23 @@ class DatabaseHelper {
       rethrow;
     }
   }
+
+  // Method to count the number of meter readings in the database
+  static Future<int> countMeterReadings() async {
+    final db = await database;
+    _log.fine('Counting the number of meter readings.');
+
+    // Perform a SQL query to count the number of rows in the meter_readings table
+    final result = db.select('SELECT COUNT() AS count FROM meter_readings');
+
+    // Extract the count value from the query result
+    final count = result.first['count'] as int;
+
+    _log.fine('Total number of meter readings: $count');
+
+    return count;
+  }
+
+  // TODO: Get unsynced records
+  // TODO: Get last entry by date
 }

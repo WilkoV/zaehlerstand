@@ -30,7 +30,7 @@ void main() {
 
       test('should upsert meter readings correctly', () async {
         final initialReading = MeterReading(date: DateTime(2023, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
-        final updatedReading = MeterReading(date: DateTime(2023, 5, 15), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false);
+        final updatedReading = MeterReading(date: DateTime(2023, 5, 15), reading: 300, isGenerated: true, enteredReading: 300, isSynced: true);
 
         await DatabaseHelper.insertMeterReading(initialReading);
         await DatabaseHelper.insertMeterReading(updatedReading);
@@ -169,6 +169,37 @@ void main() {
 
         final fetchedReadings = await DatabaseHelper.getMeterReadings();
         expect(fetchedReadings.isEmpty, true);
+      });
+    });
+
+    group('countMeterReadings', () {
+      test('should return 0 when no meter readings exist', () async {
+        final count = await DatabaseHelper.countMeterReadings();
+        expect(count, 0);
+      });
+
+      test('should return the correct count after inserting readings', () async {
+        final reading1 = MeterReading(date: DateTime(2023, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
+        final reading2 = MeterReading(date: DateTime(2023, 6, 10), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false);
+
+        await DatabaseHelper.insertMeterReading(reading1);
+        await DatabaseHelper.insertMeterReading(reading2);
+
+        final count = await DatabaseHelper.countMeterReadings();
+        expect(count, 2);
+      });
+
+      test('should return the correct count after deleting all readings', () async {
+        final reading1 = MeterReading(date: DateTime(2023, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
+        final reading2 = MeterReading(date: DateTime(2023, 6, 10), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false);
+
+        await DatabaseHelper.insertMeterReading(reading1);
+        await DatabaseHelper.insertMeterReading(reading2);
+
+        await DatabaseHelper.deleteAllMeterReadings();
+
+        final count = await DatabaseHelper.countMeterReadings();
+        expect(count, 0);
       });
     });
   });
