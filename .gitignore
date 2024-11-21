@@ -43,3 +43,9 @@ app.*.map.json
 /android/app/release
 sqlite3.def
 sqlite3.dll
+
+# Don't publish credentials
+lib/src/constants/google_sheets_credentials.dart
+key.properties
+**/*.keystore
+**/*.jks
