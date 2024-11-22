@@ -68,7 +68,7 @@ void main() {
         await DatabaseHelper.insertMeterReading(reading2);
 
         final years = await DatabaseHelper.getMeterReadingsDistinctYears();
-        expect(years, [2022, 2024]);
+        expect(years, [2024, 2022]);
       });
 
       test('should handle empty database gracefully', () async {

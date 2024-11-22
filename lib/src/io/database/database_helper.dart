@@ -42,9 +42,9 @@ class DatabaseHelper {
         year INTEGER NOT NULL,
         month INTEGER NOT NULL,
         day INTEGER NOT NULL,
+        entered_reading INTEGER NOT NULL,
         reading INTEGER NOT NULL,
         is_generated INTEGER NOT NULL,
-        entered_reading INTEGER NOT NULL,
         is_synced INTEGER NOT NULL,
         UNIQUE(year, month, day) -- Ensures no duplicate entries for the same date
       );
@@ -59,20 +59,21 @@ class DatabaseHelper {
     _log.fine('Inserting or updating meter reading: $reading');
 
     // Convert boolean to integer for storage.
-    int generated = reading.isGenerated ? 1 : 0;
+    int isGenerated = reading.isGenerated ? 1 : 0;
+    int isSynced = reading.isSynced ? 1 : 0;
 
     // Perform the SQL insertion or update operation.
     db.execute(
       '''
-      INSERT INTO meter_readings (year, month, day, reading, is_generated, entered_reading, is_synced)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-      ON CONFLICT(year, month, day) DO UPDATE SET
-        reading = excluded.reading, 
-        entered_reading = excluded.entered_reading,
-        is_generated = excluded.is_generated,
-        is_synced = excluded.is_synced;
+        INSERT INTO meter_readings (year, month, day, entered_reading, reading, is_generated, is_synced)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(year, month, day) DO UPDATE SET
+          entered_reading = excluded.entered_reading,
+          reading = excluded.reading, 
+          is_generated = excluded.is_generated,
+          is_synced = excluded.is_synced;
       ''',
-      [reading.date.year, reading.date.month, reading.date.day, reading.reading, generated, reading.enteredReading, reading.isSynced],
+      [reading.date.year, reading.date.month, reading.date.day, reading.enteredReading, reading.reading, isGenerated, isSynced],
     );
 
     _log.fine('Meter reading ${reading.toString()} inserted/updated successfully.');
@@ -84,7 +85,7 @@ class DatabaseHelper {
     _log.fine('Fetching all meter readings.');
 
     // Query all rows from the table and sort by date.
-    final result = db.select('SELECT * FROM meter_readings ORDER BY year, month, day');
+    final result = db.select('SELECT * FROM meter_readings ORDER BY year desc, month asc, day asc');
     _log.fine('Fetched ${result.length} meter readings.');
 
     // Map the database rows to `MeterReading` objects.
@@ -97,7 +98,7 @@ class DatabaseHelper {
     _log.fine('Fetching distinct years of meter readings.');
 
     // Query for distinct years and return them as a list.
-    final result = db.select('SELECT DISTINCT year FROM meter_readings ORDER BY year');
+    final result = db.select('SELECT DISTINCT year FROM meter_readings ORDER BY year desc');
     _log.fine('Fetched ${result.length} distinct years.');
 
     return result.map((row) => row['year'] as int).toList();
@@ -110,11 +111,7 @@ class DatabaseHelper {
 
     // Query for the earliest reading in the specified year.
     final result = db.select(
-      '''
-    SELECT * FROM meter_readings 
-    WHERE year = ? 
-    ORDER BY month, day 
-    ''',
+      'SELECT * FROM meter_readings WHERE year = ?  ORDER BY month asc, day asc',
       [year],
     );
 
@@ -128,11 +125,7 @@ class DatabaseHelper {
     _log.fine('Fetching unsynchronized meter readings.');
 
     // Query for the earliest reading in the specified year.
-    final result = db.select('''
-    SELECT * FROM meter_readings 
-    WHERE is_synced = 'FALSE' 
-    ORDER BY month, day 
-    ''');
+    final result = db.select('SELECT * FROM meter_readings WHERE is_synced = 0 ORDER BY month asc, day asc');
 
     // Map the database rows to `MeterReading` objects.
     return _createMeterReadingsFromQueryResult(result);
@@ -148,11 +141,7 @@ class DatabaseHelper {
 
     // Query for the earliest reading in the calculated day.
     final result = db.select(
-      '''
-    SELECT * FROM meter_readings 
-    WHERE year = ? AND month = ? AND day = ? 
-    LIMIT 1
-    ''',
+      'SELECT * FROM meter_readings WHERE year = ? AND month = ? AND day = ? ORDER BY month asc, day asc LIMIT 1',
       [targetDate.year, targetDate.month, targetDate.day],
     );
     if (result.isEmpty) {
@@ -183,20 +172,22 @@ class DatabaseHelper {
     db.execute('BEGIN TRANSACTION');
     try {
       for (final reading in readings) {
-        int generated = reading.isGenerated ? 1 : 0;
+        // Convert boolean to integer for storage.
+        int isGenerated = reading.isGenerated ? 1 : 0;
+        int isSynced = reading.isSynced ? 1 : 0;
 
-        // Insert or update each reading.
+        // Perform the SQL insertion or update operation.
         db.execute(
           '''
-          INSERT INTO meter_readings (year, month, day, reading, is_generated, entered_reading, is_synced)
-          VALUES (?, ?, ?, ?, ?, ?, ?)
-          ON CONFLICT(year, month, day) DO UPDATE SET
-            reading = excluded.reading, 
-            entered_reading = excluded.entered_reading,
-            is_generated = excluded.is_generated,
-            is_synced = excluded.is_synced;
+            INSERT INTO meter_readings (year, month, day, entered_reading, reading, is_generated, is_synced)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(year, month, day) DO UPDATE SET
+              entered_reading = excluded.entered_reading,
+              reading = excluded.reading, 
+              is_generated = excluded.is_generated,
+              is_synced = excluded.is_synced;
           ''',
-          [reading.date.year, reading.date.month, reading.date.day, reading.reading, generated, reading.enteredReading, reading.isSynced],
+          [reading.date.year, reading.date.month, reading.date.day, reading.enteredReading, reading.reading, isGenerated, isSynced],
         );
       }
 
