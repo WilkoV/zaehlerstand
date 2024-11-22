@@ -19,23 +19,23 @@ void main() {
 
     group('insertMeterReading', () {
       test('should insert a new meter reading', () async {
-        final reading = MeterReading(date: DateTime(2023, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
+        final reading = MeterReading(date: DateTime(2022, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
 
         await DatabaseHelper.insertMeterReading(reading);
 
-        final readings = await DatabaseHelper.getMeterReadings();
+        final readings = await DatabaseHelper.getAllMeterReadings();
         expect(readings.length, 1);
         expect(readings.first.reading, 250);
       });
 
       test('should upsert meter readings correctly', () async {
-        final initialReading = MeterReading(date: DateTime(2023, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
-        final updatedReading = MeterReading(date: DateTime(2023, 5, 15), reading: 300, isGenerated: true, enteredReading: 300, isSynced: true);
+        final initialReading = MeterReading(date: DateTime(2022, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
+        final updatedReading = MeterReading(date: DateTime(2022, 5, 15), reading: 300, isGenerated: true, enteredReading: 300, isSynced: true);
 
         await DatabaseHelper.insertMeterReading(initialReading);
         await DatabaseHelper.insertMeterReading(updatedReading);
 
-        final readings = await DatabaseHelper.getMeterReadings();
+        final readings = await DatabaseHelper.getAllMeterReadings();
         expect(readings.length, 1);
         expect(readings.first.reading, 300);
       });
@@ -43,32 +43,32 @@ void main() {
 
     group('getMeterReadings', () {
       test('should fetch all readings', () async {
-        final reading1 = MeterReading(date: DateTime(2023, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
-        final reading2 = MeterReading(date: DateTime(2023, 6, 10), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false);
+        final reading1 = MeterReading(date: DateTime(2022, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
+        final reading2 = MeterReading(date: DateTime(2022, 6, 10), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false);
 
         await DatabaseHelper.insertMeterReading(reading1);
         await DatabaseHelper.insertMeterReading(reading2);
 
-        final readings = await DatabaseHelper.getMeterReadings();
+        final readings = await DatabaseHelper.getAllMeterReadings();
         expect(readings.length, 2);
       });
 
       test('should handle empty database gracefully', () async {
-        final readings = await DatabaseHelper.getMeterReadings();
+        final readings = await DatabaseHelper.getAllMeterReadings();
         expect(readings.isEmpty, true);
       });
     });
 
     group('getDistinctYears', () {
       test('should fetch distinct years', () async {
-        final reading1 = MeterReading(date: DateTime(2023, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
+        final reading1 = MeterReading(date: DateTime(2022, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
         final reading2 = MeterReading(date: DateTime(2024, 5, 15), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false);
 
         await DatabaseHelper.insertMeterReading(reading1);
         await DatabaseHelper.insertMeterReading(reading2);
 
         final years = await DatabaseHelper.getMeterReadingsDistinctYears();
-        expect(years, [2023, 2024]);
+        expect(years, [2022, 2024]);
       });
 
       test('should handle empty database gracefully', () async {
@@ -77,21 +77,23 @@ void main() {
       });
     });
 
-    group('getReadingForYear', () {
+    group('getReadingsForYear', () {
       test('should fetch the first reading for a specific year', () async {
-        final reading1 = MeterReading(date: DateTime(2023, 1, 1), reading: 100, isGenerated: false, enteredReading: 100, isSynced: false);
-        final reading2 = MeterReading(date: DateTime(2023, 5, 15), reading: 200, isGenerated: false, enteredReading: 200, isSynced: false);
+        final reading1 = MeterReading(date: DateTime(2022, 1, 1), reading: 100, isGenerated: false, enteredReading: 100, isSynced: false);
+        final reading2 = MeterReading(date: DateTime(2022, 5, 15), reading: 200, isGenerated: false, enteredReading: 200, isSynced: false);
+        final reading3 = MeterReading(date: DateTime(2021, 5, 15), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false);
 
         await DatabaseHelper.insertMeterReading(reading1);
         await DatabaseHelper.insertMeterReading(reading2);
+        await DatabaseHelper.insertMeterReading(reading3);
 
-        final firstReading = await DatabaseHelper.getMeterReadingForYear(2023);
-        expect(firstReading?.reading, 100);
+        final readings = await DatabaseHelper.getMeterReadingForYear(2022);
+        expect(readings.length, 2);
       });
 
       test('should return null for a year with no readings', () async {
-        final firstReading = await DatabaseHelper.getMeterReadingForYear(2023);
-        expect(firstReading, isNull);
+        final firstReading = await DatabaseHelper.getMeterReadingForYear(2020);
+        expect(firstReading, isEmpty);
       });
     });
 
@@ -114,15 +116,15 @@ void main() {
 
     group('deleteAllReadings', () {
       test('should delete all readings', () async {
-        final reading1 = MeterReading(date: DateTime(2023, 1, 1), reading: 100, isGenerated: false, enteredReading: 100, isSynced: false);
-        final reading2 = MeterReading(date: DateTime(2023, 2, 1), reading: 200, isGenerated: false, enteredReading: 200, isSynced: false);
+        final reading1 = MeterReading(date: DateTime(2022, 1, 1), reading: 100, isGenerated: false, enteredReading: 100, isSynced: false);
+        final reading2 = MeterReading(date: DateTime(2022, 2, 1), reading: 200, isGenerated: false, enteredReading: 200, isSynced: false);
 
         await DatabaseHelper.insertMeterReading(reading1);
         await DatabaseHelper.insertMeterReading(reading2);
 
         await DatabaseHelper.deleteAllMeterReadings();
 
-        final readings = await DatabaseHelper.getMeterReadings();
+        final readings = await DatabaseHelper.getAllMeterReadings();
         expect(readings.isEmpty, true);
       });
     });
@@ -130,13 +132,13 @@ void main() {
     group('bulkImport', () {
       test('should import multiple meter readings in bulk', () async {
         final readings = [
-          MeterReading(date: DateTime(2023, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false),
-          MeterReading(date: DateTime(2023, 6, 10), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false),
+          MeterReading(date: DateTime(2022, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false),
+          MeterReading(date: DateTime(2022, 6, 10), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false),
         ];
 
         await DatabaseHelper.bulkImport(readings);
 
-        final fetchedReadings = await DatabaseHelper.getMeterReadings();
+        final fetchedReadings = await DatabaseHelper.getAllMeterReadings();
         expect(fetchedReadings.length, 2);
 
         expect(fetchedReadings[0].reading, 250);
@@ -145,19 +147,19 @@ void main() {
 
       test('should handle upserts during bulk import', () async {
         final initialReadings = [
-          MeterReading(date: DateTime(2023, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false),
-          MeterReading(date: DateTime(2023, 6, 10), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false),
+          MeterReading(date: DateTime(2022, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false),
+          MeterReading(date: DateTime(2022, 6, 10), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false),
         ];
 
         final updatedReadings = [
-          MeterReading(date: DateTime(2023, 5, 15), reading: 350, isGenerated: false, enteredReading: 350, isSynced: false),
-          MeterReading(date: DateTime(2023, 6, 10), reading: 400, isGenerated: false, enteredReading: 400, isSynced: false),
+          MeterReading(date: DateTime(2022, 5, 15), reading: 350, isGenerated: false, enteredReading: 350, isSynced: false),
+          MeterReading(date: DateTime(2022, 6, 10), reading: 400, isGenerated: false, enteredReading: 400, isSynced: false),
         ];
 
         await DatabaseHelper.bulkImport(initialReadings);
         await DatabaseHelper.bulkImport(updatedReadings);
 
-        final fetchedReadings = await DatabaseHelper.getMeterReadings();
+        final fetchedReadings = await DatabaseHelper.getAllMeterReadings();
         expect(fetchedReadings.length, 2);
 
         expect(fetchedReadings[0].reading, 350);
@@ -167,7 +169,7 @@ void main() {
       test('should handle an empty list gracefully', () async {
         await DatabaseHelper.bulkImport([]);
 
-        final fetchedReadings = await DatabaseHelper.getMeterReadings();
+        final fetchedReadings = await DatabaseHelper.getAllMeterReadings();
         expect(fetchedReadings.isEmpty, true);
       });
     });
@@ -179,8 +181,8 @@ void main() {
       });
 
       test('should return the correct count after inserting readings', () async {
-        final reading1 = MeterReading(date: DateTime(2023, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
-        final reading2 = MeterReading(date: DateTime(2023, 6, 10), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false);
+        final reading1 = MeterReading(date: DateTime(2022, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
+        final reading2 = MeterReading(date: DateTime(2022, 6, 10), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false);
 
         await DatabaseHelper.insertMeterReading(reading1);
         await DatabaseHelper.insertMeterReading(reading2);
@@ -190,8 +192,8 @@ void main() {
       });
 
       test('should return the correct count after deleting all readings', () async {
-        final reading1 = MeterReading(date: DateTime(2023, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
-        final reading2 = MeterReading(date: DateTime(2023, 6, 10), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false);
+        final reading1 = MeterReading(date: DateTime(2022, 5, 15), reading: 250, isGenerated: false, enteredReading: 250, isSynced: false);
+        final reading2 = MeterReading(date: DateTime(2022, 6, 10), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false);
 
         await DatabaseHelper.insertMeterReading(reading1);
         await DatabaseHelper.insertMeterReading(reading2);

@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/screens/zaehlerstand_screen.dart';
 
-Future<void> main() async {
+void main() {
   final Logger log = Logger('Main');
 
   if (kReleaseMode) {
@@ -32,7 +32,7 @@ Future<void> main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   log.fine('Initializing DataProvider.');
-  DataProvider dataProvider = await DataProvider.create();
+  DataProvider dataProvider = DataProvider();
   log.fine('DataProvider initialized successfully.');
 
   log.fine('Starting the ZaehlerstandApp.');
@@ -58,6 +58,7 @@ class ZaehlerstandApp extends StatelessWidget {
     log.fine('Building ZaehlerstandApp.');
 
     return const MaterialApp(
+      title: 'Zählerstand',
       debugShowCheckedModeBanner: false,
       home: ZaehlerstandScreen(),
     );

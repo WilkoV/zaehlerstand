@@ -11,12 +11,7 @@ extension MeterReadingLogic on MeterReading {
     _log.fine('Converting MeterReading to a List<String>');
 
     // Convert each property of the reading into a string
-    List<String> result = [
-      formatDate(),            // Format the date as a string
-      reading.toString(),      // Convert reading value to string
-      isGenerated.toString(),  // Convert boolean to string
-      enteredReading.toString() // Convert entered reading to string
-    ];
+    List<String> result = [formatDate(), reading.toString(), isGenerated.toString(), enteredReading.toString()];
 
     _log.fine('Converted MeterReading $result');
     return result;
@@ -28,12 +23,7 @@ extension MeterReadingLogic on MeterReading {
     _log.fine('Converting MeterReading to a List<dynamic>');
 
     // Maintain types while converting properties to a list
-    List<dynamic> result = [
-      formatDate(),            // Format the date as a string
-      reading,                 // Keep as integer
-      isGenerated,             // Keep as boolean
-      enteredReading           // Keep as integer
-    ];
+    List<dynamic> result = [formatDate(), reading, isGenerated, enteredReading];
 
     _log.fine('Converted MeterReading $result');
     return result;
@@ -45,19 +35,14 @@ extension MeterReadingLogic on MeterReading {
     _log.fine('Creating MeterReading from list of Strings: $list');
 
     // Parse each element from the list to its respective type
-    DateTime date = parseDate(list[0]); // Parse date string
-    int reading = int.parse(list[1]);   // Parse reading value
-    bool isGenerated = list[2].toLowerCase() == 'true'; // Parse boolean
-    int enteredReading = int.parse(list[3]); // Parse entered reading value
+    DateTime date = parseDate(list[0]);
+    int reading = int.parse(list[1]);
+    bool isGenerated = list[2].toLowerCase() == 'true';
+    int enteredReading = int.parse(list[3]);
 
     // Create and return a new MeterReading instance
-    MeterReading meterReading = MeterReading(
-      date: date,
-      reading: reading,
-      isGenerated: isGenerated,
-      enteredReading: enteredReading,
-      isSynced: true // Default value for synchronization status
-    );
+    MeterReading meterReading = MeterReading(date: date, reading: reading, isGenerated: isGenerated, enteredReading: enteredReading, isSynced: true // Default value for synchronization status
+        );
 
     _log.fine('Created MeterReading = ${meterReading.toString()}');
     return meterReading;
