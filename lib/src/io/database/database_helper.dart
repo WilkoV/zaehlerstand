@@ -122,6 +122,22 @@ class DatabaseHelper {
     return _createMeterReadingsFromQueryResult(result);
   }
 
+  // Fetches the earliest meter reading for a given year.
+  static Future<List<MeterReading>> getUnsynchronizedMeterReadings() async {
+    final db = await database;
+    _log.fine('Fetching unsynchronized meter readings.');
+
+    // Query for the earliest reading in the specified year.
+    final result = db.select('''
+    SELECT * FROM meter_readings 
+    WHERE is_synced = 'FALSE' 
+    ORDER BY month, day 
+    ''');
+
+    // Map the database rows to `MeterReading` objects.
+    return _createMeterReadingsFromQueryResult(result);
+  }
+
   // Fetch the reading for a specific number of days before the current date
   static Future<MeterReading?> getMeterReadingDaysBefore(int daysBefore) async {
     final db = await database;

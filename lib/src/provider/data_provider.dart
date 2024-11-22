@@ -11,11 +11,19 @@ class DataProvider extends ChangeNotifier {
   /// Tracks the current status of the provider (e.g., loading, idle, syncing).
   ProviderStatus status = ProviderStatus.loading;
 
+  List<int> _dataYears = <int>[]; // TODO: Check if needed
+
   /// List of all meter readings managed by the provider.
-  List<MeterReading> _meterReadings = [];
+  List<MeterReading> _meterReadings = <MeterReading>[];
 
   /// Getter for the list of meter readings.
   List<MeterReading> get meterReadings => _meterReadings;
+
+  // Getter for the list of data years
+  List<int> get dataYears => _dataYears;
+
+  // TODO: Publish unsynchronized data from the database to Google Sheets
+  // TODO: Check if current year in Google Sheets has more records than the local database
 
   /// Initializes the provider by checking if the database has data.
   /// If the database is empty, data is fetched from Google Sheets and imported.
@@ -26,13 +34,12 @@ class DataProvider extends ChangeNotifier {
     try {
       // Check database for data and load it if necessary
       await _checkIfDbHasData();
+      await _getDataYears();
+      await _getAllMeterReadings();
     } catch (e, stackTrace) {
       _log.severe('Failed to check DB or load from Google Sheets: $e', e, stackTrace);
       return;
     }
-
-    // TODO: Check if current year in Google Sheets has more records than the local database
-    // TODO: Publish unsynchronized data from the database to Google Sheets
 
     status = ProviderStatus.idle;
     _log.fine('Initialization finished');
@@ -45,24 +52,41 @@ class DataProvider extends ChangeNotifier {
     status = ProviderStatus.loading;
 
     // Load readings from the database
-    _meterReadings = await DatabaseHelper.getAllMeterReadings();
-    _log.fine('Fetched ${_meterReadings.length} meter readings');
+    await _getAllMeterReadings();
 
     status = ProviderStatus.idle;
     notifyListeners(); // Notify listeners to update the UI
   }
 
   /// Fetches a list of distinct years for which meter readings exist.
-  Future<List<int>> getDistinctYears() async {
+  Future<void> getDataYears() async {
     _log.fine('Fetching distinct years from the database');
     status = ProviderStatus.loading;
 
     // Query the database for distinct years
-    final years = await DatabaseHelper.getMeterReadingsDistinctYears();
-    _log.fine('Fetched ${years.length} distinct years: $years');
+    await _getDataYears();
 
     status = ProviderStatus.idle;
-    return years;
+
+    notifyListeners();
+  }
+
+  /// Checks if the database has data. If not, fetches data from Google Sheets and imports it.
+  Future<void> _checkIfUnsynchronizedDataIsInTheDB() async {
+    _log.fine('Checking if database has data');
+
+    // Query the database for the number of meter readings
+    List<MeterReading> unsynchronizedReadings = await DatabaseHelper.getUnsynchronizedMeterReadings();
+    _log.fine('Database currently contains ${unsynchronizedReadings.length} entries');
+
+    if (unsynchronizedReadings.isNotEmpty) {
+      GoogleSheetsHelper googleSheetsHelper = GoogleSheetsHelper();
+
+      for (var unsynchronizedReading in unsynchronizedReadings) {
+        _log.fine('Syncing ${unsynchronizedReading.toString()}');
+        await googleSheetsHelper.insertRow(unsynchronizedReading);
+      }
+    }
   }
 
   /// Adds a new meter reading to the database and refreshes the list of readings.
@@ -71,6 +95,7 @@ class DataProvider extends ChangeNotifier {
 
     // Insert the reading into the database and refresh the readings list
     await DatabaseHelper.insertMeterReading(reading);
+    await getDataYears();
     await getAllMeterReadings();
 
     status = ProviderStatus.idle;
@@ -84,6 +109,7 @@ class DataProvider extends ChangeNotifier {
     // Delete all records and refresh the list
     await DatabaseHelper.deleteAllMeterReadings();
     await getAllMeterReadings();
+    await getDataYears();
 
     status = ProviderStatus.idle;
     _log.fine('All meter readings deleted');
@@ -111,7 +137,7 @@ class DataProvider extends ChangeNotifier {
     return numberOfReadings;
   }
 
-  /// Checks if the database has data. If not, fetches data from Google Sheets and imports it.
+  /// Check if database has data
   Future<int> _checkIfDbHasData() async {
     _log.fine('Checking if database has data');
 
@@ -126,5 +152,19 @@ class DataProvider extends ChangeNotifier {
 
     _log.fine('Database now contains $numberOfReadings entries');
     return numberOfReadings;
+  }
+
+  /// Get the years where data has been stored for
+  Future<List<int>> _getDataYears() async {
+    // Query the database for distinct years
+    _dataYears = await DatabaseHelper.getMeterReadingsDistinctYears();
+    _log.fine('Fetched ${_dataYears.length} distinct years: $_dataYears');
+    return _dataYears;
+  }
+
+  /// Get all meter readings
+  Future<void> _getAllMeterReadings() async {
+    _meterReadings = await DatabaseHelper.getAllMeterReadings();
+    _log.fine('Fetched ${_meterReadings.length} meter readings');
   }
 }

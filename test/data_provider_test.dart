@@ -60,10 +60,11 @@ void main() {
         await DatabaseHelper.insertMeterReading(meterReading2);
 
         // Act: Fetch distinct years
-        final years = await dataProvider.getDistinctYears();
+        await dataProvider.getDataYears();
+        
 
         // Assert: Verify the distinct years
-        expect(years, containsAll([2022, 2024]));
+        expect(dataProvider.dataYears, containsAll([2022, 2024]));
       });
     });
 
