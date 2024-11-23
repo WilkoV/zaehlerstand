@@ -11,16 +11,10 @@ class DataProvider extends ChangeNotifier {
   /// Tracks the current status of the provider (e.g., loading, idle, syncing).
   ProviderStatus status = ProviderStatus.loading;
 
-  List<int> _dataYears = <int>[]; // TODO: Check if needed
+  List<int> dataYears = <int>[]; // TODO: Check if needed
 
   /// List of all meter readings managed by the provider.
-  List<MeterReading> _meterReadings = <MeterReading>[];
-
-  /// Getter for the list of meter readings.
-  List<MeterReading> get meterReadings => _meterReadings;
-
-  // Getter for the list of data years
-  List<int> get dataYears => _dataYears;
+  List<MeterReading> meterReadings = <MeterReading>[];
 
   // TODO: Publish unsynchronized data from the database to Google Sheets
   // TODO: Check if current year in Google Sheets has more records than the local database
@@ -157,14 +151,14 @@ class DataProvider extends ChangeNotifier {
   /// Get the years where data has been stored for
   Future<List<int>> _getDataYears() async {
     // Query the database for distinct years
-    _dataYears = await DatabaseHelper.getMeterReadingsDistinctYears();
-    _log.fine('Fetched ${_dataYears.length} distinct years: $_dataYears');
-    return _dataYears;
+    dataYears = await DatabaseHelper.getMeterReadingsDistinctYears();
+    _log.fine('Fetched ${dataYears.length} distinct years: $dataYears');
+    return dataYears;
   }
 
   /// Get all meter readings
   Future<void> _getAllMeterReadings() async {
-    _meterReadings = await DatabaseHelper.getAllMeterReadings();
-    _log.fine('Fetched ${_meterReadings.length} meter readings');
+    meterReadings = await DatabaseHelper.getAllMeterReadings();
+    _log.fine('Fetched ${meterReadings.length} meter readings');
   }
 }

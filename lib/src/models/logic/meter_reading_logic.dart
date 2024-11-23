@@ -1,6 +1,6 @@
+import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:zaehlerstand/src/models/base/meter_reading.dart';
-import 'package:intl/intl.dart';
 
 extension MeterReadingLogic on MeterReading {
   static final Logger _log = Logger('MeterReadingLogic');
@@ -11,7 +11,7 @@ extension MeterReadingLogic on MeterReading {
     _log.fine('Converting MeterReading to a List<String>');
 
     // Convert each property of the reading into a string
-    List<String> result = [formatDate(), reading.toString(), isGenerated.toString(), enteredReading.toString()];
+    List<String> result = [getDate(), enteredReading.toString(), reading.toString(), isGenerated.toString()];
 
     _log.fine('Converted MeterReading $result');
     return result;
@@ -23,7 +23,7 @@ extension MeterReadingLogic on MeterReading {
     _log.fine('Converting MeterReading to a List<dynamic>');
 
     // Maintain types while converting properties to a list
-    List<dynamic> result = [formatDate(), reading, isGenerated, enteredReading];
+    List<dynamic> result = [getDate(), enteredReading, reading, isGenerated];
 
     _log.fine('Converted MeterReading $result');
     return result;
@@ -36,13 +36,12 @@ extension MeterReadingLogic on MeterReading {
 
     // Parse each element from the list to its respective type
     DateTime date = parseDate(list[0]);
-    int reading = int.parse(list[1]);
-    bool isGenerated = list[2].toLowerCase() == 'true';
-    int enteredReading = int.parse(list[3]);
+    int enteredReading = int.parse(list[1]);
+    int reading = int.parse(list[2]);
+    bool isGenerated = list[3].toLowerCase() == 'true';
 
     // Create and return a new MeterReading instance
-    MeterReading meterReading = MeterReading(date: date, reading: reading, isGenerated: isGenerated, enteredReading: enteredReading, isSynced: true // Default value for synchronization status
-        );
+    MeterReading meterReading = MeterReading(date: date, enteredReading: enteredReading, reading: reading, isGenerated: isGenerated, isSynced: true);
 
     _log.fine('Created MeterReading = ${meterReading.toString()}');
     return meterReading;
@@ -78,7 +77,7 @@ extension MeterReadingLogic on MeterReading {
   }
 
   /// Formats the [date] of the current [MeterReading] instance to `dd.MM.yyyy`.
-  String formatDate() {
+  String getDate() {
     _log.fine('Formatting date: ${date.toString()}');
 
     // Define date format and format the DateTime object
