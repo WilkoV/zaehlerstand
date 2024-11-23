@@ -11,7 +11,7 @@ extension MeterReadingLogic on MeterReading {
     _log.fine('Converting MeterReading to a List<String>');
 
     // Convert each property of the reading into a string
-    List<String> result = [getDate(), enteredReading.toString(), reading.toString(), isGenerated.toString()];
+    List<String> result = [getFormattedDate(), enteredReading.toString(), reading.toString(), isGenerated.toString()];
 
     _log.fine('Converted MeterReading $result');
     return result;
@@ -23,7 +23,7 @@ extension MeterReadingLogic on MeterReading {
     _log.fine('Converting MeterReading to a List<dynamic>');
 
     // Maintain types while converting properties to a list
-    List<dynamic> result = [getDate(), enteredReading, reading, isGenerated];
+    List<dynamic> result = [getFormattedDate(), enteredReading, reading, isGenerated];
 
     _log.fine('Converted MeterReading $result');
     return result;
@@ -77,7 +77,7 @@ extension MeterReadingLogic on MeterReading {
   }
 
   /// Formats the [date] of the current [MeterReading] instance to `dd.MM.yyyy`.
-  String getDate() {
+  String getFormattedDate() {
     _log.fine('Formatting date: ${date.toString()}');
 
     // Define date format and format the DateTime object

@@ -9,7 +9,7 @@ class AppTheme {
       headlineLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black),
       headlineMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.w600, color: Colors.black87),
       bodyLarge: TextStyle(fontSize: 25, color: Colors.black),
-      bodyMedium: TextStyle(fontSize: 22, color: Colors.black54),
+      bodyMedium: TextStyle(fontSize: 22, color: Colors.black87),
     ),
     inputDecorationTheme: const InputDecorationTheme(
       border: OutlineInputBorder(),
@@ -30,7 +30,7 @@ class AppTheme {
       headlineLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
       headlineMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.w600, color: Colors.white70),
       bodyLarge: TextStyle(fontSize: 25, color: Colors.white),
-      bodyMedium: TextStyle(fontSize: 22, color: Colors.white60),
+      bodyMedium: TextStyle(fontSize: 22, color: Colors.white70),
     ),
     inputDecorationTheme: const InputDecorationTheme(
       border: OutlineInputBorder(),

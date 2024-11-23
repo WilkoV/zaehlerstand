@@ -18,7 +18,7 @@ class MobileBody extends StatelessWidget {
                 body: Column(
                   children: [
                     Expanded(
-                      flex: 3,
+                      flex: 5,
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
                         child: Container(
@@ -27,7 +27,7 @@ class MobileBody extends StatelessWidget {
                       ),
                     ),
                     const Expanded(
-                      flex: 2,
+                      flex: 4,
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(12, 6, 12, 80),
                         child: DynamicYearsTab(),

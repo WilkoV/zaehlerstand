@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
+import 'package:zaehlerstand/src/widgets/data_view/meter_reading_list_widget.dart';
 
 class DynamicYearsTab extends StatelessWidget {
   const DynamicYearsTab({super.key});
@@ -30,12 +31,7 @@ class DynamicYearsTab extends StatelessWidget {
             ),
             body: TabBarView(
               children: dataProvider.dataYears.map((year) {
-                // Replace this with the actual content for the specific year
-                return Center(
-                    child: Text(
-                  'Content for year $year',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ));
+                return MeterReadingListWidget(meterReadings: dataProvider.meterReadings, year: year);
               }).toList(),
             ),
           ),
