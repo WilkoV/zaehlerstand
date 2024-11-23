@@ -7,9 +7,9 @@ part 'meter_reading.g.dart';
 class MeterReading with _$MeterReading {
   factory MeterReading({
     required DateTime date,
+    required int enteredReading,
     required int reading,
     required bool isGenerated,
-    required int enteredReading,
     required bool isSynced,
   }) = _MeterReading;
 
