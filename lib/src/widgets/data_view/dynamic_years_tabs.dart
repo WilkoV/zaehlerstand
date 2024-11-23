@@ -21,10 +21,7 @@ class DynamicYearsTab extends StatelessWidget {
                 indicatorWeight: 7.0,
                 tabs: dataProvider.dataYears.map((year) {
                   return Tab(
-                    // Use the text style from the theme
-                    child: Text(
-                      year.toString(), style: Theme.of(context).textTheme.headlineMedium, // Apply the desired text style here
-                    ),
+                    child: Text(year.toString(), style: Theme.of(context).textTheme.headlineMedium),
                   );
                 }).toList(),
               ),

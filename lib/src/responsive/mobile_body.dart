@@ -29,7 +29,7 @@ class MobileBody extends StatelessWidget {
                     const Expanded(
                       flex: 4,
                       child: Padding(
-                        padding: EdgeInsets.fromLTRB(12, 6, 12, 80),
+                        padding: EdgeInsets.fromLTRB(12, 6, 12, 6),
                         child: DynamicYearsTab(),
                       ),
                     ),

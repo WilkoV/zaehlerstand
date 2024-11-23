@@ -12,7 +12,7 @@ class MeterReadingListWidget extends StatelessWidget {
     required this.year,
   });
 
-  String calculateTagesverbrauch(MeterReading reading, int index, List<MeterReading> filteredReadings) {
+  String calculateDailyConsumption(MeterReading reading, int index, List<MeterReading> filteredReadings) {
     String difference = '';
 
     // Check if the current reading is not the last in the list
@@ -48,7 +48,7 @@ class MeterReadingListWidget extends StatelessWidget {
               itemBuilder: (context, index) {
                 final reading = filteredReadings[index];
                 // Call the helper method to get the Tagesverbrauch for the current reading
-                String difference = calculateTagesverbrauch(reading, index, filteredReadings);
+                String difference = calculateDailyConsumption(reading, index, filteredReadings);
 
                 return Card(
                   elevation: 4,
@@ -74,7 +74,12 @@ class MeterReadingListWidget extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text("Generiert: ${reading.isGenerated ? 'Ja' : 'Nein'}", style: Theme.of(context).textTheme.bodyMedium),
-                            Text("Gesichert: ${reading.isSynced ? 'Ja' : 'Nein'}", style: Theme.of(context).textTheme.bodyMedium),
+                            Text(
+                              "Gesichert: ${reading.isSynced ? 'Ja' : 'Nein'}",
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: reading.isSynced ? null : Colors.red, 
+                                  ),
+                            ),
                           ],
                         ),
                       ],
