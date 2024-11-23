@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:provider/provider.dart';
+import 'package:zaehlerstand/src/provider/theme_provider.dart';
 import 'package:zaehlerstand/src/responsive/mobile_body.dart';
 import 'package:zaehlerstand/src/responsive/responsive_layout.dart';
 import 'package:zaehlerstand/src/responsive/tablet_body.dart';
@@ -22,8 +24,28 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Zählerstand', style: TextStyle(fontSize: 30)),
+        title: Text('Zählerstand', style: Theme.of(context).textTheme.headlineLarge),
         centerTitle: true,
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            const DrawerHeader(
+              child: Text('Settings'),
+            ),
+            Consumer<ThemeProvider>(
+              builder: (context, themeProvider, child) {
+                return SwitchListTile(
+                  title: const Text('Dark Mode'),
+                  value: themeProvider.isDarkMode,
+                  onChanged: (value) {
+                    themeProvider.toggleTheme();
+                  },
+                );
+              },
+            ),
+          ],
+        ),
       ),
       body: const ResponsiveLayout(
         mobileBody: MobileBody(),

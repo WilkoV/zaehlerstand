@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
+import 'package:zaehlerstand/src/app/zaehlerstand_app.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
-import 'package:zaehlerstand/src/screens/zaehlerstand_screen.dart';
+import 'package:zaehlerstand/src/provider/theme_provider.dart';
 
-void main() {
+Future<void> main() async {
   final Logger log = Logger('Main');
+  final DataProvider dataProvider = DataProvider();
+  final ThemeProvider themeProvider = ThemeProvider();
 
   if (kReleaseMode) {
     // In release mode, set log level to WARNING
@@ -32,35 +35,21 @@ void main() {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   log.fine('Initializing DataProvider.');
-  DataProvider dataProvider = DataProvider();
+  await dataProvider.initialize();
   log.fine('DataProvider initialized successfully.');
+
+  log.fine('Initializing ThemeProvider.');
+  await themeProvider.loadTheme();
+  log.fine('ThemeProvider initialized successfully.');
 
   log.fine('Starting the ZaehlerstandApp.');
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) {
-          log.fine('Providing DataProvider to the app.');
-          return dataProvider;
-        }),
+        ChangeNotifierProvider(create: (_) => themeProvider),
+        ChangeNotifierProvider(create: (_) => DataProvider()..initialize()),
       ],
       child: const ZaehlerstandApp(),
     ),
   );
-}
-
-class ZaehlerstandApp extends StatelessWidget {
-  const ZaehlerstandApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final Logger log = Logger('ZaehlerstandApp');
-    log.fine('Building ZaehlerstandApp.');
-
-    return const MaterialApp(
-      title: 'Zählerstand',
-      debugShowCheckedModeBanner: false,
-      home: ZaehlerstandScreen(),
-    );
-  }
 }

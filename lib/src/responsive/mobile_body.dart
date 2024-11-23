@@ -2,25 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/constants/provider_status.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
+import 'package:zaehlerstand/src/widgets/data_view/dynamic_years_tabs.dart';
 
-class MobileBody extends StatefulWidget {
+class MobileBody extends StatelessWidget {
   const MobileBody({super.key});
-
-  @override
-  State<MobileBody> createState() => _MobileBodyState();
-}
-
-class _MobileBodyState extends State<MobileBody> {
-  @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) async {
-        await Provider.of<DataProvider>(context, listen: false).initialize();
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,13 +26,11 @@ class _MobileBodyState extends State<MobileBody> {
                         ),
                       ),
                     ),
-                    Expanded(
+                    const Expanded(
                       flex: 2,
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 6, 12, 80),
-                        child: Container(
-                          color: Colors.deepPurple[400],
-                        ),
+                        padding: EdgeInsets.fromLTRB(12, 6, 12, 80),
+                        child: DynamicYearsTab(),
                       ),
                     ),
                   ],
