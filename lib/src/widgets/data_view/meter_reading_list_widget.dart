@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zaehlerstand/src/models/base/meter_reading.dart';
 import 'package:zaehlerstand/src/widgets/data_view/meter_reading_card.dart';
+import 'package:zaehlerstand/src/widgets/text/text_body_large.dart';
 
 class MeterReadingListWidget extends StatelessWidget {
   final List<MeterReading> meterReadings;
@@ -41,7 +42,7 @@ class MeterReadingListWidget extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         body: filteredReadings.isEmpty
-            ? Center(child: Text("Keine Daten gefunden", style: Theme.of(context).textTheme.bodyLarge))
+            ? const Center(child: TextBodyLarge("Keine Daten gefunden"))
             : ListView.builder(
                 itemCount: filteredReadings.length,
                 itemBuilder: (context, index) {
