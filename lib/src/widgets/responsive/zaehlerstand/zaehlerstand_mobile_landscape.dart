@@ -24,7 +24,7 @@ class ZaehlerstandMobileLandscape extends StatelessWidget {
                   body: Row(
                     children: [
                       Expanded(
-                        flex: 5,
+                        flex: 3,
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(0, 0, 0, 6),
                           child: Container(
@@ -33,7 +33,7 @@ class ZaehlerstandMobileLandscape extends StatelessWidget {
                         ),
                       ),
                       const Expanded(
-                        flex: 4,
+                        flex: 2,
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(0, 0, 0, 6),
                           child: DynamicYearsTab(),
