@@ -85,7 +85,7 @@ class DatabaseHelper {
     _log.fine('Fetching all meter readings.');
 
     // Query all rows from the table and sort by date.
-    final result = db.select('SELECT * FROM meter_readings ORDER BY year desc, month asc, day asc');
+    final result = db.select('SELECT * FROM meter_readings ORDER BY year DESC, month DESC, day DESC');
     _log.fine('Fetched ${result.length} meter readings.');
 
     // Map the database rows to `MeterReading` objects.
@@ -98,7 +98,7 @@ class DatabaseHelper {
     _log.fine('Fetching distinct years of meter readings.');
 
     // Query for distinct years and return them as a list.
-    final result = db.select('SELECT DISTINCT year FROM meter_readings ORDER BY year desc');
+    final result = db.select('SELECT DISTINCT year FROM meter_readings ORDER BY year DESC');
     _log.fine('Fetched ${result.length} distinct years.');
 
     return result.map((row) => row['year'] as int).toList();
@@ -111,7 +111,7 @@ class DatabaseHelper {
 
     // Query for the earliest reading in the specified year.
     final result = db.select(
-      'SELECT * FROM meter_readings WHERE year = ?  ORDER BY month asc, day asc',
+      'SELECT * FROM meter_readings WHERE year = ?  ORDER BY month DESC, day DESC',
       [year],
     );
 
@@ -125,7 +125,7 @@ class DatabaseHelper {
     _log.fine('Fetching unsynchronized meter readings.');
 
     // Query for the earliest reading in the specified year.
-    final result = db.select('SELECT * FROM meter_readings WHERE is_synced = 0 ORDER BY month asc, day asc');
+    final result = db.select('SELECT * FROM meter_readings WHERE is_synced = 0 ORDER BY month DESC, day DESC');
 
     // Map the database rows to `MeterReading` objects.
     return _createMeterReadingsFromQueryResult(result);
@@ -141,7 +141,7 @@ class DatabaseHelper {
 
     // Query for the earliest reading in the calculated day.
     final result = db.select(
-      'SELECT * FROM meter_readings WHERE year = ? AND month = ? AND day = ? ORDER BY month asc, day asc LIMIT 1',
+      'SELECT * FROM meter_readings WHERE year = ? AND month = ? AND day = ? ORDER BY month DESC, day DESC LIMIT 1',
       [targetDate.year, targetDate.month, targetDate.day],
     );
     if (result.isEmpty) {

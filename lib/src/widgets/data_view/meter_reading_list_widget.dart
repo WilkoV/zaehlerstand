@@ -38,7 +38,7 @@ class MeterReadingListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Filter the meter readings by the provided year and reverse the list
-    List<MeterReading> filteredReadings = meterReadings.where((reading) => reading.date.year == year).toList().reversed.toList(); // Reverse the list here
+    List<MeterReading> filteredReadings = meterReadings.where((reading) => reading.date.year == year).toList(); 
 
     return Scaffold(
       body: filteredReadings.isEmpty

@@ -141,8 +141,8 @@ void main() {
         final fetchedReadings = await DatabaseHelper.getAllMeterReadings();
         expect(fetchedReadings.length, 2);
 
-        expect(fetchedReadings[0].reading, 250);
-        expect(fetchedReadings[1].reading, 300);
+        expect(fetchedReadings[0].reading, 300);
+        expect(fetchedReadings[1].reading, 250);
       });
 
       test('should handle upserts during bulk import', () async {
@@ -162,8 +162,8 @@ void main() {
         final fetchedReadings = await DatabaseHelper.getAllMeterReadings();
         expect(fetchedReadings.length, 2);
 
-        expect(fetchedReadings[0].reading, 350);
-        expect(fetchedReadings[1].reading, 400);
+        expect(fetchedReadings[0].reading, 400);
+        expect(fetchedReadings[1].reading, 350);
       });
 
       test('should handle an empty list gracefully', () async {
