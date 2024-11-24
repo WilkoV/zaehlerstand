@@ -3,9 +3,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/theme_provider.dart';
 import 'package:zaehlerstand/src/widgets/responsive/zaehlerstand/zaehlerstand_responsive_layout.dart';
-import 'package:zaehlerstand/src/widgets/text/test_heading_large.dart';
-import 'package:zaehlerstand/src/widgets/text/test_heading_medium.dart';
-import 'package:zaehlerstand/src/widgets/text/text_body_medium.dart';
 
 class ZaehlerstandScreen extends StatefulWidget {
   const ZaehlerstandScreen({super.key});
@@ -27,19 +24,19 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
-            title: const TextHeadingLarge('Zählerstand'),
+            title: Text('Zählerstand', style: Theme.of(context).textTheme.headlineLarge),
             centerTitle: true,
           ),
           drawer: Drawer(
             child: ListView(
               children: [
-                const DrawerHeader(
-                  child: TextHeadingMedium('Settings'),
+                DrawerHeader(
+                  child: Text('Settings', style: Theme.of(context).textTheme.headlineMedium),
                 ),
                 Consumer<ThemeProvider>(
                   builder: (context, themeProvider, child) {
                     return SwitchListTile(
-                      title: const TextBodyMedium('Dark Mode'),
+                      title: Text('Dark Mode', style: Theme.of(context).textTheme.bodyMedium),
                       value: themeProvider.isDarkMode,
                       onChanged: (value) {
                         themeProvider.toggleTheme();
@@ -50,7 +47,7 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
               ],
             ),
           ),
-          body: ZaehlerstandResponsiveLayout(),
+          body: const ZaehlerstandResponsiveLayout(),
         ),
       ),
     );

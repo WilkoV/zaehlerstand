@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zaehlerstand/src/models/base/meter_reading.dart';
 import 'package:zaehlerstand/src/models/logic/meter_reading_logic.dart';
-import 'package:zaehlerstand/src/widgets/text/text_body_large.dart';
-import 'package:zaehlerstand/src/widgets/text/text_body_medium.dart';
-import 'package:zaehlerstand/src/widgets/text/text_body_medium_red.dart';
 
 class MeterReadingCard extends StatelessWidget {
   const MeterReadingCard({
@@ -26,22 +23,24 @@ class MeterReadingCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TextBodyLarge("Tagesverbrauch: $dailyConsumption"),
-                TextBodyLarge("Datum: ${reading.getFormattedDate()}"),
+                Text("Tagesverbrauch: $dailyConsumption", style: Theme.of(context).textTheme.bodyLarge),
+                Text("Datum: ${reading.getFormattedDate()}", style: Theme.of(context).textTheme.bodyLarge),
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TextBodyMedium("Zählerstand: ${reading.reading}"),
-                TextBodyMedium("Eingegeben: ${reading.enteredReading}"),
+                Text("Zählerstand: ${reading.reading}", style: Theme.of(context).textTheme.bodyMedium),
+                Text("Eingegeben: ${reading.enteredReading}", style: Theme.of(context).textTheme.bodyMedium),
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TextBodyMedium("Generiert: ${reading.isGenerated ? 'Ja' : 'Nein'}"),
-                reading.isSynced ? TextBodyMedium("Gesichert: ${reading.isSynced ? 'Ja' : 'Nein'}") : TextBodyMediumRed("Gesichert: ${reading.isSynced ? 'Ja' : 'Nein'}"),
+                Text("Generiert: ${reading.isGenerated ? 'Ja' : 'Nein'}", style: Theme.of(context).textTheme.bodyMedium),
+                reading.isSynced
+                    ? Text("Gesichert: ${reading.isSynced ? 'Ja' : 'Nein'}", style: Theme.of(context).textTheme.bodyMedium)
+                    : Text("Gesichert: ${reading.isSynced ? 'Ja' : 'Nein'}", style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red)),
               ],
             ),
           ],

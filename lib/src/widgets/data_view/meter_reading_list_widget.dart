@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zaehlerstand/src/models/base/meter_reading.dart';
 import 'package:zaehlerstand/src/widgets/responsive/meter_reading/meter_reading_responsive_layout.dart';
-import 'package:zaehlerstand/src/widgets/text/text_body_large.dart';
 
 class MeterReadingListWidget extends StatelessWidget {
   final List<MeterReading> meterReadings;
@@ -37,19 +36,19 @@ class MeterReadingListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Filter the meter readings by the provided year and reverse the list
-    List<MeterReading> filteredReadings = meterReadings.where((reading) => reading.date.year == year).toList(); 
+    List<MeterReading> filteredReadings = meterReadings.where((reading) => reading.date.year == year).toList();
 
     return SafeArea(
       child: Scaffold(
         body: filteredReadings.isEmpty
-            ? const Center(child: TextBodyLarge("Keine Daten gefunden"))
+            ? Center(child: Text("Keine Daten gefunden", style: Theme.of(context).textTheme.bodyLarge))
             : ListView.builder(
                 itemCount: filteredReadings.length,
                 itemBuilder: (context, index) {
                   final reading = filteredReadings[index];
                   // Call the helper method to get the Tagesverbrauch for the current reading
                   int dailyConsumption = calculateDailyConsumption(reading, index, filteredReadings);
-      
+
                   return MeterReadingCardResponsiveLayout(dailyConsumption: dailyConsumption, meterReading: reading);
                 },
               ),

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zaehlerstand/src/models/base/meter_reading.dart';
 import 'package:zaehlerstand/src/models/logic/meter_reading_logic.dart';
-import 'package:zaehlerstand/src/widgets/text/text_body_large.dart';
-import 'package:zaehlerstand/src/widgets/text/text_body_medium.dart';
-import 'package:zaehlerstand/src/widgets/text/text_body_medium_red.dart';
 
 class MeterReadingCardMobile extends StatelessWidget {
   const MeterReadingCardMobile({
@@ -23,12 +20,12 @@ class MeterReadingCardMobile extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextBodyLarge("Datum: ${meterReading.getFormattedDate()}"),
-            TextBodyLarge("Tagesverbrauch: $dailyConsumption"),
-            TextBodyMedium("Zählerstand: ${meterReading.reading}"),
-            TextBodyMedium("Eingegeben: ${meterReading.enteredReading}"),
-            TextBodyMedium("Generiert: ${meterReading.isGenerated ? 'Ja' : 'Nein'}"),
-            meterReading.isSynced ? const TextBodyMedium("Gesichert: Ja") : const TextBodyMediumRed("Gesichert: Nein"),
+            Text("Datum: ${meterReading.getFormattedDate()}", style: Theme.of(context).textTheme.bodyLarge),
+            Text("Tagesverbrauch: $dailyConsumption", style: Theme.of(context).textTheme.bodyLarge),
+            Text("Zählerstand: ${meterReading.reading}", style: Theme.of(context).textTheme.bodyMedium),
+            Text("Eingegeben: ${meterReading.enteredReading}", style: Theme.of(context).textTheme.bodyMedium),
+            Text("Generiert: ${meterReading.isGenerated ? 'Ja' : 'Nein'}", style: Theme.of(context).textTheme.bodyMedium),
+            meterReading.isSynced ? Text("Gesichert: Ja", style: Theme.of(context).textTheme.bodyMedium) : Text("Gesichert: Nein", style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red)),
           ],
         ),
       ),
