@@ -1,43 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/constants/provider_status.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/data_view/dynamic_years_tabs.dart';
 
-class TabletBody extends StatelessWidget {
-  const TabletBody({super.key});
+class ZaehlerstandTabletLandscape extends StatelessWidget {
+  ZaehlerstandTabletLandscape({super.key});
+
+  final Logger _log = Logger('TabletLandscape');
 
   @override
   Widget build(BuildContext context) {
+    _log.fine('Building tablet landscape mode'); 
+
     return Consumer<DataProvider>(
       builder: (_, notifier, __) {
         return notifier.status.isLoading
             ? const Center(child: CircularProgressIndicator())
             : SafeArea(
-              child: Scaffold(
-                  backgroundColor: Colors.lightBlue[300],
+                child: Scaffold(
+                  backgroundColor: Colors.green[300],
                   body: Row(
                     children: [
                       Expanded(
-                        flex: 6,
+                        flex: 5,
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 12, 6, 12),
+                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 6),
                           child: Container(
-                            color: Colors.blue[400],
+                            color: Colors.green[600],
                           ),
                         ),
                       ),
                       const Expanded(
-                        flex: 5,
+                        flex: 4,
                         child: Padding(
-                          padding: EdgeInsets.fromLTRB(6, 12, 12, 12),
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, 6),
                           child: DynamicYearsTab(),
                         ),
                       ),
                     ],
                   ),
                 ),
-            );
+              );
       },
     );
   }

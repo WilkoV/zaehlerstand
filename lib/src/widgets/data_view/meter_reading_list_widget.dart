@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zaehlerstand/src/models/base/meter_reading.dart';
+import 'package:zaehlerstand/src/widgets/responsive/meter_reading/meter_reading_responsive_layout.dart';
 import 'package:zaehlerstand/src/widgets/data_view/meter_reading_card.dart';
 import 'package:zaehlerstand/src/widgets/text/text_body_large.dart';
 
@@ -50,7 +51,7 @@ class MeterReadingListWidget extends StatelessWidget {
                   // Call the helper method to get the Tagesverbrauch for the current reading
                   int dailyConsumption = calculateDailyConsumption(reading, index, filteredReadings);
       
-                  return MeterReadingCard(dailyConsumption: dailyConsumption, reading: reading);
+                  return MeterReadingCardResponsiveLayout(dailyConsumption: dailyConsumption, meterReading: reading);
                 },
               ),
       ),

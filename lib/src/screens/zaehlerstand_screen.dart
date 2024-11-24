@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/theme_provider.dart';
-import 'package:zaehlerstand/src/responsive/mobile_body.dart';
-import 'package:zaehlerstand/src/responsive/responsive_layout.dart';
-import 'package:zaehlerstand/src/responsive/tablet_body.dart';
+import 'package:zaehlerstand/src/widgets/responsive/zaehlerstand/zaehlerstand_responsive_layout.dart';
 import 'package:zaehlerstand/src/widgets/text/test_heading_large.dart';
 import 'package:zaehlerstand/src/widgets/text/test_heading_medium.dart';
 import 'package:zaehlerstand/src/widgets/text/text_body_medium.dart';
@@ -52,10 +50,7 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
               ],
             ),
           ),
-          body: const ResponsiveLayout(
-            mobileBody: MobileBody(),
-            tabletBody: TabletBody(),
-          ),
+          body: ZaehlerstandResponsiveLayout(),
         ),
       ),
     );
