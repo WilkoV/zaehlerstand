@@ -12,6 +12,7 @@ class ZaehlerstandApp extends StatelessWidget {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return MaterialApp(
+          
           title: 'Zählerstand',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,

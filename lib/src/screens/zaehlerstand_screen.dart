@@ -22,34 +22,38 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Zählerstand', style: Theme.of(context).textTheme.headlineLarge),
-        centerTitle: true,
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: [
-            const DrawerHeader(
-              child: Text('Settings'),
-            ),
-            Consumer<ThemeProvider>(
-              builder: (context, themeProvider, child) {
-                return SwitchListTile(
-                  title: const Text('Dark Mode'),
-                  value: themeProvider.isDarkMode,
-                  onChanged: (value) {
-                    themeProvider.toggleTheme();
+    return SafeArea(
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Zählerstand', style: Theme.of(context).textTheme.headlineLarge),
+            centerTitle: true,
+          ),
+          drawer: Drawer(
+            child: ListView(
+              children: [
+                const DrawerHeader(
+                  child: Text('Settings'),
+                ),
+                Consumer<ThemeProvider>(
+                  builder: (context, themeProvider, child) {
+                    return SwitchListTile(
+                      title: const Text('Dark Mode'),
+                      value: themeProvider.isDarkMode,
+                      onChanged: (value) {
+                        themeProvider.toggleTheme();
+                      },
+                    );
                   },
-                );
-              },
+                ),
+              ],
             ),
-          ],
+          ),
+          body: const ResponsiveLayout(
+            mobileBody: MobileBody(),
+            tabletBody: TabletBody(),
+          ),
         ),
-      ),
-      body: const ResponsiveLayout(
-        mobileBody: MobileBody(),
-        tabletBody: TabletBody(),
       ),
     );
   }

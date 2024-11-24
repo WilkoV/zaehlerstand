@@ -13,29 +13,31 @@ class TabletBody extends StatelessWidget {
       builder: (_, notifier, __) {
         return notifier.status.isLoading
             ? const Center(child: CircularProgressIndicator())
-            : Scaffold(
-                backgroundColor: Colors.lightBlue[300],
-                body: Row(
-                  children: [
-                    Expanded(
-                      flex: 6,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 12, 6, 12),
-                        child: Container(
-                          color: Colors.blue[400],
+            : SafeArea(
+              child: Scaffold(
+                  backgroundColor: Colors.lightBlue[300],
+                  body: Row(
+                    children: [
+                      Expanded(
+                        flex: 6,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 12, 6, 12),
+                          child: Container(
+                            color: Colors.blue[400],
+                          ),
                         ),
                       ),
-                    ),
-                    const Expanded(
-                      flex: 5,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(6, 12, 12, 12),
-                        child: DynamicYearsTab(),
+                      const Expanded(
+                        flex: 5,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(6, 12, 12, 12),
+                          child: DynamicYearsTab(),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              );
+            );
       },
     );
   }
