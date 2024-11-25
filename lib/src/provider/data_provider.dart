@@ -3,6 +3,7 @@ import 'package:logging/logging.dart';
 import 'package:zaehlerstand/src/constants/provider_status.dart';
 import 'package:zaehlerstand/src/io/database/database_helper.dart';
 import 'package:zaehlerstand/src/io/googlesheets/google_sheets_helper.dart';
+import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
 import 'package:zaehlerstand/src/models/base/meter_reading.dart';
 
 class DataProvider extends ChangeNotifier {
@@ -11,10 +12,17 @@ class DataProvider extends ChangeNotifier {
   /// Tracks the current status of the provider (e.g., loading, idle, syncing).
   ProviderStatus status = ProviderStatus.loading;
 
-  List<int> dataYears = <int>[]; // TODO: Check if needed
-
   /// List of all meter readings managed by the provider.
   List<MeterReading> meterReadings = <MeterReading>[];
+
+  // All meter readings grouped by year
+  Map<int, List<MeterReading>> groupedMeterReadings = {};
+
+  /// All dailyConsumptions based on meterReadings grouped by year
+  Map<int, List<DailyConsumption>> groupedDailyConsumptions = {};
+
+  /// List of all years that have data in meterReadings
+  List<int> dataYears = <int>[];
 
   // TODO: Publish unsynchronized data from the database to Google Sheets
   // TODO: Check if current year in Google Sheets has more records than the local database
@@ -28,8 +36,18 @@ class DataProvider extends ChangeNotifier {
     try {
       // Check database for data and load it if necessary
       await _checkIfDbHasData();
+
+      // Get all data years from DB
       await _getDataYears();
+
+      // Get all meter readings from DB
       await _getAllMeterReadings();
+
+      // Group meter readings by year
+      _groupMeterReadingsByYear();
+
+      // Calculate the daily consumptions for all meter readings and group them by year
+      _calculateDailyConsumptionAndGroupByYear();
     } catch (e, stackTrace) {
       _log.severe('Failed to check DB or load from Google Sheets: $e', e, stackTrace);
       return;
@@ -47,6 +65,11 @@ class DataProvider extends ChangeNotifier {
 
     // Load readings from the database
     await _getAllMeterReadings();
+    await _getDataYears();
+    
+    // Update calculated data
+    _calculateDailyConsumptionAndGroupByYear();
+    _calculateDailyConsumptionAndGroupByYear();
 
     status = ProviderStatus.idle;
     notifyListeners(); // Notify listeners to update the UI
@@ -160,5 +183,56 @@ class DataProvider extends ChangeNotifier {
   Future<void> _getAllMeterReadings() async {
     meterReadings = await DatabaseHelper.getAllMeterReadings();
     _log.fine('Fetched ${meterReadings.length} meter readings');
+  }
+
+  /// Calculate the daily consumption
+  void _calculateDailyConsumptionAndGroupByYear() {
+    // Clear the map to ensure no duplicate data
+    groupedDailyConsumptions.clear();
+
+    // Iterate through the list of meterReadings
+    for (int i = 0; i < meterReadings.length; i++) {
+      MeterReading currentReading = meterReadings[i];
+
+      // Determine the year of the current reading
+      int year = currentReading.date.year;
+
+      // For the last entry, consumption is 0
+      int consumption = 0;
+      if (i < meterReadings.length - 1) {
+        MeterReading nextReading = meterReadings[i + 1];
+        consumption = currentReading.reading - nextReading.reading;
+      }
+
+      // Create a DailyConsumption object
+      DailyConsumption dailyConsumption = DailyConsumption(
+        date: currentReading.date,
+        value: consumption,
+      );
+
+      // Add the consumption to the corresponding year in the map
+      if (!groupedDailyConsumptions.containsKey(year)) {
+        groupedDailyConsumptions[year] = [];
+      }
+      groupedDailyConsumptions[year]!.add(dailyConsumption);
+    }
+  }
+
+  void _groupMeterReadingsByYear() {
+    // Remove all entries
+    groupedMeterReadings.clear();
+
+    // Iterate through the meterReadings list
+    for (var reading in meterReadings) {
+      int year = reading.date.year; // Extract the year from the date
+
+      // If the year is not yet a key in the map, initialize an empty list for it
+      if (!groupedMeterReadings.containsKey(year)) {
+        groupedMeterReadings[year] = [];
+      }
+
+      // Add the current reading to the corresponding year's list
+      groupedMeterReadings[year]!.add(reading);
+    }
   }
 }

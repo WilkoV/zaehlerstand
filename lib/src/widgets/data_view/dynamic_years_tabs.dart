@@ -29,7 +29,7 @@ class DynamicYearsTab extends StatelessWidget {
               ),
               body: TabBarView(
                 children: dataProvider.dataYears.map((year) {
-                  return MeterReadingListWidget(meterReadings: dataProvider.meterReadings, year: year);
+                  return MeterReadingListWidget(year: year);
                 }).toList(),
               ),
             ),

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
 import 'package:zaehlerstand/src/models/base/meter_reading.dart';
 import 'package:zaehlerstand/src/models/logic/meter_reading_logic.dart';
 
 class MeterReadingCardMobile extends StatelessWidget {
+  final MeterReading meterReading;
+  final DailyConsumption dailyConsumption;
+
   const MeterReadingCardMobile({
     super.key,
     required this.dailyConsumption,
     required this.meterReading,
   });
-
-  final int dailyConsumption;
-  final MeterReading meterReading;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +22,7 @@ class MeterReadingCardMobile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text("Datum: ${meterReading.getFormattedDate()}", style: Theme.of(context).textTheme.bodyLarge),
-            Text("Tagesverbrauch: $dailyConsumption", style: Theme.of(context).textTheme.bodyLarge),
+            Text("Tagesverbrauch: ${dailyConsumption.value}", style: Theme.of(context).textTheme.bodyLarge),
             Text("Zählerstand: ${meterReading.reading}", style: Theme.of(context).textTheme.bodyMedium),
             Text("Eingegeben: ${meterReading.enteredReading}", style: Theme.of(context).textTheme.bodyMedium),
             Text("Generiert: ${meterReading.isGenerated ? 'Ja' : 'Nein'}", style: Theme.of(context).textTheme.bodyMedium),
