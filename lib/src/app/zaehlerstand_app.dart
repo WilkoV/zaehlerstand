@@ -12,14 +12,16 @@ class ZaehlerstandApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
-        return ResponsiveApp(
-          builder: (context) => MaterialApp(
-            title: 'Zählerstand',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.getResponsiveTheme(context),
-            darkTheme: AppTheme.getResponsiveTheme(context, isDarkMode: true),
-            themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-            home: const ZaehlerstandScreen(),
+        return SafeArea(
+          child: ResponsiveApp(
+            builder: (context) => MaterialApp(
+              title: 'Zählerstand',
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.getResponsiveTheme(context),
+              darkTheme: AppTheme.getResponsiveTheme(context, isDarkMode: true),
+              themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+              home: const ZaehlerstandScreen(),
+            ),
           ),
         );
       },

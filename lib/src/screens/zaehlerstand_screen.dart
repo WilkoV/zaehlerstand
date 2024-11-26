@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
-import 'package:zaehlerstand/src/provider/theme_provider.dart';
+import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/responsive/zaehlerstand/zaehlerstand_responsive_layout.dart';
+import 'package:zaehlerstand/src/widgets/zaehlerstand/show_meter_reading_dialog.dart';
+import 'package:zaehlerstand/src/widgets/zaehlerstand/zaehlerstand_drawer.dart';
 
 class ZaehlerstandScreen extends StatefulWidget {
   const ZaehlerstandScreen({super.key});
@@ -12,6 +15,9 @@ class ZaehlerstandScreen extends StatefulWidget {
 }
 
 class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
+  late TextEditingController zaehlerstandController;
+  final Logger _log = Logger('_ZaehlerstandScreenState');
+
   @override
   void initState() {
     super.initState();
@@ -19,37 +25,50 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
   }
 
   @override
+  void dispose() {
+    // Dispose of the controller to avoid memory leaks.
+    zaehlerstandController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: SafeArea(
-        child: Scaffold(
+    return Consumer<DataProvider>(
+      builder: (context, dataProvider, child) {
+        return Scaffold(
           appBar: AppBar(
             title: Text('Zählerstand', style: Theme.of(context).textTheme.headlineLarge),
             centerTitle: true,
           ),
-          drawer: Drawer(
-            child: ListView(
-              children: [
-                DrawerHeader(
-                  child: Text('Settings', style: Theme.of(context).textTheme.headlineMedium),
-                ),
-                Consumer<ThemeProvider>(
-                  builder: (context, themeProvider, child) {
-                    return SwitchListTile(
-                      title: Text('Dark Mode', style: Theme.of(context).textTheme.bodyMedium),
-                      value: themeProvider.isDarkMode,
-                      onChanged: (value) {
-                        themeProvider.toggleTheme();
-                      },
-                    );
-                  },
-                ),
-              ],
-            ),
+          drawer: const ZaehlerstandDrawer(),
+          body: const Padding(
+            padding: EdgeInsets.only(bottom: 16), // Adjust if needed
+            child: ZaehlerstandResponsiveLayout(),
           ),
-          body: const ZaehlerstandResponsiveLayout(),
-        ),
-      ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () async {
+              // Show the dialog when the FAB is pressed.
+              final result = await showDialog<String>(
+                context: context,
+                builder: (context) => MeterReadingDialog(
+                  minimalReadingValue: _getMinimumValue(dataProvider),
+                  zaehlerstandController: TextEditingController(text: _getFirstTwoDigitsFromNewestMeterReading(dataProvider)),
+                ),
+              );
+
+              // Handle the result from the dialog.
+              if (result != null) {
+                dataProvider.addMeterReading(int.parse(result));
+                _log.fine(result);
+              }
+            },
+            child: const Icon(Icons.add),
+          ),
+        );
+      },
     );
   }
+
+  String _getFirstTwoDigitsFromNewestMeterReading(DataProvider dataProvider) => dataProvider.meterReadings.isNotEmpty ? dataProvider.meterReadings.first.reading.toString().substring(0, 2) : '';
+  int _getMinimumValue(DataProvider dataProvider) => dataProvider.meterReadings.isNotEmpty ? dataProvider.meterReadings.first.reading : 0;
 }

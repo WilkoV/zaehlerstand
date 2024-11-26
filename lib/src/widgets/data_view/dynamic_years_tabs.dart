@@ -12,26 +12,24 @@ class DynamicYearsTab extends StatelessWidget {
       builder: (context, dataProvider, child) {
         return DefaultTabController(
           length: dataProvider.dataYears.length,
-          child: SafeArea(
-            child: Scaffold(
-              appBar: AppBar(
-                toolbarHeight: 6,
-                bottom: TabBar(
-                  isScrollable: true,
-                  indicatorColor: Theme.of(context).indicatorColor,
-                  indicatorWeight: 7.0,
-                  tabs: dataProvider.dataYears.map((year) {
-                    return Tab(
-                      child: Text(year.toString(), style: Theme.of(context).textTheme.headlineMedium),
-                    );
-                  }).toList(),
-                ),
-              ),
-              body: TabBarView(
-                children: dataProvider.dataYears.map((year) {
-                  return MeterReadingListWidget(year: year);
+          child: Scaffold(
+            appBar: AppBar(
+              toolbarHeight: 6,
+              bottom: TabBar(
+                isScrollable: true,
+                indicatorColor: Theme.of(context).indicatorColor,
+                indicatorWeight: 7.0,
+                tabs: dataProvider.dataYears.map((year) {
+                  return Tab(
+                    child: Text(year.toString(), style: Theme.of(context).textTheme.headlineMedium),
+                  );
                 }).toList(),
               ),
+            ),
+            body: TabBarView(
+              children: dataProvider.dataYears.map((year) {
+                return MeterReadingListWidget(year: year);
+              }).toList(),
             ),
           ),
         );

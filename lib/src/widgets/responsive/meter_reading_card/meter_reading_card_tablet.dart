@@ -38,10 +38,10 @@ class MeterReadingCardTablet extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Generiert: ${meterReading.isGenerated ? 'Ja' : 'Nein'}", style: Theme.of(context).textTheme.bodyMedium),
                 meterReading.isSynced
                     ? Text("Gesichert: ${meterReading.isSynced ? 'Ja' : 'Nein'}", style: Theme.of(context).textTheme.bodyMedium)
                     : Text("Gesichert: ${meterReading.isSynced ? 'Ja' : 'Nein'}", style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red)),
+                Text("Generiert: ${meterReading.isGenerated ? 'Ja' : 'Nein'}", style: Theme.of(context).textTheme.bodyMedium),
               ],
             ),
           ],

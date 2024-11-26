@@ -9,7 +9,7 @@ void main() {
     late DataProvider dataProvider;
 
     setUp(() async {
-// Setup an in-memory database for testing
+      // Setup an in-memory database for testing
       final db = sqlite3.openInMemory();
 
       // Reinitialize the DatabaseHelper to use the test database
@@ -71,11 +71,8 @@ void main() {
     // Test: Add new meter reading and refresh meter readings
     group('addMeterReading', () {
       test('Add new meter reading and refresh meter readings', () async {
-        // Arrange: Create a meter reading to add
-        final meterReading = MeterReading(date: DateTime(2022, 7, 5), reading: 220, isGenerated: false, enteredReading: 220, isSynced: false);
-
         // Act: Add the reading and refresh the list
-        await dataProvider.addMeterReading(meterReading);
+        await dataProvider.addMeterReading(220);
 
         // Assert: Ensure the meter readings list contains the newly added reading
         expect(dataProvider.meterReadings, isNotEmpty);

@@ -18,31 +18,29 @@ class ZaehlerstandTabletLandscape extends StatelessWidget {
       builder: (_, notifier, __) {
         return notifier.status.isLoading
             ? const Center(child: CircularProgressIndicator())
-            : SafeArea(
-                child: Scaffold(
-                  backgroundColor: Colors.green[300],
-                  body: Row(
-                    children: [
-                      Expanded(
-                        flex: 5,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 6),
-                          child: Container(
-                            color: Colors.green[600],
-                          ),
-                        ),
+            : Scaffold(
+              backgroundColor: Colors.green[300],
+              body: Row(
+                children: [
+                  Expanded(
+                    flex: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 6),
+                      child: Container(
+                        color: Colors.green[600],
                       ),
-                      const Expanded(
-                        flex: 4,
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(0, 0, 0, 6),
-                          child: DynamicYearsTab(),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              );
+                  const Expanded(
+                    flex: 4,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 6),
+                      child: DynamicYearsTab(),
+                    ),
+                  ),
+                ],
+              ),
+            );
       },
     );
   }

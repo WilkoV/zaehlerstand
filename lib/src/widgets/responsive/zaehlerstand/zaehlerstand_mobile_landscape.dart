@@ -18,31 +18,29 @@ class ZaehlerstandMobileLandscape extends StatelessWidget {
       builder: (_, notifier, __) {
         return notifier.status.isLoading
             ? const Center(child: CircularProgressIndicator())
-            : SafeArea(
-                child: Scaffold(
-                  backgroundColor: Colors.brown[300],
-                  body: Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 0, 6),
-                          child: Container(
-                            color: Colors.brown[600],
-                          ),
-                        ),
+            : Scaffold(
+              backgroundColor: Colors.brown[300],
+              body: Row(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 6),
+                      child: Container(
+                        color: Colors.brown[600],
                       ),
-                      const Expanded(
-                        flex: 2,
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(0, 0, 0, 6),
-                          child: DynamicYearsTab(),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              );
+                  const Expanded(
+                    flex: 2,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 6),
+                      child: DynamicYearsTab(),
+                    ),
+                  ),
+                ],
+              ),
+            );
       },
     );
   }

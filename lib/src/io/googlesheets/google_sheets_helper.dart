@@ -12,10 +12,10 @@ class GoogleSheetsHelper {
 
   /// Inserts a new row in the Google Sheet corresponding to the year of the provided [MeterReading].
   /// Returns `true` if the insertion was successful, `false` otherwise.
-  Future<bool> insertRow(MeterReading reading) async {
+  Future<bool> insertRow(MeterReading reading, int credentialId) async {
     try {
       // Fetch the spreadsheet and the specific worksheet by title (year)
-      final Spreadsheet spreadsheet = await _getSheet();
+      final Spreadsheet spreadsheet = await _getSheet(credentialId: credentialId);
       final Worksheet? worksheet = await _getWorksheetByTitle(spreadsheet, _getWorksheetTitle(reading));
 
       // Ensure the worksheet exists
@@ -84,9 +84,6 @@ class GoogleSheetsHelper {
           List<List<String>> tmp = await _fetchWorksheet(worksheet);
           result.addAll(tmp);
         }
-
-        // Add a small delay to prevent rate-limiting issues
-        await Future.delayed(const Duration(seconds: 2));
       }
 
       // Remove invalid or empty rows
@@ -103,10 +100,10 @@ class GoogleSheetsHelper {
   }
 
   /// Fetches the spreadsheet using the provided credentials and spreadsheet ID.
-  Future<Spreadsheet> _getSheet() async {
+  Future<Spreadsheet> _getSheet({int credentialId = 0}) async {
     try {
       _log.fine('Fetching spreadsheet');
-      final GSheets gsheets = GSheets(gsc.credentials);
+      final GSheets gsheets = GSheets(gsc.credentials[credentialId]);
       return await gsheets.spreadsheet(gsc.spreadsheetId);
     } catch (e, stackTrace) {
       _log.severe('Failed to get spreadsheet: $e', e, stackTrace);

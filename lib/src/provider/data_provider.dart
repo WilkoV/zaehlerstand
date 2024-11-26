@@ -65,10 +65,16 @@ class DataProvider extends ChangeNotifier {
 
     // Load readings from the database
     await _getAllMeterReadings();
+    // Get all data years from DB
     await _getDataYears();
-    
-    // Update calculated data
-    _calculateDailyConsumptionAndGroupByYear();
+
+    // Get all meter readings from DB
+    await _getAllMeterReadings();
+
+    // Group meter readings by year
+    _groupMeterReadingsByYear();
+
+    // Calculate the daily consumptions for all meter readings and group them by year
     _calculateDailyConsumptionAndGroupByYear();
 
     status = ProviderStatus.idle;
@@ -88,34 +94,103 @@ class DataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Checks if the database has data. If not, fetches data from Google Sheets and imports it.
-  Future<void> _checkIfUnsynchronizedDataIsInTheDB() async {
-    _log.fine('Checking if database has data');
+  /// Adds a new meter reading to the database and refreshes the list of readings.
+  Future<int> addMeterReading(int enteredReading) async {
+    int numberOfRecordsAdded = 0;
+    DateTime currentDate = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 12);
 
-    // Query the database for the number of meter readings
-    List<MeterReading> unsynchronizedReadings = await DatabaseHelper.getUnsynchronizedMeterReadings();
-    _log.fine('Database currently contains ${unsynchronizedReadings.length} entries');
+    // Find the most recent meter reading before the current date, or create a default one if none exist
+    _log.fine('Fetching the previous meter reading before $currentDate.');
+    MeterReading previousMeterReading = meterReadings.isNotEmpty
+        ? meterReadings.firstWhere(
+            (reading) => reading.date.isBefore(currentDate),
+            orElse: () => meterReadings.first,
+          )
+        : MeterReading.fromInput(enteredReading);
 
-    if (unsynchronizedReadings.isNotEmpty) {
-      GoogleSheetsHelper googleSheetsHelper = GoogleSheetsHelper();
+    int daysBetweenReadings = currentDate.difference(previousMeterReading.date).inDays;
+    _log.fine('Days between readings: $daysBetweenReadings.');
 
-      for (var unsynchronizedReading in unsynchronizedReadings) {
-        _log.fine('Syncing ${unsynchronizedReading.toString()}');
-        await googleSheetsHelper.insertRow(unsynchronizedReading);
+    int credentialId = 2; // Used to manage Google Sheets credentials
+
+    List<MeterReading> newMeterReadings = <MeterReading>[];
+
+    // Check if we need to generate readings for intermediate days
+    if (daysBetweenReadings > 1) {
+      _log.fine('Generating intermediate meter readings for missing days.');
+      int totalConsumption = enteredReading - previousMeterReading.reading;
+      int averageConsumption = (totalConsumption ~/ daysBetweenReadings);
+
+      _log.fine('Total consumption: $totalConsumption, Average consumption: $averageConsumption.');
+
+      for (var i = 0; i < daysBetweenReadings - 1; i++) {
+        int previousReading = previousMeterReading.reading;
+        int calculatedReading = previousReading + averageConsumption;
+        DateTime targetDate = previousMeterReading.date.add(const Duration(days: 1));
+        MeterReading calculatedMeterReading = MeterReading.fromGenerateData(targetDate, calculatedReading);
+
+        _log.fine('Generated intermediate reading: ${calculatedMeterReading.toString()}');
+        newMeterReadings.add(calculatedMeterReading);
+
+        previousMeterReading = calculatedMeterReading; // Update for the next iteration
       }
     }
-  }
 
-  /// Adds a new meter reading to the database and refreshes the list of readings.
-  Future<void> addMeterReading(MeterReading reading) async {
-    _log.fine('Adding new meter reading: $reading');
+    // Add the entered reading to the list
+    MeterReading meterReadingFromInput = MeterReading.fromInput(enteredReading);
+    _log.fine('Adding user-entered reading: ${meterReadingFromInput.toString()}.');
+    newMeterReadings.add(meterReadingFromInput);
 
-    // Insert the reading into the database and refresh the readings list
-    await DatabaseHelper.insertMeterReading(reading);
-    await getDataYears();
-    await getAllMeterReadings();
+    // Insert all new meter readings into the database
+    for (var currentReading in newMeterReadings) {
+      await DatabaseHelper.insertMeterReading(currentReading);
+      _log.fine('Inserted reading into the database: ${currentReading.toString()}.');
+    }
 
-    status = ProviderStatus.idle;
+    // Refresh data views after inserting readings
+    _log.fine('Refreshing data views.');
+    await _getDataYears();
+    await _getAllMeterReadings();
+    _groupMeterReadingsByYear();
+    _calculateDailyConsumptionAndGroupByYear();
+    notifyListeners();
+
+    // Sync the readings with Google Sheets
+    for (var currentReading in newMeterReadings) {
+      if (numberOfRecordsAdded > 0 && numberOfRecordsAdded % 4 == 0) {
+        credentialId++;
+        await Future.delayed(const Duration(seconds: 1)); // Avoid hitting Google Sheets API limits
+        _log.fine('Switched Google Sheets credential ID to: $credentialId.');
+      }
+
+      if (credentialId > 4) {
+        credentialId = 1; // Reset credential ID if it exceeds the limit
+      }
+
+      GoogleSheetsHelper googleSheetsHelper = GoogleSheetsHelper();
+      bool isSynced = await googleSheetsHelper.insertRow(currentReading, credentialId - 1);
+
+      if (isSynced) {
+        _log.fine('Successfully synced reading with Google Sheets: ${currentReading.toString()}.');
+        await DatabaseHelper.insertMeterReading(currentReading.copyWith(isSynced: true));
+        _log.fine('Updated reading as synced in the database: ${currentReading.toString()}.');
+      } else {
+        _log.warning('Failed to sync reading with Google Sheets: ${currentReading.toString()}.');
+      }
+
+      numberOfRecordsAdded++;
+    }
+
+    // Refresh data views again after syncing
+    _log.fine('Refreshing data views after syncing.');
+    await _getDataYears();
+    await _getAllMeterReadings();
+    _groupMeterReadingsByYear();
+    _calculateDailyConsumptionAndGroupByYear();
+    notifyListeners();
+
+    _log.fine('Completed adding meter readings. Total records added: $numberOfRecordsAdded.');
+    return numberOfRecordsAdded;
   }
 
   /// Deletes all meter readings from the database and refreshes the list.
@@ -125,8 +200,15 @@ class DataProvider extends ChangeNotifier {
 
     // Delete all records and refresh the list
     await DatabaseHelper.deleteAllMeterReadings();
-    await getAllMeterReadings();
-    await getDataYears();
+
+    // Get all data years from DB
+    await _getDataYears();
+
+    // Get all meter readings from DB
+    await _getAllMeterReadings();
+
+    // Group meter readings by year
+    _groupMeterReadingsByYear();
 
     status = ProviderStatus.idle;
     _log.fine('All meter readings deleted');
@@ -233,6 +315,24 @@ class DataProvider extends ChangeNotifier {
 
       // Add the current reading to the corresponding year's list
       groupedMeterReadings[year]!.add(reading);
+    }
+  }
+
+  /// Checks if the database has data. If not, fetches data from Google Sheets and imports it.
+  Future<void> _checkIfUnsynchronizedDataIsInTheDB(int credentialsId) async {
+    _log.fine('Checking if database has data');
+
+    // Query the database for the number of meter readings
+    List<MeterReading> unsynchronizedReadings = await DatabaseHelper.getUnsynchronizedMeterReadings();
+    _log.fine('Database currently contains ${unsynchronizedReadings.length} entries');
+
+    if (unsynchronizedReadings.isNotEmpty) {
+      GoogleSheetsHelper googleSheetsHelper = GoogleSheetsHelper();
+
+      for (var unsynchronizedReading in unsynchronizedReadings) {
+        _log.fine('Syncing ${unsynchronizedReading.toString()}');
+        await googleSheetsHelper.insertRow(unsynchronizedReading, credentialsId);
+      }
     }
   }
 }
