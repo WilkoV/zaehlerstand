@@ -7,15 +7,28 @@ import 'package:zaehlerstand/src/models/logic/meter_reading_logic.dart';
 class GoogleSheetsHelper {
   final Logger _log = Logger('GoogleSheetsHelper');
 
+  int numberOfInserts = 0;
+  int credentialId = 2;
+
   // TODO: Implement logic to get the total count of rows in all worksheets
   // TODO: Implement logic to get the last entry by date across all worksheets
 
   /// Inserts a new row in the Google Sheet corresponding to the year of the provided [MeterReading].
   /// Returns `true` if the insertion was successful, `false` otherwise.
-  Future<bool> insertRow(MeterReading reading, int credentialId) async {
+  Future<bool> insertRow(MeterReading reading) async {
+    if (numberOfInserts > 0 && numberOfInserts % gsc.credentials.length == 0) {
+      credentialId++;
+      await Future.delayed(const Duration(seconds: 2)); // Avoid hitting Google Sheets API limits
+      _log.fine('Switched Google Sheets credential ID to: $credentialId.');
+    }
+
+    if (credentialId > 4) {
+      credentialId = 1; // Reset credential ID if it exceeds the limit
+    }
+
     try {
       // Fetch the spreadsheet and the specific worksheet by title (year)
-      final Spreadsheet spreadsheet = await _getSheet(credentialId: credentialId);
+      final Spreadsheet spreadsheet = await _getSheet(credentialId: credentialId -1);
       final Worksheet? worksheet = await _getWorksheetByTitle(spreadsheet, _getWorksheetTitle(reading));
 
       // Ensure the worksheet exists

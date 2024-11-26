@@ -111,8 +111,6 @@ class DataProvider extends ChangeNotifier {
     int daysBetweenReadings = currentDate.difference(previousMeterReading.date).inDays;
     _log.fine('Days between readings: $daysBetweenReadings.');
 
-    int credentialId = 2; // Used to manage Google Sheets credentials
-
     List<MeterReading> newMeterReadings = <MeterReading>[];
 
     // Check if we need to generate readings for intermediate days
@@ -156,19 +154,10 @@ class DataProvider extends ChangeNotifier {
     notifyListeners();
 
     // Sync the readings with Google Sheets
+    GoogleSheetsHelper googleSheetsHelper = GoogleSheetsHelper();
+
     for (var currentReading in newMeterReadings) {
-      if (numberOfRecordsAdded > 0 && numberOfRecordsAdded % 4 == 0) {
-        credentialId++;
-        await Future.delayed(const Duration(seconds: 1)); // Avoid hitting Google Sheets API limits
-        _log.fine('Switched Google Sheets credential ID to: $credentialId.');
-      }
-
-      if (credentialId > 4) {
-        credentialId = 1; // Reset credential ID if it exceeds the limit
-      }
-
-      GoogleSheetsHelper googleSheetsHelper = GoogleSheetsHelper();
-      bool isSynced = await googleSheetsHelper.insertRow(currentReading, credentialId - 1);
+      bool isSynced = await googleSheetsHelper.insertRow(currentReading);
 
       if (isSynced) {
         _log.fine('Successfully synced reading with Google Sheets: ${currentReading.toString()}.');
@@ -315,24 +304,6 @@ class DataProvider extends ChangeNotifier {
 
       // Add the current reading to the corresponding year's list
       groupedMeterReadings[year]!.add(reading);
-    }
-  }
-
-  /// Checks if the database has data. If not, fetches data from Google Sheets and imports it.
-  Future<void> _checkIfUnsynchronizedDataIsInTheDB(int credentialsId) async {
-    _log.fine('Checking if database has data');
-
-    // Query the database for the number of meter readings
-    List<MeterReading> unsynchronizedReadings = await DatabaseHelper.getUnsynchronizedMeterReadings();
-    _log.fine('Database currently contains ${unsynchronizedReadings.length} entries');
-
-    if (unsynchronizedReadings.isNotEmpty) {
-      GoogleSheetsHelper googleSheetsHelper = GoogleSheetsHelper();
-
-      for (var unsynchronizedReading in unsynchronizedReadings) {
-        _log.fine('Syncing ${unsynchronizedReading.toString()}');
-        await googleSheetsHelper.insertRow(unsynchronizedReading, credentialsId);
-      }
     }
   }
 }
