@@ -164,7 +164,7 @@ class DatabaseHelper {
   }
 
   // Bulk imports multiple meter readings, ensuring atomicity with transactions.
-  static Future<void> bulkImport(List<MeterReading> readings) async {
+  static Future<void> bulkInsert(List<MeterReading> readings) async {
     final db = await database;
     _log.fine('Bulk importing ${readings.length} meter readings.');
 

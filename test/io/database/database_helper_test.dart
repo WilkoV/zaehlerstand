@@ -136,7 +136,7 @@ void main() {
           MeterReading(date: DateTime(2022, 6, 10), reading: 300, isGenerated: false, enteredReading: 300, isSynced: false),
         ];
 
-        await DatabaseHelper.bulkImport(readings);
+        await DatabaseHelper.bulkInsert(readings);
 
         final fetchedReadings = await DatabaseHelper.getAllMeterReadings();
         expect(fetchedReadings.length, 2);
@@ -156,8 +156,8 @@ void main() {
           MeterReading(date: DateTime(2022, 6, 10), reading: 400, isGenerated: false, enteredReading: 400, isSynced: false),
         ];
 
-        await DatabaseHelper.bulkImport(initialReadings);
-        await DatabaseHelper.bulkImport(updatedReadings);
+        await DatabaseHelper.bulkInsert(initialReadings);
+        await DatabaseHelper.bulkInsert(updatedReadings);
 
         final fetchedReadings = await DatabaseHelper.getAllMeterReadings();
         expect(fetchedReadings.length, 2);
@@ -167,7 +167,7 @@ void main() {
       });
 
       test('should handle an empty list gracefully', () async {
-        await DatabaseHelper.bulkImport([]);
+        await DatabaseHelper.bulkInsert([]);
 
         final fetchedReadings = await DatabaseHelper.getAllMeterReadings();
         expect(fetchedReadings.isEmpty, true);
