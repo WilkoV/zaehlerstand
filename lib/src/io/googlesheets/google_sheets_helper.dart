@@ -8,7 +8,7 @@ class GoogleSheetsHelper {
   final Logger _log = Logger('GoogleSheetsHelper');
 
   int numberOfInserts = 0;
-  int credentialId = 2;
+  int credentialId = 1;
 
   // TODO: Implement logic to get the total count of rows in all worksheets
   // TODO: Implement logic to get the last entry by date across all worksheets
@@ -16,19 +16,9 @@ class GoogleSheetsHelper {
   /// Inserts a new row in the Google Sheet corresponding to the year of the provided [MeterReading].
   /// Returns `true` if the insertion was successful, `false` otherwise.
   Future<bool> insertRow(MeterReading reading) async {
-    if (numberOfInserts > 0 && numberOfInserts % gsc.credentials.length == 0) {
-      credentialId++;
-      await Future.delayed(const Duration(seconds: 2)); // Avoid hitting Google Sheets API limits
-      _log.fine('Switched Google Sheets credential ID to: $credentialId.');
-    }
-
-    if (credentialId > 4) {
-      credentialId = 1; // Reset credential ID if it exceeds the limit
-    }
-
     try {
       // Fetch the spreadsheet and the specific worksheet by title (year)
-      final Spreadsheet spreadsheet = await _getSheet(credentialId: credentialId -1);
+      final Spreadsheet spreadsheet = await _getSheet(credentialId: 0);
       final Worksheet? worksheet = await _getWorksheetByTitle(spreadsheet, _getWorksheetTitle(reading));
 
       // Ensure the worksheet exists
@@ -44,6 +34,82 @@ class GoogleSheetsHelper {
       _log.severe('Failed to insert row: $e', e, stackTrace);
       return false;
     }
+  }
+
+  Future<List<MeterReading>> insertRows({required List<MeterReading> readings, bool isRetry = false}) async {
+    late Spreadsheet spreadsheet;
+    late Worksheet? worksheet;
+
+    numberOfInserts = 0;
+
+    List<MeterReading> synchronizedMeterReadings = <MeterReading>[];
+    List<MeterReading> unsynchronizedMeterReadings = <MeterReading>[];
+
+    bool switched = false;
+    bool failed = false;
+
+    // Fetch the spreadsheet and the specific worksheet by title (year)
+
+    for (MeterReading reading in readings) {
+      if (numberOfInserts == 0) {
+        switched = true;
+      } else if (failed) {
+        switched = await _updateCredentialId(forceSwitch: true);
+      } else {
+        switched = await _updateCredentialId();
+      }
+
+      _log.fine('switch is set to $switched');
+
+      if (switched) {
+        try {
+          _log.fine('Getting spreadsheet with credentialId $credentialId');
+          spreadsheet = await _getSheet(credentialId: credentialId - 1);
+
+          _log.fine('Getting worksheet');
+          worksheet = await _getWorksheetByTitle(spreadsheet, _getWorksheetTitle(reading));
+        } catch (e, stackTrace) {
+          _log.severe('Failed to get sheets: $e', e, stackTrace);
+          return synchronizedMeterReadings;
+        }
+      }
+
+      // Ensure the worksheet exists
+      if (worksheet != null) {
+        _log.fine('Sheets loaded');
+      } else {
+        _log.warning('Worksheet is null, cannot insert row.');
+        return synchronizedMeterReadings;
+      }
+
+      // Insert the row data at the specific row index (day of the year)
+      try {
+        final bool ok = await worksheet.values.insertRow(reading.getDayOfYear(), reading.toDynamicList());
+
+        if (ok) {
+          synchronizedMeterReadings.add(reading.copyWith(isSynced: true));
+        } else {
+          unsynchronizedMeterReadings.add(reading);
+        }
+
+        numberOfInserts++;
+      } catch (e, stackTrace) {
+        _log.severe('Failed to insert row: $e', e, stackTrace);
+        unsynchronizedMeterReadings.add(reading);
+        failed = true;
+      }
+    }
+
+    if (unsynchronizedMeterReadings.isNotEmpty && unsynchronizedMeterReadings.length < readings.length) {
+      _log.fine('Retrying ${unsynchronizedMeterReadings.length} meter readings}');
+      synchronizedMeterReadings.addAll(await insertRows(readings: unsynchronizedMeterReadings));
+    }
+
+    _log.fine('${synchronizedMeterReadings.length} written to google sheets');
+
+    numberOfInserts = 0;
+
+    return synchronizedMeterReadings;
   }
 
   /// Fetches all rows for the given [year] from the corresponding worksheet.
@@ -186,4 +252,24 @@ class GoogleSheetsHelper {
 
   /// Returns the title of the worksheet corresponding to the year of the given [MeterReading].
   String _getWorksheetTitle(MeterReading reading) => reading.date.year.toString();
+
+  Future<bool> _updateCredentialId({bool forceSwitch = false}) async {
+    bool switched = false;
+    bool isTimeToSwitch = (numberOfInserts % gsc.switchInterval) == 0;
+
+    if (isTimeToSwitch || forceSwitch) {
+      _log.fine('Switching credentials because switch limit');
+      credentialId++;
+      switched = true;
+      await Future.delayed(const Duration(seconds: gsc.insertDelay)); 
+    } 
+
+    if (credentialId > gsc.credentials.length) {
+      credentialId = 1; 
+    }
+
+    _log.fine('Switched Google Sheets credential ID to: $credentialId.');
+
+    return switched;
+  }
 }

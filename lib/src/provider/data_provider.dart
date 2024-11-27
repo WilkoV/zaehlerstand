@@ -227,25 +227,14 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<int> _syncToGoogleSheets(List<MeterReading> unsynchronizedMeterReadings) async {
-    int numberOfRecordsAdded = 0;
     GoogleSheetsHelper googleSheetsHelper = GoogleSheetsHelper();
 
-    for (var currentReading in unsynchronizedMeterReadings) {
-      bool isSynced = await googleSheetsHelper.insertRow(currentReading);
+    List<MeterReading> synchronizedMeterReadings = await googleSheetsHelper.insertRows(readings: unsynchronizedMeterReadings);
 
-      if (isSynced) {
-        _log.fine('Successfully synced reading with Google Sheets: ${currentReading.toString()}.');
-        await DatabaseHelper.insertMeterReading(currentReading.copyWith(isSynced: true));
-        _log.fine('Updated reading as synced in the database: ${currentReading.toString()}.');
-      } else {
-        _log.warning('Failed to sync reading with Google Sheets: ${currentReading.toString()}.');
-      }
+    await DatabaseHelper.bulkInsert(synchronizedMeterReadings);
 
-      numberOfRecordsAdded++;
-    }
-
-    _log.fine('Completed adding meter readings. Total records added: $numberOfRecordsAdded.');
-    return numberOfRecordsAdded;
+    _log.fine('Completed adding meter readings. Total records added: ${synchronizedMeterReadings.length}.');
+    return synchronizedMeterReadings.length;
   }
 
   List<MeterReading> _createMeterReadingsForIntermediateDays(int enteredReading) {
