@@ -39,6 +39,9 @@ class DataProvider extends ChangeNotifier {
       await _checkForUnsynchronizedDbRecords();
 
       await _refreshLists();
+
+      status = ProviderStatus.idle;
+
       notifyListeners();
     } catch (e, stackTrace) {
       _log.severe('Failed to check DB or load from Google Sheets: $e', e, stackTrace);

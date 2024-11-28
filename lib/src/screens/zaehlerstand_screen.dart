@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
+import 'package:zaehlerstand/src/constants/provider_status.dart';
+import 'package:zaehlerstand/src/models/base/meter_reading.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/responsive/zaehlerstand/zaehlerstand_responsive_layout.dart';
 import 'package:zaehlerstand/src/widgets/zaehlerstand/show_meter_reading_dialog.dart';
@@ -33,42 +35,75 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<DataProvider>(
-      builder: (context, dataProvider, child) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('Zählerstand', style: Theme.of(context).textTheme.headlineLarge),
-            centerTitle: true,
-          ),
-          drawer: const ZaehlerstandDrawer(),
-          body: const Padding(
-            padding: EdgeInsets.only(bottom: 16), // Adjust if needed
-            child: ZaehlerstandResponsiveLayout(),
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () async {
-              // Show the dialog when the FAB is pressed.
-              final result = await showDialog<String>(
-                context: context,
-                builder: (context) => MeterReadingDialog(
-                  minimalReadingValue: _getMinimumValue(dataProvider),
-                  zaehlerstandController: TextEditingController(text: _getFirstTwoDigitsFromNewestMeterReading(dataProvider)),
-                ),
-              );
+    return FutureBuilder(
+      future: Provider.of<DataProvider>(context, listen: false).initialize(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-              // Handle the result from the dialog.
-              if (result != null) {
-                dataProvider.addMeterReading(int.parse(result));
-                _log.fine(result);
-              }
-            },
-            child: const Icon(Icons.add),
-          ),
+        if (snapshot.hasError) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Error')),
+            body: Center(child: Text('Error: ${snapshot.error}')),
+          );
+        }
+
+        return Consumer<DataProvider>(
+          builder: (context, dataProvider, child) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text('Zählerstand', style: Theme.of(context).textTheme.headlineLarge),
+                centerTitle: true,
+              ),
+              drawer: const ZaehlerstandDrawer(),
+              body: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: dataProvider.status.isLoading ? const Center(child: CircularProgressIndicator()) : const ZaehlerstandResponsiveLayout(),
+              ),
+              floatingActionButton: FloatingActionButton(
+                onPressed: () async {
+                  final result = await showDialog<String>(
+                    context: context,
+                    builder: (context) => MeterReadingDialog(
+                      minimalReadingValue: _getMinimumValue(dataProvider),
+                      zaehlerstandController: TextEditingController(
+                        text: _getFirstTwoDigitsFromNewestMeterReading(dataProvider),
+                      ),
+                    ),
+                  );
+
+                  if (result != null) {
+                    dataProvider.addMeterReading(int.parse(result));
+                    _log.fine(result);
+                  }
+                },
+                child: const Icon(Icons.add),
+              ),
+            );
+          },
         );
       },
     );
   }
 
-  String _getFirstTwoDigitsFromNewestMeterReading(DataProvider dataProvider) => dataProvider.meterReadings.isNotEmpty ? dataProvider.meterReadings.first.reading.toString().substring(0, 2) : '';
+  String _getFirstTwoDigitsFromNewestMeterReading(DataProvider dataProvider) {
+    if (dataProvider.meterReadings.isEmpty) {
+      return '';
+    }
+
+    MeterReading reading = dataProvider.meterReadings.first;
+    var readingAsString = reading.reading.toString();
+    int currentLength = readingAsString.length;
+
+    if (currentLength < 3) {
+      return '';
+    }
+
+    int targetPosition = currentLength - 3;
+
+    return dataProvider.meterReadings.isNotEmpty ? readingAsString.substring(0, targetPosition) : '';
+  }
+
   int _getMinimumValue(DataProvider dataProvider) => dataProvider.meterReadings.isNotEmpty ? dataProvider.meterReadings.first.reading : 0;
 }

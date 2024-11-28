@@ -125,7 +125,7 @@ class DatabaseHelper {
     _log.fine('Fetching unsynchronized meter readings.');
 
     // Query for the earliest reading in the specified year.
-    final result = db.select('SELECT * FROM meter_readings WHERE is_synced = 0 ORDER BY month DESC, day DESC');
+    final result = db.select('SELECT * FROM meter_readings WHERE is_synced = 0 ORDER BY year DESC, month DESC, day DESC');
 
     // Map the database rows to `MeterReading` objects.
     return _createMeterReadingsFromQueryResult(result);
