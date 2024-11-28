@@ -9,7 +9,6 @@ import 'package:zaehlerstand/src/provider/theme_provider.dart';
 
 Future<void> main() async {
   final Logger log = Logger('Main');
-  final DataProvider dataProvider = DataProvider();
   final ThemeProvider themeProvider = ThemeProvider();
 
   if (kReleaseMode) {
@@ -27,18 +26,10 @@ Future<void> main() async {
     print('[${record.loggerName}] ${record.level.name}: ${record.time}: ${record.message}');
   });
 
-  log.fine('Ensuring widgets are initialized.');
-  WidgetsFlutterBinding.ensureInitialized();
-
   log.fine('Preserving native splash screen.');
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  log.fine('Initializing DataProvider.');
-  await dataProvider.initialize();
-  log.fine('DataProvider initialized successfully.');
-
-  log.fine('Initializing ThemeProvider.');
   await themeProvider.loadTheme();
   log.fine('ThemeProvider initialized successfully.');
 
@@ -47,7 +38,7 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => themeProvider),
-        ChangeNotifierProvider(create: (_) => DataProvider()..initialize()),
+        ChangeNotifierProvider(create: (_) => DataProvider()),
       ],
       child: const ZaehlerstandApp(),
     ),
