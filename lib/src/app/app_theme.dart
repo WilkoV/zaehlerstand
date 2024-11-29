@@ -83,7 +83,7 @@ class AppTheme {
       primary: Colors.blueGrey,
       secondary: Colors.teal,
     ),
-    indicatorColor: Colors.blue[300],
+    indicatorColor: Colors.blue[400],
   );
 
   // Function to get the appropriate theme based on screen size

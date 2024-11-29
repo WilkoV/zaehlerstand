@@ -3,6 +3,7 @@ import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/data_view/dynamic_years_tabs.dart';
+import 'package:zaehlerstand/src/widgets/progress_bars/add_meter_reading_progress_bar.dart';
 
 class ZaehlerstandTabletPortrait extends StatelessWidget {
   ZaehlerstandTabletPortrait({super.key});
@@ -16,7 +17,6 @@ class ZaehlerstandTabletPortrait extends StatelessWidget {
     return Consumer<DataProvider>(
       builder: (_, notifier, __) {
         return Scaffold(
-          backgroundColor: Colors.purple[300],
           body: Column(
             children: [
               Expanded(
@@ -35,6 +35,7 @@ class ZaehlerstandTabletPortrait extends StatelessWidget {
                   child: DynamicYearsTab(),
                 ),
               ),
+              const AddMeterReadingProgressBar(),
             ],
           ),
         );

@@ -2,12 +2,12 @@ import 'package:gsheets/gsheets.dart';
 import 'package:logging/logging.dart';
 import 'package:zaehlerstand/src/constants/google_sheets_credentials.dart' as gsc;
 import 'package:zaehlerstand/src/models/base/meter_reading.dart';
+import 'package:zaehlerstand/src/models/base/progress_update.dart';
 import 'package:zaehlerstand/src/models/logic/meter_reading_logic.dart';
 
 class GoogleSheetsHelper {
   final Logger _log = Logger('GoogleSheetsHelper');
 
-  int numberOfInserts = 0;
   int credentialId = 1;
 
   // TODO: Implement logic to get the total count of rows in all worksheets
@@ -36,17 +36,19 @@ class GoogleSheetsHelper {
     }
   }
 
-  Future<List<MeterReading>> insertRows({required List<MeterReading> readings, bool isRetry = false}) async {
+  Future<List<MeterReading>> insertRows(List<MeterReading> readings, Function(ProgressUpdate) onProgress) async {
     late Spreadsheet spreadsheet;
     late Worksheet? worksheet;
 
-    numberOfInserts = 0;
-
     List<MeterReading> synchronizedMeterReadings = <MeterReading>[];
-    List<MeterReading> unsynchronizedMeterReadings = <MeterReading>[];
 
     bool switched = false;
     bool failed = false;
+
+    final total = readings.length;
+    int recordIndex = 1;
+
+    int numberOfInserts = 0;
 
     // Fetch the spreadsheet and the specific worksheet by title (year)
 
@@ -54,12 +56,10 @@ class GoogleSheetsHelper {
       if (numberOfInserts == 0) {
         switched = true;
       } else if (failed) {
-        switched = await _updateCredentialId(forceSwitch: true);
+        switched = await _updateCredentialId(numberOfInserts: numberOfInserts, forceSwitch: true);
       } else {
-        switched = await _updateCredentialId();
+        switched = await _updateCredentialId(numberOfInserts: numberOfInserts);
       }
-
-      _log.fine('switch is set to $switched');
 
       if (switched) {
         try {
@@ -88,26 +88,19 @@ class GoogleSheetsHelper {
 
         if (ok) {
           synchronizedMeterReadings.add(reading.copyWith(isSynced: true));
-        } else {
-          unsynchronizedMeterReadings.add(reading);
         }
 
         numberOfInserts++;
       } catch (e, stackTrace) {
         _log.severe('Failed to insert row: $e', e, stackTrace);
-        unsynchronizedMeterReadings.add(reading);
         failed = true;
       }
-    }
 
-    if (unsynchronizedMeterReadings.isNotEmpty && unsynchronizedMeterReadings.length < readings.length) {
-      _log.fine('Retrying ${unsynchronizedMeterReadings.length} meter readings}');
-      synchronizedMeterReadings.addAll(await insertRows(readings: unsynchronizedMeterReadings));
+      onProgress(ProgressUpdate(current: recordIndex, total: total));
+      recordIndex++;
     }
 
     _log.fine('${synchronizedMeterReadings.length} written to google sheets');
-
-    numberOfInserts = 0;
 
     return synchronizedMeterReadings;
   }
@@ -253,7 +246,7 @@ class GoogleSheetsHelper {
   /// Returns the title of the worksheet corresponding to the year of the given [MeterReading].
   String _getWorksheetTitle(MeterReading reading) => reading.date.year.toString();
 
-  Future<bool> _updateCredentialId({bool forceSwitch = false}) async {
+  Future<bool> _updateCredentialId({required int numberOfInserts, bool forceSwitch = false}) async {
     bool switched = false;
     bool isTimeToSwitch = (numberOfInserts % gsc.switchInterval) == 0;
 
@@ -261,11 +254,11 @@ class GoogleSheetsHelper {
       _log.fine('Switching credentials because switch limit');
       credentialId++;
       switched = true;
-      await Future.delayed(const Duration(seconds: gsc.insertDelay)); 
-    } 
+      await Future.delayed(const Duration(seconds: gsc.insertDelay));
+    }
 
     if (credentialId > gsc.credentials.length) {
-      credentialId = 1; 
+      credentialId = 1;
     }
 
     _log.fine('Switched Google Sheets credential ID to: $credentialId.');

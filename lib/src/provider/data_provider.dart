@@ -1,16 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
-import 'package:zaehlerstand/src/constants/provider_status.dart';
 import 'package:zaehlerstand/src/io/database/database_helper.dart';
 import 'package:zaehlerstand/src/io/googlesheets/google_sheets_helper.dart';
 import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
 import 'package:zaehlerstand/src/models/base/meter_reading.dart';
+import 'package:zaehlerstand/src/models/base/progress_update.dart';
 
 class DataProvider extends ChangeNotifier {
   static final _log = Logger('DataProvider');
 
   /// Tracks the current status of the provider (e.g., loading, idle, syncing).
-  ProviderStatus status = ProviderStatus.loading;
+  bool isLoading = true;
+  bool isAddingMeterReadings = false;
 
   /// List of all meter readings managed by the provider.
   List<MeterReading> meterReadings = <MeterReading>[];
@@ -24,13 +27,19 @@ class DataProvider extends ChangeNotifier {
   /// List of all years that have data in meterReadings
   List<int> dataYears = <int>[];
 
+  final StreamController<ProgressUpdate> _addMeterProgressController = StreamController<ProgressUpdate>.broadcast();
+  Stream<ProgressUpdate> get addMeterProgressStream => _addMeterProgressController.stream;
+
+  final StreamController<ProgressUpdate> _syncMeterProgressController = StreamController<ProgressUpdate>.broadcast();
+  Stream<ProgressUpdate> get syncMeterProgressStream => _syncMeterProgressController.stream;
+
   // TODO: Check if current year in Google Sheets has more records than the local database
 
   /// Initializes the provider by checking if the database has data.
   /// If the database is empty, data is fetched from Google Sheets and imported.
   Future<void> initialize() async {
     _log.fine('Initialization started');
-    status = ProviderStatus.loading;
+    isLoading = true;
 
     try {
       // Check database for data and load it if necessary
@@ -40,15 +49,14 @@ class DataProvider extends ChangeNotifier {
 
       await _refreshLists();
 
-      status = ProviderStatus.idle;
-
+      isLoading = false;
       notifyListeners();
     } catch (e, stackTrace) {
       _log.severe('Failed to check DB or load from Google Sheets: $e', e, stackTrace);
       return;
     }
 
-    status = ProviderStatus.idle;
+    isLoading = false;
     _log.fine('Initialization finished');
     notifyListeners(); // Notify UI listeners that state has changed
   }
@@ -56,36 +64,30 @@ class DataProvider extends ChangeNotifier {
   /// Fetches all meter readings from the database and updates the provider's state.
   Future<void> getAllMeterReadings() async {
     _log.fine('Fetching all meter readings from the database');
-    status = ProviderStatus.loading;
 
     // Load readings from the database
     await _getAllMeterReadings();
-
     await _refreshLists();
-    notifyListeners();
 
-    status = ProviderStatus.idle;
-    notifyListeners(); // Notify listeners to update the UI
+    notifyListeners();
   }
 
   /// Fetches a list of distinct years for which meter readings exist.
   Future<void> getDataYears() async {
     _log.fine('Fetching distinct years from the database');
-    status = ProviderStatus.loading;
 
     // Query the database for distinct years
     await _getDataYears();
-
     await _refreshLists();
-    notifyListeners();
-
-    status = ProviderStatus.idle;
 
     notifyListeners();
   }
 
   /// Adds a new meter reading to the database and refreshes the list of readings.
   Future<int> addMeterReading(int enteredReading) async {
+    isAddingMeterReadings = true;
+    notifyListeners();
+
     List<MeterReading> intermediateMeterReadings = _createMeterReadingsForIntermediateDays(enteredReading);
 
     // Add the entered reading to the intermediateMeterReadings list
@@ -99,11 +101,21 @@ class DataProvider extends ChangeNotifier {
 
     // Refresh data views after inserting readings
     await _refreshLists();
+
     notifyListeners();
 
     // Sync the readings with Google Sheets
-    int numberOfRecordsAdded = await _syncToGoogleSheets(intermediateMeterReadings);
+    int numberOfRecordsAdded = await _syncToGoogleSheets(
+      intermediateMeterReadings,
+      (progress) {
+        _addMeterProgressController.add(progress);
+        _log.fine('addMeterReading progress: ${progress.current} of ${progress.total}');
+      },
+    );
+    
+    isAddingMeterReadings = false;
     await _refreshLists();
+    
     notifyListeners();
 
     return numberOfRecordsAdded;
@@ -112,7 +124,6 @@ class DataProvider extends ChangeNotifier {
   /// Deletes all meter readings from the database and refreshes the list.
   Future<void> deleteAllMeterReadings() async {
     _log.fine('Deleting all meter readings');
-    status = ProviderStatus.loading;
 
     // Delete all records and refresh the list
     await DatabaseHelper.deleteAllMeterReadings();
@@ -121,7 +132,7 @@ class DataProvider extends ChangeNotifier {
     await _refreshLists();
     notifyListeners();
 
-    status = ProviderStatus.idle;
+    isLoading = false;
     _log.fine('All meter readings deleted');
   }
 
@@ -229,10 +240,10 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  Future<int> _syncToGoogleSheets(List<MeterReading> unsynchronizedMeterReadings) async {
+  Future<int> _syncToGoogleSheets(List<MeterReading> unsynchronizedMeterReadings, Function(ProgressUpdate) onProgress) async {
     GoogleSheetsHelper googleSheetsHelper = GoogleSheetsHelper();
 
-    List<MeterReading> synchronizedMeterReadings = await googleSheetsHelper.insertRows(readings: unsynchronizedMeterReadings);
+    List<MeterReading> synchronizedMeterReadings = await googleSheetsHelper.insertRows(unsynchronizedMeterReadings, onProgress);
 
     await DatabaseHelper.bulkInsert(synchronizedMeterReadings);
 
@@ -261,11 +272,13 @@ class DataProvider extends ChangeNotifier {
     if (daysBetweenReadings > 1) {
       _log.fine('Generating intermediate meter readings for missing days.');
       int totalConsumption = enteredReading - previousMeterReading.reading;
+      // TODO: use double for calculation
       int averageConsumption = (totalConsumption ~/ daysBetweenReadings);
 
       _log.fine('Total consumption: $totalConsumption, Average consumption: $averageConsumption.');
 
       for (var i = 0; i < daysBetweenReadings - 1; i++) {
+        // TODO move outside loop and keep add doubles
         int previousReading = previousMeterReading.reading;
         int calculatedReading = previousReading + averageConsumption;
         DateTime targetDate = previousMeterReading.date.add(const Duration(days: 1));
@@ -294,7 +307,13 @@ class DataProvider extends ChangeNotifier {
   Future<void> _checkForUnsynchronizedDbRecords() async {
     List<MeterReading> unsynchronizedReadings = await DatabaseHelper.getUnsynchronizedMeterReadings();
     if (unsynchronizedReadings.isNotEmpty) {
-      await _syncToGoogleSheets(unsynchronizedReadings);
+      await _syncToGoogleSheets(
+        unsynchronizedReadings,
+        (progress) {
+          _syncMeterProgressController.add(progress);
+          _log.fine('Check for unsynchronized progress: ${progress.current} of ${progress.total}');
+        },
+      );
     }
   }
 }
