@@ -14,6 +14,7 @@ class DataProvider extends ChangeNotifier {
   /// Tracks the current status of the provider (e.g., loading, idle, syncing).
   bool isLoading = true;
   bool isAddingMeterReadings = false;
+  bool isSynchronizingToGoogleSheets = false;
 
   /// List of all meter readings managed by the provider.
   List<MeterReading> meterReadings = <MeterReading>[];
@@ -28,10 +29,10 @@ class DataProvider extends ChangeNotifier {
   List<int> dataYears = <int>[];
 
   final StreamController<ProgressUpdate> _addMeterProgressController = StreamController<ProgressUpdate>.broadcast();
-  Stream<ProgressUpdate> get addMeterProgressStream => _addMeterProgressController.stream;
+  Stream<ProgressUpdate> get addMeterReadingsProgressStream => _addMeterProgressController.stream;
 
   final StreamController<ProgressUpdate> _syncMeterProgressController = StreamController<ProgressUpdate>.broadcast();
-  Stream<ProgressUpdate> get syncMeterProgressStream => _syncMeterProgressController.stream;
+  Stream<ProgressUpdate> get syncMeterReadingsProgressStream => _syncMeterProgressController.stream;
 
   // TODO: Check if current year in Google Sheets has more records than the local database
 
@@ -44,13 +45,12 @@ class DataProvider extends ChangeNotifier {
     try {
       // Check database for data and load it if necessary
       await _checkIfDbHasData();
-
-      await _checkForUnsynchronizedDbRecords();
-
       await _refreshLists();
 
-      isLoading = false;
       notifyListeners();
+
+      // Check if the DB has records that are not saved to google sheets
+      _checkForUnsynchronizedDbRecords();
     } catch (e, stackTrace) {
       _log.severe('Failed to check DB or load from Google Sheets: $e', e, stackTrace);
       return;
@@ -112,10 +112,10 @@ class DataProvider extends ChangeNotifier {
         _log.fine('addMeterReading progress: ${progress.current} of ${progress.total}');
       },
     );
-    
+
     isAddingMeterReadings = false;
     await _refreshLists();
-    
+
     notifyListeners();
 
     return numberOfRecordsAdded;
@@ -271,7 +271,7 @@ class DataProvider extends ChangeNotifier {
     // Check if we need to generate readings for intermediate days
     if (daysBetweenReadings > 1) {
       _log.fine('Generating intermediate meter readings for missing days.');
-      
+
       int totalConsumption = enteredReading - previousMeterReading.reading;
       double averageConsumption = totalConsumption / daysBetweenReadings;
       double previousReading = previousMeterReading.reading.toDouble();
@@ -302,6 +302,8 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> _checkForUnsynchronizedDbRecords() async {
+    isSynchronizingToGoogleSheets = true;
+
     List<MeterReading> unsynchronizedReadings = await DatabaseHelper.getUnsynchronizedMeterReadings();
     if (unsynchronizedReadings.isNotEmpty) {
       await _syncToGoogleSheets(
@@ -312,5 +314,12 @@ class DataProvider extends ChangeNotifier {
         },
       );
     }
+
+    await _checkIfDbHasData();
+    await _refreshLists();
+
+    isSynchronizingToGoogleSheets = false;
+    
+    notifyListeners();
   }
 }

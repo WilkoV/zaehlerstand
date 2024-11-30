@@ -3,7 +3,8 @@ import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/data_view/dynamic_years_tabs.dart';
-import 'package:zaehlerstand/src/widgets/responsive/progress_indicators/add_meter_reading_progress_indicator_responsive_layout.dart';
+import 'package:zaehlerstand/src/widgets/responsive/progress_indicators/add_meter_reading_progress_indicator_mobile/add_meter_reading_progress_indicator_responsive_layout.dart';
+import 'package:zaehlerstand/src/widgets/responsive/progress_indicators/synchronizing_to_google_sheets_progress_indicator/synchronizing_to_google_sheets_progress_indicator_responsive_layout.dart';
 
 class ZaehlerstandTabletPortrait extends StatelessWidget {
   ZaehlerstandTabletPortrait({super.key});
@@ -47,7 +48,20 @@ class ZaehlerstandTabletPortrait extends StatelessWidget {
                       ),
                     ),
                   ],
-                )
+                ),
+              if (dataProvider.isSynchronizingToGoogleSheets)
+                const Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 90),
+                        child: SynchronizingToGoogleSheetsProgressIndicatorResponsiveLayout(),
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
         );
