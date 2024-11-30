@@ -13,29 +13,6 @@ class GoogleSheetsHelper {
   // TODO: Implement logic to get the total count of rows in all worksheets
   // TODO: Implement logic to get the last entry by date across all worksheets
 
-  /// Inserts a new row in the Google Sheet corresponding to the year of the provided [MeterReading].
-  /// Returns `true` if the insertion was successful, `false` otherwise.
-  Future<bool> insertRow(MeterReading reading) async {
-    try {
-      // Fetch the spreadsheet and the specific worksheet by title (year)
-      final Spreadsheet spreadsheet = await _getSheet(credentialId: 0);
-      final Worksheet? worksheet = await _getWorksheetByTitle(spreadsheet, _getWorksheetTitle(reading));
-
-      // Ensure the worksheet exists
-      if (worksheet == null) {
-        _log.warning('Worksheet is null, cannot insert row.');
-        return false;
-      }
-
-      // Insert the row data at the specific row index (day of the year)
-      final bool ok = await worksheet.values.insertRow(reading.getDayOfYear(), reading.toDynamicList());
-      return ok;
-    } catch (e, stackTrace) {
-      _log.severe('Failed to insert row: $e', e, stackTrace);
-      return false;
-    }
-  }
-
   Future<List<MeterReading>> insertRows(List<MeterReading> readings, Function(ProgressUpdate) onProgress) async {
     late Spreadsheet spreadsheet;
     late Worksheet? worksheet;
