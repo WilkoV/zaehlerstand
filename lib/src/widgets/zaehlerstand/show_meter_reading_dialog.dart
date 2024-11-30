@@ -47,6 +47,21 @@ class MeterReadingDialog extends StatelessWidget {
             }
             return null;
           },
+          onFieldSubmitted: (value) {
+            // Save logic when the check symbol is pressed
+            final input = zaehlerstandController.text;
+            if (int.parse(input) <= minimalReadingValue) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Der eingegeben Zählerstand ist kleiner als der vorherige. Bitte korrigieren.')),
+              );
+            } else if (input.isNotEmpty && RegExp(r'^\d{1,6}$').hasMatch(input)) {
+              Navigator.of(context).pop(input); 
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Bitte eine gültige 6-stellige Zahl eingeben.')),
+              );
+            }
+          },
         ),
       ),
       actions: [
