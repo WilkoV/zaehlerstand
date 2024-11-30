@@ -271,23 +271,20 @@ class DataProvider extends ChangeNotifier {
     // Check if we need to generate readings for intermediate days
     if (daysBetweenReadings > 1) {
       _log.fine('Generating intermediate meter readings for missing days.');
+      
       int totalConsumption = enteredReading - previousMeterReading.reading;
-      // TODO: use double for calculation
-      int averageConsumption = (totalConsumption ~/ daysBetweenReadings);
-
+      double averageConsumption = totalConsumption / daysBetweenReadings;
+      double previousReading = previousMeterReading.reading.toDouble();
       _log.fine('Total consumption: $totalConsumption, Average consumption: $averageConsumption.');
+      DateTime targetDate = previousMeterReading.date;
 
       for (var i = 0; i < daysBetweenReadings - 1; i++) {
-        // TODO move outside loop and keep add doubles
-        int previousReading = previousMeterReading.reading;
-        int calculatedReading = previousReading + averageConsumption;
-        DateTime targetDate = previousMeterReading.date.add(const Duration(days: 1));
-        MeterReading calculatedMeterReading = MeterReading.fromGenerateData(targetDate, calculatedReading);
+        previousReading = previousReading + averageConsumption;
+        targetDate = targetDate.add(const Duration(days: 1));
+        MeterReading calculatedMeterReading = MeterReading.fromGenerateData(targetDate, previousReading.toInt());
 
         _log.fine('Generated intermediate reading: ${calculatedMeterReading.toString()}');
         newMeterReadings.add(calculatedMeterReading);
-
-        previousMeterReading = calculatedMeterReading; // Update for the next iteration
       }
     }
     return newMeterReadings;
