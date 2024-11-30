@@ -10,6 +10,7 @@ import 'package:zaehlerstand/src/provider/theme_provider.dart';
 Future<void> main() async {
   final Logger log = Logger('Main');
   final ThemeProvider themeProvider = ThemeProvider();
+  final DataProvider dataProvider = DataProvider();
 
   if (kReleaseMode) {
     // In release mode, set log level to WARNING
@@ -38,7 +39,10 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => themeProvider),
-        ChangeNotifierProvider(create: (_) => DataProvider()),
+        ChangeNotifierProvider<DataProvider>(
+          create: (_) => dataProvider..initialize(),
+          lazy: true,
+        ),
       ],
       child: const ZaehlerstandApp(),
     ),

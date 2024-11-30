@@ -29,7 +29,7 @@ class MeterReadingDialog extends StatelessWidget {
       title: Text('Heutiger Zählerstand', style: Theme.of(context).textTheme.headlineMedium),
       content: Form(
         child: TextFormField(
-          style: Theme.of(context).textTheme.bodyLarge,
+          style: Theme.of(context).textTheme.headlineLarge,
           controller: zaehlerstandController,
           focusNode: focusNode, // Attach the focus node
           keyboardType: TextInputType.number,
@@ -54,7 +54,7 @@ class MeterReadingDialog extends StatelessWidget {
           onPressed: () {
             Navigator.of(context).pop(); // Close the dialog
           },
-          child: Text('Abbrechen', style: Theme.of(context).textTheme.bodyMedium),
+          child: Text('Abbrechen', style: Theme.of(context).textTheme.bodyLarge),
         ),
         ElevatedButton(
           onPressed: () {
@@ -71,7 +71,7 @@ class MeterReadingDialog extends StatelessWidget {
               );
             }
           },
-          child: Text('Speichern', style: Theme.of(context).textTheme.bodyMedium),
+          child: Text('Speichern', style: Theme.of(context).textTheme.bodyLarge),
         ),
       ],
     );

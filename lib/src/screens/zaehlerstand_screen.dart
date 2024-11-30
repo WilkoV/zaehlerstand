@@ -18,28 +18,11 @@ class ZaehlerstandScreen extends StatefulWidget {
 class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
   late TextEditingController zaehlerstandController;
   final Logger _log = Logger('_ZaehlerstandScreenState');
-  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     FlutterNativeSplash.remove();
-    _initializeData();
-  }
-
-  Future<void> _initializeData() async {
-    try {
-      final dataProvider = Provider.of<DataProvider>(context, listen: false);
-      await dataProvider.initialize();
-    } catch (e) {
-      _log.severe('Error initializing data: $e');
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
   }
 
   @override
@@ -51,12 +34,6 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
-    }
-
     return Consumer<DataProvider>(
       builder: (context, dataProvider, child) {
         return Scaffold(

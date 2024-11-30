@@ -3,7 +3,7 @@ import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/data_view/dynamic_years_tabs.dart';
-import 'package:zaehlerstand/src/widgets/progress_bars/add_meter_reading_progress_bar.dart';
+import 'package:zaehlerstand/src/widgets/responsive/progress_indicators/add_meter_reading_progress_indicator_responsive_layout.dart';
 
 class ZaehlerstandTabletPortrait extends StatelessWidget {
   ZaehlerstandTabletPortrait({super.key});
@@ -15,12 +15,12 @@ class ZaehlerstandTabletPortrait extends StatelessWidget {
     _log.fine('Building tablet portrait mode');
 
     return Consumer<DataProvider>(
-      builder: (_, notifier, __) {
+      builder: (_, dataProvider, __) {
         return Scaffold(
           body: Column(
             children: [
               Expanded(
-                flex: 5,
+                flex: 8,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 0, 6),
                   child: Container(
@@ -29,13 +29,25 @@ class ZaehlerstandTabletPortrait extends StatelessWidget {
                 ),
               ),
               const Expanded(
-                flex: 4,
+                flex: 6,
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(0, 0, 0, 6),
                   child: DynamicYearsTab(),
                 ),
               ),
-              const AddMeterReadingProgressBar(),
+              if (dataProvider.isAddingMeterReadings)
+                const Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 90),
+                        child: AddMeterReadingProgressIndicatorResponsiveLayout(),
+                      ),
+                    ),
+                  ],
+                )
             ],
           ),
         );
