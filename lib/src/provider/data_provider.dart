@@ -15,6 +15,7 @@ class DataProvider extends ChangeNotifier {
   bool isLoading = true;
   bool isAddingMeterReadings = false;
   bool isSynchronizingToGoogleSheets = false;
+  int unsyncedCount = 0;
 
   /// List of all meter readings managed by the provider.
   List<MeterReading> meterReadings = <MeterReading>[];
@@ -28,11 +29,28 @@ class DataProvider extends ChangeNotifier {
   /// List of all years that have data in meterReadings
   List<int> dataYears = <int>[];
 
-  final StreamController<ProgressUpdate> _addMeterProgressController = StreamController<ProgressUpdate>.broadcast();
-  Stream<ProgressUpdate> get addMeterReadingsProgressStream => _addMeterProgressController.stream;
+  final StreamController<ProgressUpdate> _addMeterProgressController;
+  final StreamController<ProgressUpdate> _syncMeterProgressController;
 
-  final StreamController<ProgressUpdate> _syncMeterProgressController = StreamController<ProgressUpdate>.broadcast();
+  Stream<ProgressUpdate> get addMeterReadingsProgressStream => _addMeterProgressController.stream;
   Stream<ProgressUpdate> get syncMeterReadingsProgressStream => _syncMeterProgressController.stream;
+
+  DataProvider()
+      : _addMeterProgressController = StreamController<ProgressUpdate>.broadcast(),
+        _syncMeterProgressController = StreamController<ProgressUpdate>.broadcast() {
+    _log.fine('DataProvider initialized.');
+  }
+
+  @override
+  void dispose() {
+    _log.fine('Disposing DataProvider.');
+
+    // Close StreamControllers
+    _addMeterProgressController.close();
+    _syncMeterProgressController.close();
+
+    super.dispose();
+  }
 
   // TODO: Check if current year in Google Sheets has more records than the local database
 
@@ -44,13 +62,20 @@ class DataProvider extends ChangeNotifier {
 
     try {
       // Check database for data and load it if necessary
-      await _checkIfDbHasData();
       await _refreshLists();
+
+      if (meterReadings.isEmpty) {
+        await _copyFromGoogleSheetsToDb();
+        await _refreshLists();
+      }
 
       notifyListeners();
 
       // Check if the DB has records that are not saved to google sheets
-      _checkForUnsynchronizedDbRecords();
+      if (unsyncedCount > 0) {
+        _checkForUnsynchronizedDbRecords();
+        notifyListeners();
+      }
     } catch (e, stackTrace) {
       _log.severe('Failed to check DB or load from Google Sheets: $e', e, stackTrace);
       return;
@@ -297,6 +322,7 @@ class DataProvider extends ChangeNotifier {
     await _getAllMeterReadings();
     _groupMeterReadingsByYear();
     _calculateDailyConsumptionAndGroupByYear();
+    unsyncedCount = meterReadings.where((reading) => !reading.isSynced).length;
 
     _log.fine('All lists updated.');
   }
@@ -304,7 +330,7 @@ class DataProvider extends ChangeNotifier {
   Future<void> _checkForUnsynchronizedDbRecords() async {
     isSynchronizingToGoogleSheets = true;
 
-    List<MeterReading> unsynchronizedReadings = await DatabaseHelper.getUnsynchronizedMeterReadings();
+    final List<MeterReading> unsynchronizedReadings = meterReadings.where((reading) => !reading.isSynced).toList();
     if (unsynchronizedReadings.isNotEmpty) {
       await _syncToGoogleSheets(
         unsynchronizedReadings,
@@ -315,11 +341,10 @@ class DataProvider extends ChangeNotifier {
       );
     }
 
-    await _checkIfDbHasData();
     await _refreshLists();
 
     isSynchronizingToGoogleSheets = false;
-    
+
     notifyListeners();
   }
 }
