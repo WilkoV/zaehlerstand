@@ -14,6 +14,7 @@ class MeterReading with _$MeterReading {
   }) = _MeterReading;
 
   factory MeterReading.fromJson(Map<String, dynamic> json) => _$MeterReadingFromJson(json);
+  
   factory MeterReading.fromInput(int enteredReading) => MeterReading(
         date: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 12),
         enteredReading: enteredReading,
