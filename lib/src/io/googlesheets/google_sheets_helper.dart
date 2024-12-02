@@ -10,9 +10,6 @@ class GoogleSheetsHelper {
 
   int credentialId = 1;
 
-  // TODO: Implement logic to get the total count of rows in all worksheets
-  // TODO: Implement logic to get the last entry by date across all worksheets
-
   Future<List<MeterReading>> insertRows(List<MeterReading> readings, Function(ProgressUpdate) onProgress) async {
     late Spreadsheet spreadsheet;
     late Worksheet? worksheet;

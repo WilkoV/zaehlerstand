@@ -52,8 +52,6 @@ class DataProvider extends ChangeNotifier {
     super.dispose();
   }
 
-  // TODO: Check if current year in Google Sheets has more records than the local database
-
   /// Initializes the provider by checking if the database has data.
   /// If the database is empty, data is fetched from Google Sheets and imported.
   Future<void> initialize() async {
