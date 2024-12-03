@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
-import 'package:zaehlerstand/src/widgets/responsive/meter_reading_card/meter_reading_responsive_layout.dart';
+import 'package:zaehlerstand/src/widgets/responsive/reading_card/reading_responsive_layout.dart';
 
-class MeterReadingListWidget extends StatelessWidget {
+class ReadingListWidget extends StatelessWidget {
   final int year;
 
-  const MeterReadingListWidget({
+  const ReadingListWidget({
     super.key,
     required this.year,
   });
@@ -15,15 +15,15 @@ class MeterReadingListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<DataProvider>(builder: (context, dataProvider, child) {
       return Scaffold(
-        body: dataProvider.groupedMeterReadings.isEmpty || dataProvider.groupedMeterReadings[year]!.isEmpty
+        body: dataProvider.groupedReadings.isEmpty || dataProvider.groupedReadings[year]!.isEmpty
             ? Center(child: Text("Keine Daten gefunden", style: Theme.of(context).textTheme.bodyLarge))
             : ListView.builder(
-                itemCount: dataProvider.groupedMeterReadings[year]!.length,
+                itemCount: dataProvider.groupedReadings[year]!.length,
                 itemBuilder: (context, index) {
-                  final reading = dataProvider.groupedMeterReadings[year]![index];
+                  final reading = dataProvider.groupedReadings[year]![index];
                   final dailyConsumption = dataProvider.groupedDailyConsumptions[year]![index];
       
-                  return MeterReadingCardResponsiveLayout(dailyConsumption: dailyConsumption, meterReading: reading);
+                  return ReadingCardResponsiveLayout(dailyConsumption: dailyConsumption, reading: reading);
                 },
               ),
       );

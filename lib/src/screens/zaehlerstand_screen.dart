@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
-import 'package:zaehlerstand/src/models/base/meter_reading.dart';
+import 'package:zaehlerstand/src/models/base/reading.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/responsive/zaehlerstand/zaehlerstand_responsive_layout.dart';
-import 'package:zaehlerstand/src/widgets/zaehlerstand/show_meter_reading_dialog.dart';
+import 'package:zaehlerstand/src/widgets/zaehlerstand/show_reading_dialog.dart';
 import 'package:zaehlerstand/src/widgets/zaehlerstand/zaehlerstand_drawer.dart';
 
 class ZaehlerstandScreen extends StatefulWidget {
@@ -51,16 +51,16 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
             onPressed: () async {
               final result = await showDialog<String>(
                 context: context,
-                builder: (context) => MeterReadingDialog(
+                builder: (context) => ReadingDialog(
                   minimalReadingValue: _getMinimumValue(dataProvider),
                   zaehlerstandController: TextEditingController(
-                    text: _getFirstTwoDigitsFromNewestMeterReading(dataProvider),
+                    text: _getFirstTwoDigitsFromNewestReading(dataProvider),
                   ),
                 ),
               );
 
               if (result != null) {
-                dataProvider.addMeterReading(int.parse(result));
+                dataProvider.addReading(int.parse(result));
                 _log.fine(result);
               }
             },
@@ -71,12 +71,12 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
     );
   }
 
-  String _getFirstTwoDigitsFromNewestMeterReading(DataProvider dataProvider) {
-    if (dataProvider.meterReadings.isEmpty) {
+  String _getFirstTwoDigitsFromNewestReading(DataProvider dataProvider) {
+    if (dataProvider.reading.isEmpty) {
       return '';
     }
 
-    MeterReading reading = dataProvider.meterReadings.first;
+    Reading reading = dataProvider.reading.first;
     var readingAsString = reading.reading.toString();
     int currentLength = readingAsString.length;
 
@@ -86,8 +86,8 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
 
     int targetPosition = currentLength - 3;
 
-    return dataProvider.meterReadings.isNotEmpty ? readingAsString.substring(0, targetPosition) : '';
+    return dataProvider.reading.isNotEmpty ? readingAsString.substring(0, targetPosition) : '';
   }
 
-  int _getMinimumValue(DataProvider dataProvider) => dataProvider.meterReadings.isNotEmpty ? dataProvider.meterReadings.first.reading : 0;
+  int _getMinimumValue(DataProvider dataProvider) => dataProvider.reading.isNotEmpty ? dataProvider.reading.first.reading : 0;
 }

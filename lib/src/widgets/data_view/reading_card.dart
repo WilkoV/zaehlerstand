@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:zaehlerstand/src/models/base/meter_reading.dart';
-import 'package:zaehlerstand/src/models/logic/meter_reading_logic.dart';
+import 'package:zaehlerstand/src/models/base/reading.dart';
+import 'package:zaehlerstand/src/models/logic/reading_logic.dart';
 
-class MeterReadingCard extends StatelessWidget {
-  const MeterReadingCard({
+class ReadingCard extends StatelessWidget {
+  const ReadingCard({
     super.key,
     required this.dailyConsumption,
     required this.reading,
   });
 
   final int dailyConsumption;
-  final MeterReading reading;
+  final Reading reading;
 
   @override
   Widget build(BuildContext context) {

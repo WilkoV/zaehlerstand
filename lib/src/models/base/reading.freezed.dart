@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'meter_reading.dart';
+part of 'reading.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -14,33 +14,31 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-MeterReading _$MeterReadingFromJson(Map<String, dynamic> json) {
-  return _MeterReading.fromJson(json);
+Reading _$ReadingFromJson(Map<String, dynamic> json) {
+  return _Reading.fromJson(json);
 }
 
 /// @nodoc
-mixin _$MeterReading {
+mixin _$Reading {
   DateTime get date => throw _privateConstructorUsedError;
   int get enteredReading => throw _privateConstructorUsedError;
   int get reading => throw _privateConstructorUsedError;
   bool get isGenerated => throw _privateConstructorUsedError;
   bool get isSynced => throw _privateConstructorUsedError;
 
-  /// Serializes this MeterReading to a JSON map.
+  /// Serializes this Reading to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
-  /// Create a copy of MeterReading
+  /// Create a copy of Reading
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $MeterReadingCopyWith<MeterReading> get copyWith =>
-      throw _privateConstructorUsedError;
+  $ReadingCopyWith<Reading> get copyWith => throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $MeterReadingCopyWith<$Res> {
-  factory $MeterReadingCopyWith(
-          MeterReading value, $Res Function(MeterReading) then) =
-      _$MeterReadingCopyWithImpl<$Res, MeterReading>;
+abstract class $ReadingCopyWith<$Res> {
+  factory $ReadingCopyWith(Reading value, $Res Function(Reading) then) =
+      _$ReadingCopyWithImpl<$Res, Reading>;
   @useResult
   $Res call(
       {DateTime date,
@@ -51,16 +49,16 @@ abstract class $MeterReadingCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$MeterReadingCopyWithImpl<$Res, $Val extends MeterReading>
-    implements $MeterReadingCopyWith<$Res> {
-  _$MeterReadingCopyWithImpl(this._value, this._then);
+class _$ReadingCopyWithImpl<$Res, $Val extends Reading>
+    implements $ReadingCopyWith<$Res> {
+  _$ReadingCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of MeterReading
+  /// Create a copy of Reading
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -97,11 +95,10 @@ class _$MeterReadingCopyWithImpl<$Res, $Val extends MeterReading>
 }
 
 /// @nodoc
-abstract class _$$MeterReadingImplCopyWith<$Res>
-    implements $MeterReadingCopyWith<$Res> {
-  factory _$$MeterReadingImplCopyWith(
-          _$MeterReadingImpl value, $Res Function(_$MeterReadingImpl) then) =
-      __$$MeterReadingImplCopyWithImpl<$Res>;
+abstract class _$$ReadingImplCopyWith<$Res> implements $ReadingCopyWith<$Res> {
+  factory _$$ReadingImplCopyWith(
+          _$ReadingImpl value, $Res Function(_$ReadingImpl) then) =
+      __$$ReadingImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call(
@@ -113,14 +110,14 @@ abstract class _$$MeterReadingImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$MeterReadingImplCopyWithImpl<$Res>
-    extends _$MeterReadingCopyWithImpl<$Res, _$MeterReadingImpl>
-    implements _$$MeterReadingImplCopyWith<$Res> {
-  __$$MeterReadingImplCopyWithImpl(
-      _$MeterReadingImpl _value, $Res Function(_$MeterReadingImpl) _then)
+class __$$ReadingImplCopyWithImpl<$Res>
+    extends _$ReadingCopyWithImpl<$Res, _$ReadingImpl>
+    implements _$$ReadingImplCopyWith<$Res> {
+  __$$ReadingImplCopyWithImpl(
+      _$ReadingImpl _value, $Res Function(_$ReadingImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of MeterReading
+  /// Create a copy of Reading
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -131,7 +128,7 @@ class __$$MeterReadingImplCopyWithImpl<$Res>
     Object? isGenerated = null,
     Object? isSynced = null,
   }) {
-    return _then(_$MeterReadingImpl(
+    return _then(_$ReadingImpl(
       date: null == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
@@ -158,16 +155,16 @@ class __$$MeterReadingImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$MeterReadingImpl implements _MeterReading {
-  _$MeterReadingImpl(
+class _$ReadingImpl implements _Reading {
+  _$ReadingImpl(
       {required this.date,
       required this.enteredReading,
       required this.reading,
       required this.isGenerated,
       required this.isSynced});
 
-  factory _$MeterReadingImpl.fromJson(Map<String, dynamic> json) =>
-      _$$MeterReadingImplFromJson(json);
+  factory _$ReadingImpl.fromJson(Map<String, dynamic> json) =>
+      _$$ReadingImplFromJson(json);
 
   @override
   final DateTime date;
@@ -182,14 +179,14 @@ class _$MeterReadingImpl implements _MeterReading {
 
   @override
   String toString() {
-    return 'MeterReading(date: $date, enteredReading: $enteredReading, reading: $reading, isGenerated: $isGenerated, isSynced: $isSynced)';
+    return 'Reading(date: $date, enteredReading: $enteredReading, reading: $reading, isGenerated: $isGenerated, isSynced: $isSynced)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$MeterReadingImpl &&
+            other is _$ReadingImpl &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.enteredReading, enteredReading) ||
                 other.enteredReading == enteredReading) &&
@@ -205,32 +202,31 @@ class _$MeterReadingImpl implements _MeterReading {
   int get hashCode => Object.hash(
       runtimeType, date, enteredReading, reading, isGenerated, isSynced);
 
-  /// Create a copy of MeterReading
+  /// Create a copy of Reading
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$MeterReadingImplCopyWith<_$MeterReadingImpl> get copyWith =>
-      __$$MeterReadingImplCopyWithImpl<_$MeterReadingImpl>(this, _$identity);
+  _$$ReadingImplCopyWith<_$ReadingImpl> get copyWith =>
+      __$$ReadingImplCopyWithImpl<_$ReadingImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$MeterReadingImplToJson(
+    return _$$ReadingImplToJson(
       this,
     );
   }
 }
 
-abstract class _MeterReading implements MeterReading {
-  factory _MeterReading(
+abstract class _Reading implements Reading {
+  factory _Reading(
       {required final DateTime date,
       required final int enteredReading,
       required final int reading,
       required final bool isGenerated,
-      required final bool isSynced}) = _$MeterReadingImpl;
+      required final bool isSynced}) = _$ReadingImpl;
 
-  factory _MeterReading.fromJson(Map<String, dynamic> json) =
-      _$MeterReadingImpl.fromJson;
+  factory _Reading.fromJson(Map<String, dynamic> json) = _$ReadingImpl.fromJson;
 
   @override
   DateTime get date;
@@ -243,10 +239,10 @@ abstract class _MeterReading implements MeterReading {
   @override
   bool get isSynced;
 
-  /// Create a copy of MeterReading
+  /// Create a copy of Reading
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$MeterReadingImplCopyWith<_$MeterReadingImpl> get copyWith =>
+  _$$ReadingImplCopyWith<_$ReadingImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

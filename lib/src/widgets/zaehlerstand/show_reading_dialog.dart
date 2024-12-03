@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class MeterReadingDialog extends StatelessWidget {
-  const MeterReadingDialog({
+class ReadingDialog extends StatelessWidget {
+  const ReadingDialog({
     super.key,
     required this.minimalReadingValue,
     required this.zaehlerstandController,

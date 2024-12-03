@@ -1,38 +1,38 @@
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
-import 'package:zaehlerstand/src/models/base/meter_reading.dart';
+import 'package:zaehlerstand/src/models/base/reading.dart';
 
-extension MeterReadingLogic on MeterReading {
-  static final Logger _log = Logger('MeterReadingLogic');
+extension ReadingLogic on Reading {
+  static final Logger _log = Logger('ReadingLogic');
 
-  /// Converts a [MeterReading] instance into a `List<String>` representation.
+  /// Converts a [Reading] instance into a `List<String>` representation.
   /// Useful for storing or serializing the reading as a row of strings.
   List<String> toStringList() {
-    _log.fine('Converting MeterReading to a List<String>');
+    _log.fine('Converting Reading to a List<String>');
 
     // Convert each property of the reading into a string
     List<String> result = [getFormattedDate(), enteredReading.toString(), reading.toString(), isGenerated.toString()];
 
-    _log.fine('Converted MeterReading $result');
+    _log.fine('Converted Reading $result');
     return result;
   }
 
-  /// Converts a [MeterReading] instance into a `List<dynamic>` representation.
+  /// Converts a [Reading] instance into a `List<dynamic>` representation.
   /// Similar to `toStringList` but maintains the type of each value.
   List<dynamic> toDynamicList() {
-    _log.fine('Converting MeterReading to a List<dynamic>');
+    _log.fine('Converting Reading to a List<dynamic>');
 
     // Maintain types while converting properties to a list
     List<dynamic> result = [getFormattedDate(), enteredReading, reading, isGenerated];
 
-    _log.fine('Converted MeterReading $result');
+    _log.fine('Converted Reading $result');
     return result;
   }
 
-  /// Creates a [MeterReading] instance from a list of strings.
+  /// Creates a [Reading] instance from a list of strings.
   /// Assumes the list follows the structure: `[date, reading, isGenerated, enteredReading]`.
-  static MeterReading fromStringList(List<String> list) {
-    _log.fine('Creating MeterReading from list of Strings: $list');
+  static Reading fromStringList(List<String> list) {
+    _log.fine('Creating Reading from list of Strings: $list');
 
     // Parse each element from the list to its respective type
     DateTime date = parseDate(list[0]);
@@ -40,24 +40,24 @@ extension MeterReadingLogic on MeterReading {
     int reading = int.parse(list[2]);
     bool isGenerated = list[3].toLowerCase() == 'true';
 
-    // Create and return a new MeterReading instance
-    MeterReading meterReading = MeterReading(date: date, enteredReading: enteredReading, reading: reading, isGenerated: isGenerated, isSynced: true);
+    // Create and return a new Reading instance
+    Reading readingFromStringList = Reading(date: date, enteredReading: enteredReading, reading: reading, isGenerated: isGenerated, isSynced: true);
 
-    _log.fine('Created MeterReading = ${meterReading.toString()}');
-    return meterReading;
+    _log.fine('Created Reading = ${readingFromStringList.toString()}');
+    return readingFromStringList;
   }
 
-  /// Converts a list of string lists into a list of [MeterReading] instances.
+  /// Converts a list of string lists into a list of [Reading] instances.
   /// Each sublist represents a row, converted using [fromStringList].
-  static List<MeterReading> fromListOfStringLists(List<List<String>> nestedList) {
-    List<MeterReading> readings = [];
+  static List<Reading> fromListOfStringLists(List<List<String>> nestedList) {
+    List<Reading> readings = [];
 
     for (var row in nestedList) {
       try {
-        // Convert each sublist to a MeterReading instance
+        // Convert each sublist to a Reading instance
         readings.add(fromStringList(row));
       } catch (e) {
-        _log.warning('Failed to create MeterReading from row: $row', e);
+        _log.warning('Failed to create Reading from row: $row', e);
       }
     }
 
@@ -76,7 +76,7 @@ extension MeterReadingLogic on MeterReading {
     return date;
   }
 
-  /// Formats the [date] of the current [MeterReading] instance to `dd.MM.yyyy`.
+  /// Formats the [date] of the current [Reading] instance to `dd.MM.yyyy`.
   String getFormattedDate() {
     _log.fine('Formatting date: ${date.toString()}');
 
@@ -88,7 +88,7 @@ extension MeterReadingLogic on MeterReading {
     return transformedDate;
   }
 
-  /// Returns the day of the year for the [date] of the current [MeterReading].
+  /// Returns the day of the year for the [date] of the current [Reading].
   /// E.g., January 1st returns 1, December 31st returns 365/366 (leap years considered).
   int getDayOfYear() {
     _log.fine('Calculating day of the year');

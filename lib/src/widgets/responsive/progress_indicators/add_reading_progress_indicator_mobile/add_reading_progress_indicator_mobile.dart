@@ -3,18 +3,18 @@ import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/models/base/progress_update.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 
-class AddMeterReadingProgressIndicatorMobile extends StatelessWidget {
-  const AddMeterReadingProgressIndicatorMobile({super.key});
+class AddReadingProgressIndicatorMobile extends StatelessWidget {
+  const AddReadingProgressIndicatorMobile({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Consumer<DataProvider>(
       builder: (context, dataProvider, _) {
         // Early exit if not adding meter readings
-        if (!dataProvider.isAddingMeterReadings) return const SizedBox.shrink();
+        if (!dataProvider.isAddingReadings) return const SizedBox.shrink();
 
         return StreamBuilder<ProgressUpdate>(
-          stream: dataProvider.addMeterReadingsProgressStream,
+          stream: dataProvider.addReadingsProgressStream,
           builder: (context, snapshot) {
             // If the stream is not providing any data or is waiting, hide the progress bar
             if (!snapshot.hasData || snapshot.connectionState == ConnectionState.waiting) {

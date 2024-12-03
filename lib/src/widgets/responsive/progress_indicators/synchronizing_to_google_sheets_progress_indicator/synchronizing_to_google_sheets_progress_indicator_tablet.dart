@@ -14,7 +14,7 @@ class SynchronizingToGoogleSheetsProgressIndicatorTablet extends StatelessWidget
         if (!dataProvider.isSynchronizingToGoogleSheets) return const SizedBox.shrink();
 
         return StreamBuilder<ProgressUpdate>(
-          stream: dataProvider.syncMeterReadingsProgressStream,
+          stream: dataProvider.syncReadingsProgressStream,
           builder: (context, snapshot) {
             // If the stream is not providing any data or is waiting, hide the progress bar
             if (!snapshot.hasData || snapshot.connectionState == ConnectionState.waiting) {

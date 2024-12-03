@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart';
-import 'package:zaehlerstand/src/models/base/meter_reading.dart';
+import 'package:zaehlerstand/src/models/base/reading.dart';
 
 class DatabaseHelper {
   // Logger for debugging and monitoring database operations.
@@ -37,7 +37,7 @@ class DatabaseHelper {
     _log.fine('Creating database table if not exists.');
 
     db.execute('''
-      CREATE TABLE IF NOT EXISTS meter_readings (
+      CREATE TABLE IF NOT EXISTS readings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         year INTEGER NOT NULL,
         month INTEGER NOT NULL,
@@ -54,7 +54,7 @@ class DatabaseHelper {
   }
 
   // Inserts or updates a meter reading in the database using the `ON CONFLICT` clause.
-  static Future<void> insertMeterReading(MeterReading reading) async {
+  static Future<void> insertReading(Reading reading) async {
     final db = await database;
     _log.fine('Inserting or updating meter reading: $reading');
 
@@ -65,7 +65,7 @@ class DatabaseHelper {
     // Perform the SQL insertion or update operation.
     db.execute(
       '''
-        INSERT INTO meter_readings (year, month, day, entered_reading, reading, is_generated, is_synced)
+        INSERT INTO readings (year, month, day, entered_reading, reading, is_generated, is_synced)
         VALUES (?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(year, month, day) DO UPDATE SET
           entered_reading = excluded.entered_reading,
@@ -76,63 +76,63 @@ class DatabaseHelper {
       [reading.date.year, reading.date.month, reading.date.day, reading.enteredReading, reading.reading, isGenerated, isSynced],
     );
 
-    _log.fine('Meter reading ${reading.toString()} inserted/updated successfully.');
+    _log.fine('Reading ${reading.toString()} inserted/updated successfully.');
   }
 
   // Fetches all meter readings from the database, sorted by date.
-  static Future<List<MeterReading>> getAllMeterReadings() async {
+  static Future<List<Reading>> getAllReadings() async {
     final db = await database;
     _log.fine('Fetching all meter readings.');
 
     // Query all rows from the table and sort by date.
-    final result = db.select('SELECT * FROM meter_readings ORDER BY year DESC, month DESC, day DESC');
+    final result = db.select('SELECT * FROM readings ORDER BY year DESC, month DESC, day DESC');
     _log.fine('Fetched ${result.length} meter readings.');
 
-    // Map the database rows to `MeterReading` objects.
-    return _createMeterReadingsFromQueryResult(result);
+    // Map the database rows to `Reading` objects.
+    return _createReadingsFromQueryResult(result);
   }
 
   // Retrieves a list of distinct years from the meter readings.
-  static Future<List<int>> getMeterReadingsDistinctYears() async {
+  static Future<List<int>> getReadingsDistinctYears() async {
     final db = await database;
     _log.fine('Fetching distinct years of meter readings.');
 
     // Query for distinct years and return them as a list.
-    final result = db.select('SELECT DISTINCT year FROM meter_readings ORDER BY year DESC');
+    final result = db.select('SELECT DISTINCT year FROM readings ORDER BY year DESC');
     _log.fine('Fetched ${result.length} distinct years.');
 
     return result.map((row) => row['year'] as int).toList();
   }
 
   // Fetches the earliest meter reading for a given year.
-  static Future<List<MeterReading>> getMeterReadingForYear(int year) async {
+  static Future<List<Reading>> getReadingForYear(int year) async {
     final db = await database;
     _log.fine('Fetching first meter reading for year $year.');
 
     // Query for the earliest reading in the specified year.
     final result = db.select(
-      'SELECT * FROM meter_readings WHERE year = ?  ORDER BY month DESC, day DESC',
+      'SELECT * FROM readings WHERE year = ?  ORDER BY month DESC, day DESC',
       [year],
     );
 
-    // Map the database rows to `MeterReading` objects.
-    return _createMeterReadingsFromQueryResult(result);
+    // Map the database rows to `Reading` objects.
+    return _createReadingsFromQueryResult(result);
   }
 
   // Fetches the earliest meter reading for a given year.
-  static Future<List<MeterReading>> getUnsynchronizedMeterReadings() async {
+  static Future<List<Reading>> getUnsynchronizedReadings() async {
     final db = await database;
     _log.fine('Fetching unsynchronized meter readings.');
 
     // Query for the earliest reading in the specified year.
-    final result = db.select('SELECT * FROM meter_readings WHERE is_synced = 0 ORDER BY year DESC, month DESC, day DESC');
+    final result = db.select('SELECT * FROM readings WHERE is_synced = 0 ORDER BY year DESC, month DESC, day DESC');
 
-    // Map the database rows to `MeterReading` objects.
-    return _createMeterReadingsFromQueryResult(result);
+    // Map the database rows to `Reading` objects.
+    return _createReadingsFromQueryResult(result);
   }
 
   // Fetch the reading for a specific number of days before the current date
-  static Future<MeterReading?> getMeterReadingDaysBefore(int daysBefore) async {
+  static Future<Reading?> getReadingDaysBefore(int daysBefore) async {
     final db = await database;
 
     // Calculate target date
@@ -141,7 +141,7 @@ class DatabaseHelper {
 
     // Query for the earliest reading in the calculated day.
     final result = db.select(
-      'SELECT * FROM meter_readings WHERE year = ? AND month = ? AND day = ? ORDER BY month DESC, day DESC LIMIT 1',
+      'SELECT * FROM readings WHERE year = ? AND month = ? AND day = ? ORDER BY month DESC, day DESC LIMIT 1',
       [targetDate.year, targetDate.month, targetDate.day],
     );
     if (result.isEmpty) {
@@ -150,21 +150,21 @@ class DatabaseHelper {
       return null;
     }
 
-    return _createMeterReadingFromRow(result.first);
+    return _createReadingFromRow(result.first);
   }
 
   // Deletes all meter readings from the database.
-  static Future<void> deleteAllMeterReadings() async {
+  static Future<void> deleteAllReadings() async {
     final db = await database;
     _log.fine('Deleting all meter readings.');
 
     // Execute a deletion query.
-    db.execute('DELETE FROM meter_readings');
+    db.execute('DELETE FROM readings');
     _log.fine('All meter readings deleted successfully.');
   }
 
   // Bulk imports multiple meter readings, ensuring atomicity with transactions.
-  static Future<void> bulkInsert(List<MeterReading> readings) async {
+  static Future<void> bulkInsert(List<Reading> readings) async {
     final db = await database;
     _log.fine('Bulk importing ${readings.length} meter readings.');
 
@@ -179,7 +179,7 @@ class DatabaseHelper {
         // Perform the SQL insertion or update operation.
         db.execute(
           '''
-            INSERT INTO meter_readings (year, month, day, entered_reading, reading, is_generated, is_synced)
+            INSERT INTO readings (year, month, day, entered_reading, reading, is_generated, is_synced)
             VALUES (?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(year, month, day) DO UPDATE SET
               entered_reading = excluded.entered_reading,
@@ -203,12 +203,12 @@ class DatabaseHelper {
   }
 
   // Counts the total number of meter readings in the database.
-  static Future<int> countMeterReadings() async {
+  static Future<int> countReadings() async {
     final db = await database;
     _log.fine('Counting the number of meter readings.');
 
     // Perform a SQL query to count rows in the table.
-    final result = db.select('SELECT COUNT() AS count FROM meter_readings');
+    final result = db.select('SELECT COUNT() AS count FROM readings');
 
     // Extract and return the count.
     final count = result.first['count'] as int;
@@ -238,13 +238,13 @@ class DatabaseHelper {
     if (Platform.isAndroid || Platform.isIOS) {
       // Mobile platforms: Store in application documents directory.
       final directory = await getApplicationDocumentsDirectory();
-      _log.fine('Database path for mobile: ${directory.path}/meter_readings.db');
-      return '${directory.path}/meter_readings.db';
+      _log.fine('Database path for mobile: ${directory.path}/readings.db');
+      return '${directory.path}/readings.db';
     } else if (Platform.isWindows) {
       // Windows: Store in a temporary system directory.
       final dir = await Directory.systemTemp.createTemp();
-      _log.fine('Database path for Windows: ${dir.path}/meter_readings.db');
-      return '${dir.path}/meter_readings.db';
+      _log.fine('Database path for Windows: ${dir.path}/readings.db');
+      return '${dir.path}/readings.db';
     } else {
       // Unsupported platform: Log and throw an error.
       _log.severe('Unsupported platform encountered.');
@@ -252,15 +252,15 @@ class DatabaseHelper {
     }
   }
 
-  static List<MeterReading> _createMeterReadingsFromQueryResult(ResultSet result) {
+  static List<Reading> _createReadingsFromQueryResult(ResultSet result) {
     _log.fine('Mapping ${result.length} records');
     return result.map((row) {
-      return _createMeterReadingFromRow(row);
+      return _createReadingFromRow(row);
     }).toList();
   }
 
-  static MeterReading _createMeterReadingFromRow(Row row) {
-    MeterReading meterReading = MeterReading(
+  static Reading _createReadingFromRow(Row row) {
+    Reading reading = Reading(
       date: DateTime(
         row['year'] as int,
         row['month'] as int,
@@ -273,8 +273,8 @@ class DatabaseHelper {
       isSynced: row['is_synced'] as int == 1,
     );
 
-    _log.fine('Meter reading ${meterReading.toString()} created');
+    _log.fine('Reading ${reading.toString()} created');
 
-    return meterReading;
+    return reading;
   }
 }

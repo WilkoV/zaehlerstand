@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'meter_reading.dart';
+part of 'reading.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$MeterReadingImpl _$$MeterReadingImplFromJson(Map<String, dynamic> json) =>
-    _$MeterReadingImpl(
+_$ReadingImpl _$$ReadingImplFromJson(Map<String, dynamic> json) =>
+    _$ReadingImpl(
       date: DateTime.parse(json['date'] as String),
       enteredReading: (json['enteredReading'] as num).toInt(),
       reading: (json['reading'] as num).toInt(),
@@ -15,7 +15,7 @@ _$MeterReadingImpl _$$MeterReadingImplFromJson(Map<String, dynamic> json) =>
       isSynced: json['isSynced'] as bool,
     );
 
-Map<String, dynamic> _$$MeterReadingImplToJson(_$MeterReadingImpl instance) =>
+Map<String, dynamic> _$$ReadingImplToJson(_$ReadingImpl instance) =>
     <String, dynamic>{
       'date': instance.date.toIso8601String(),
       'enteredReading': instance.enteredReading,

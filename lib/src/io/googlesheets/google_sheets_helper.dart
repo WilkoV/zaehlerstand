@@ -1,20 +1,20 @@
 import 'package:gsheets/gsheets.dart';
 import 'package:logging/logging.dart';
 import 'package:zaehlerstand/src/constants/google_sheets_credentials.dart' as gsc;
-import 'package:zaehlerstand/src/models/base/meter_reading.dart';
+import 'package:zaehlerstand/src/models/base/reading.dart';
 import 'package:zaehlerstand/src/models/base/progress_update.dart';
-import 'package:zaehlerstand/src/models/logic/meter_reading_logic.dart';
+import 'package:zaehlerstand/src/models/logic/reading_logic.dart';
 
 class GoogleSheetsHelper {
   final Logger _log = Logger('GoogleSheetsHelper');
 
   int credentialId = 1;
 
-  Future<List<MeterReading>> insertRows(List<MeterReading> readings, Function(ProgressUpdate) onProgress) async {
+  Future<List<Reading>> insertRows(List<Reading> readings, Function(ProgressUpdate) onProgress) async {
     late Spreadsheet spreadsheet;
     late Worksheet? worksheet;
 
-    List<MeterReading> synchronizedMeterReadings = <MeterReading>[];
+    List<Reading> synchronizedReadings = <Reading>[];
 
     bool switched = false;
     bool failed = false;
@@ -26,7 +26,7 @@ class GoogleSheetsHelper {
 
     // Fetch the spreadsheet and the specific worksheet by title (year)
 
-    for (MeterReading reading in readings) {
+    for (Reading reading in readings) {
       if (numberOfInserts == 0) {
         switched = true;
       } else if (failed) {
@@ -44,7 +44,7 @@ class GoogleSheetsHelper {
           worksheet = await _getWorksheetByTitle(spreadsheet, _getWorksheetTitle(reading));
         } catch (e, stackTrace) {
           _log.severe('Failed to get sheets: $e', e, stackTrace);
-          return synchronizedMeterReadings;
+          return synchronizedReadings;
         }
       }
 
@@ -53,7 +53,7 @@ class GoogleSheetsHelper {
         _log.fine('Sheets loaded');
       } else {
         _log.warning('Worksheet is null, cannot insert row.');
-        return synchronizedMeterReadings;
+        return synchronizedReadings;
       }
 
       // Insert the row data at the specific row index (day of the year)
@@ -61,7 +61,7 @@ class GoogleSheetsHelper {
         final bool ok = await worksheet.values.insertRow(reading.getDayOfYear(), reading.toDynamicList());
 
         if (ok) {
-          synchronizedMeterReadings.add(reading.copyWith(isSynced: true));
+          synchronizedReadings.add(reading.copyWith(isSynced: true));
         }
 
         numberOfInserts++;
@@ -74,14 +74,14 @@ class GoogleSheetsHelper {
       recordIndex++;
     }
 
-    _log.fine('${synchronizedMeterReadings.length} written to google sheets');
+    _log.fine('${synchronizedReadings.length} written to google sheets');
 
-    return synchronizedMeterReadings;
+    return synchronizedReadings;
   }
 
   /// Fetches all rows for the given [year] from the corresponding worksheet.
-  /// Converts each row into a [MeterReading] object and returns a list.
-  Future<List<MeterReading>?> fetchYear(String year) async {
+  /// Converts each row into a [Reading] object and returns a list.
+  Future<List<Reading>?> fetchYear(String year) async {
     try {
       _log.fine('Fetching data for the year: $year');
 
@@ -98,8 +98,8 @@ class GoogleSheetsHelper {
       // Fetch all rows from the worksheet
       List<List<String>> result = await _fetchWorksheet(worksheet);
 
-      // Convert rows into MeterReading objects
-      List<MeterReading> readings = MeterReadingLogic.fromListOfStringLists(result);
+      // Convert rows into Reading objects
+      List<Reading> readings = ReadingLogic.fromListOfStringLists(result);
 
       _log.fine('Fetched rows: ${result.toString()}');
       return readings;
@@ -110,8 +110,8 @@ class GoogleSheetsHelper {
   }
 
   /// Fetches all rows from all worksheets in the spreadsheet.
-  /// Returns a list of [MeterReading] objects.
-  Future<List<MeterReading>?> fetchAll() async {
+  /// Returns a list of [Reading] objects.
+  Future<List<Reading>?> fetchAll() async {
     try {
       _log.fine('Fetching data from all worksheets');
 
@@ -135,10 +135,10 @@ class GoogleSheetsHelper {
       // Remove invalid or empty rows
       result.removeWhere((sublist) => sublist.isEmpty || sublist.every((element) => element.trim().isEmpty));
 
-      // Convert rows into MeterReading objects
-      List<MeterReading> meterReadings = MeterReadingLogic.fromListOfStringLists(result);
+      // Convert rows into Reading objects
+      List<Reading> reading = ReadingLogic.fromListOfStringLists(result);
 
-      return meterReadings;
+      return reading;
     } catch (e, stackTrace) {
       _log.severe('Failed to fetch all rows: $e', e, stackTrace);
       return null;
@@ -217,8 +217,8 @@ class GoogleSheetsHelper {
     }
   }
 
-  /// Returns the title of the worksheet corresponding to the year of the given [MeterReading].
-  String _getWorksheetTitle(MeterReading reading) => reading.date.year.toString();
+  /// Returns the title of the worksheet corresponding to the year of the given [Reading].
+  String _getWorksheetTitle(Reading reading) => reading.date.year.toString();
 
   Future<bool> _updateCredentialId({required int numberOfInserts, bool forceSwitch = false}) async {
     bool switched = false;
