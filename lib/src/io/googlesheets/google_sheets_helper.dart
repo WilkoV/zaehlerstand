@@ -58,7 +58,8 @@ class GoogleSheetsHelper {
 
       // Insert the row data at the specific row index (day of the year)
       try {
-        final bool ok = await worksheet.values.insertRow(reading.getDayOfYear(), reading.toDynamicList());
+        List<dynamic> dynamicList = reading.toDynamicList();
+        final bool ok = await worksheet.values.insertRow(reading.getDayOfYear(), dynamicList);
 
         if (ok) {
           synchronizedReadings.add(reading.copyWith(isSynced: true));

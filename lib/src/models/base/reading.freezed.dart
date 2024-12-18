@@ -25,6 +25,7 @@ mixin _$Reading {
   int get reading => throw _privateConstructorUsedError;
   bool get isGenerated => throw _privateConstructorUsedError;
   bool get isSynced => throw _privateConstructorUsedError;
+  WeatherInfo get weatherInfo => throw _privateConstructorUsedError;
 
   /// Serializes this Reading to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -45,7 +46,10 @@ abstract class $ReadingCopyWith<$Res> {
       int enteredReading,
       int reading,
       bool isGenerated,
-      bool isSynced});
+      bool isSynced,
+      WeatherInfo weatherInfo});
+
+  $WeatherInfoCopyWith<$Res> get weatherInfo;
 }
 
 /// @nodoc
@@ -68,6 +72,7 @@ class _$ReadingCopyWithImpl<$Res, $Val extends Reading>
     Object? reading = null,
     Object? isGenerated = null,
     Object? isSynced = null,
+    Object? weatherInfo = null,
   }) {
     return _then(_value.copyWith(
       date: null == date
@@ -90,7 +95,21 @@ class _$ReadingCopyWithImpl<$Res, $Val extends Reading>
           ? _value.isSynced
           : isSynced // ignore: cast_nullable_to_non_nullable
               as bool,
+      weatherInfo: null == weatherInfo
+          ? _value.weatherInfo
+          : weatherInfo // ignore: cast_nullable_to_non_nullable
+              as WeatherInfo,
     ) as $Val);
+  }
+
+  /// Create a copy of Reading
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $WeatherInfoCopyWith<$Res> get weatherInfo {
+    return $WeatherInfoCopyWith<$Res>(_value.weatherInfo, (value) {
+      return _then(_value.copyWith(weatherInfo: value) as $Val);
+    });
   }
 }
 
@@ -106,7 +125,11 @@ abstract class _$$ReadingImplCopyWith<$Res> implements $ReadingCopyWith<$Res> {
       int enteredReading,
       int reading,
       bool isGenerated,
-      bool isSynced});
+      bool isSynced,
+      WeatherInfo weatherInfo});
+
+  @override
+  $WeatherInfoCopyWith<$Res> get weatherInfo;
 }
 
 /// @nodoc
@@ -127,6 +150,7 @@ class __$$ReadingImplCopyWithImpl<$Res>
     Object? reading = null,
     Object? isGenerated = null,
     Object? isSynced = null,
+    Object? weatherInfo = null,
   }) {
     return _then(_$ReadingImpl(
       date: null == date
@@ -149,6 +173,10 @@ class __$$ReadingImplCopyWithImpl<$Res>
           ? _value.isSynced
           : isSynced // ignore: cast_nullable_to_non_nullable
               as bool,
+      weatherInfo: null == weatherInfo
+          ? _value.weatherInfo
+          : weatherInfo // ignore: cast_nullable_to_non_nullable
+              as WeatherInfo,
     ));
   }
 }
@@ -161,7 +189,8 @@ class _$ReadingImpl implements _Reading {
       required this.enteredReading,
       required this.reading,
       required this.isGenerated,
-      required this.isSynced});
+      required this.isSynced,
+      required this.weatherInfo});
 
   factory _$ReadingImpl.fromJson(Map<String, dynamic> json) =>
       _$$ReadingImplFromJson(json);
@@ -176,10 +205,12 @@ class _$ReadingImpl implements _Reading {
   final bool isGenerated;
   @override
   final bool isSynced;
+  @override
+  final WeatherInfo weatherInfo;
 
   @override
   String toString() {
-    return 'Reading(date: $date, enteredReading: $enteredReading, reading: $reading, isGenerated: $isGenerated, isSynced: $isSynced)';
+    return 'Reading(date: $date, enteredReading: $enteredReading, reading: $reading, isGenerated: $isGenerated, isSynced: $isSynced, weatherInfo: $weatherInfo)';
   }
 
   @override
@@ -194,13 +225,15 @@ class _$ReadingImpl implements _Reading {
             (identical(other.isGenerated, isGenerated) ||
                 other.isGenerated == isGenerated) &&
             (identical(other.isSynced, isSynced) ||
-                other.isSynced == isSynced));
+                other.isSynced == isSynced) &&
+            (identical(other.weatherInfo, weatherInfo) ||
+                other.weatherInfo == weatherInfo));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, date, enteredReading, reading, isGenerated, isSynced);
+  int get hashCode => Object.hash(runtimeType, date, enteredReading, reading,
+      isGenerated, isSynced, weatherInfo);
 
   /// Create a copy of Reading
   /// with the given fields replaced by the non-null parameter values.
@@ -224,7 +257,8 @@ abstract class _Reading implements Reading {
       required final int enteredReading,
       required final int reading,
       required final bool isGenerated,
-      required final bool isSynced}) = _$ReadingImpl;
+      required final bool isSynced,
+      required final WeatherInfo weatherInfo}) = _$ReadingImpl;
 
   factory _Reading.fromJson(Map<String, dynamic> json) = _$ReadingImpl.fromJson;
 
@@ -238,6 +272,8 @@ abstract class _Reading implements Reading {
   bool get isGenerated;
   @override
   bool get isSynced;
+  @override
+  WeatherInfo get weatherInfo;
 
   /// Create a copy of Reading
   /// with the given fields replaced by the non-null parameter values.

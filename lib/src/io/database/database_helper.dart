@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:zaehlerstand/src/models/base/reading.dart';
+import 'package:zaehlerstand/src/models/base/weather_info.dart';
 
 class DatabaseHelper {
   // Logger for debugging and monitoring database operations.
@@ -36,6 +37,7 @@ class DatabaseHelper {
   static void createDb(Database db) {
     _log.fine('Creating database table if not exists.');
 
+    // Table is de-normalized for performance reasons
     db.execute('''
       CREATE TABLE IF NOT EXISTS readings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,6 +48,11 @@ class DatabaseHelper {
         reading INTEGER NOT NULL,
         is_generated INTEGER NOT NULL,
         is_synced INTEGER NOT NULL,
+        weather_year INTEGER NOT NULL,
+        weather_month INTEGER NOT NULL,
+        weather_day INTEGER NOT NULL,
+        temperature REAL NOT NULL,
+        weather_is_generated INTEGER NOT NULL,
         UNIQUE(year, month, day) -- Ensures no duplicate entries for the same date
       );
     ''');
@@ -61,19 +68,39 @@ class DatabaseHelper {
     // Convert boolean to integer for storage.
     int isGenerated = reading.isGenerated ? 1 : 0;
     int isSynced = reading.isSynced ? 1 : 0;
+    int weatherIsGenerated = reading.weatherInfo.isGenerated ? 1 : 0;
 
     // Perform the SQL insertion or update operation.
     db.execute(
       '''
-        INSERT INTO readings (year, month, day, entered_reading, reading, is_generated, is_synced)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO readings (year, month, day, entered_reading, reading, is_generated, is_synced, 
+        weather_year, weather_month, weather_day, temperature, weather_is_generated)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(year, month, day) DO UPDATE SET
           entered_reading = excluded.entered_reading,
           reading = excluded.reading, 
           is_generated = excluded.is_generated,
-          is_synced = excluded.is_synced;
+          is_synced = excluded.is_synced,
+          weather_year = excluded.weather_year,
+          weather_month = excluded.weather_month,
+          weather_day = excluded.weather_day,
+          temperature = excluded.temperature,
+          weather_is_generated = excluded.weather_is_generated;          
       ''',
-      [reading.date.year, reading.date.month, reading.date.day, reading.enteredReading, reading.reading, isGenerated, isSynced],
+      [
+        reading.date.year,
+        reading.date.month,
+        reading.date.day,
+        reading.enteredReading,
+        reading.reading,
+        isGenerated,
+        isSynced,
+        reading.weatherInfo.date.year,
+        reading.weatherInfo.date.month,
+        reading.weatherInfo.date.day,
+        reading.weatherInfo.temperature,
+        weatherIsGenerated
+      ],
     );
 
     _log.fine('Reading ${reading.toString()} inserted/updated successfully.');
@@ -175,19 +202,39 @@ class DatabaseHelper {
         // Convert boolean to integer for storage.
         int isGenerated = reading.isGenerated ? 1 : 0;
         int isSynced = reading.isSynced ? 1 : 0;
+        int weatherIsGenerated = reading.weatherInfo.isGenerated ? 1 : 0;
 
         // Perform the SQL insertion or update operation.
         db.execute(
           '''
-            INSERT INTO readings (year, month, day, entered_reading, reading, is_generated, is_synced)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO readings (year, month, day, entered_reading, reading, is_generated, is_synced, 
+            weather_year, weather_month, weather_day, temperature, weather_is_generated)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(year, month, day) DO UPDATE SET
               entered_reading = excluded.entered_reading,
               reading = excluded.reading, 
               is_generated = excluded.is_generated,
-              is_synced = excluded.is_synced;
+              is_synced = excluded.is_synced,
+              weather_year = excluded.weather_year,
+              weather_month = excluded.weather_month,
+              weather_day = excluded.weather_day,
+              temperature = excluded.temperature,
+              weather_is_generated = excluded.weather_is_generated;          
           ''',
-          [reading.date.year, reading.date.month, reading.date.day, reading.enteredReading, reading.reading, isGenerated, isSynced],
+          [
+            reading.date.year,
+            reading.date.month,
+            reading.date.day,
+            reading.enteredReading,
+            reading.reading,
+            isGenerated,
+            isSynced,
+            reading.weatherInfo.date.year,
+            reading.weatherInfo.date.month,
+            reading.weatherInfo.date.day,
+            reading.weatherInfo.temperature,
+            weatherIsGenerated
+          ],
         );
       }
 
@@ -271,6 +318,16 @@ class DatabaseHelper {
       isGenerated: row['is_generated'] as int == 1,
       enteredReading: row['entered_reading'] as int,
       isSynced: row['is_synced'] as int == 1,
+      weatherInfo: WeatherInfo(
+        date: DateTime(
+          row['weather_year'] as int,
+          row['weather_month'] as int,
+          row['weather_day'] as int,
+          12, // Set the time to 12:00 for consistency),
+        ),
+        temperature: row['temperature'] as double,
+        isGenerated: row['weather_is_generated'] as int == 1,
+      ),
     );
 
     _log.fine('Reading ${reading.toString()} created');

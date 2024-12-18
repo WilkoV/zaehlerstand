@@ -22,9 +22,6 @@ WeatherInfo _$WeatherInfoFromJson(Map<String, dynamic> json) {
 mixin _$WeatherInfo {
   DateTime get date => throw _privateConstructorUsedError;
   double get temperature => throw _privateConstructorUsedError;
-  double get feelsLikeTemperature => throw _privateConstructorUsedError;
-  double get windSpeed => throw _privateConstructorUsedError;
-  String get icon => throw _privateConstructorUsedError;
   bool get isGenerated => throw _privateConstructorUsedError;
 
   /// Serializes this WeatherInfo to a JSON map.
@@ -43,13 +40,7 @@ abstract class $WeatherInfoCopyWith<$Res> {
           WeatherInfo value, $Res Function(WeatherInfo) then) =
       _$WeatherInfoCopyWithImpl<$Res, WeatherInfo>;
   @useResult
-  $Res call(
-      {DateTime date,
-      double temperature,
-      double feelsLikeTemperature,
-      double windSpeed,
-      String icon,
-      bool isGenerated});
+  $Res call({DateTime date, double temperature, bool isGenerated});
 }
 
 /// @nodoc
@@ -69,9 +60,6 @@ class _$WeatherInfoCopyWithImpl<$Res, $Val extends WeatherInfo>
   $Res call({
     Object? date = null,
     Object? temperature = null,
-    Object? feelsLikeTemperature = null,
-    Object? windSpeed = null,
-    Object? icon = null,
     Object? isGenerated = null,
   }) {
     return _then(_value.copyWith(
@@ -83,18 +71,6 @@ class _$WeatherInfoCopyWithImpl<$Res, $Val extends WeatherInfo>
           ? _value.temperature
           : temperature // ignore: cast_nullable_to_non_nullable
               as double,
-      feelsLikeTemperature: null == feelsLikeTemperature
-          ? _value.feelsLikeTemperature
-          : feelsLikeTemperature // ignore: cast_nullable_to_non_nullable
-              as double,
-      windSpeed: null == windSpeed
-          ? _value.windSpeed
-          : windSpeed // ignore: cast_nullable_to_non_nullable
-              as double,
-      icon: null == icon
-          ? _value.icon
-          : icon // ignore: cast_nullable_to_non_nullable
-              as String,
       isGenerated: null == isGenerated
           ? _value.isGenerated
           : isGenerated // ignore: cast_nullable_to_non_nullable
@@ -111,13 +87,7 @@ abstract class _$$WeatherInfoImplCopyWith<$Res>
       __$$WeatherInfoImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {DateTime date,
-      double temperature,
-      double feelsLikeTemperature,
-      double windSpeed,
-      String icon,
-      bool isGenerated});
+  $Res call({DateTime date, double temperature, bool isGenerated});
 }
 
 /// @nodoc
@@ -135,9 +105,6 @@ class __$$WeatherInfoImplCopyWithImpl<$Res>
   $Res call({
     Object? date = null,
     Object? temperature = null,
-    Object? feelsLikeTemperature = null,
-    Object? windSpeed = null,
-    Object? icon = null,
     Object? isGenerated = null,
   }) {
     return _then(_$WeatherInfoImpl(
@@ -149,18 +116,6 @@ class __$$WeatherInfoImplCopyWithImpl<$Res>
           ? _value.temperature
           : temperature // ignore: cast_nullable_to_non_nullable
               as double,
-      feelsLikeTemperature: null == feelsLikeTemperature
-          ? _value.feelsLikeTemperature
-          : feelsLikeTemperature // ignore: cast_nullable_to_non_nullable
-              as double,
-      windSpeed: null == windSpeed
-          ? _value.windSpeed
-          : windSpeed // ignore: cast_nullable_to_non_nullable
-              as double,
-      icon: null == icon
-          ? _value.icon
-          : icon // ignore: cast_nullable_to_non_nullable
-              as String,
       isGenerated: null == isGenerated
           ? _value.isGenerated
           : isGenerated // ignore: cast_nullable_to_non_nullable
@@ -175,9 +130,6 @@ class _$WeatherInfoImpl implements _WeatherInfo {
   _$WeatherInfoImpl(
       {required this.date,
       required this.temperature,
-      required this.feelsLikeTemperature,
-      required this.windSpeed,
-      required this.icon,
       required this.isGenerated});
 
   factory _$WeatherInfoImpl.fromJson(Map<String, dynamic> json) =>
@@ -188,17 +140,11 @@ class _$WeatherInfoImpl implements _WeatherInfo {
   @override
   final double temperature;
   @override
-  final double feelsLikeTemperature;
-  @override
-  final double windSpeed;
-  @override
-  final String icon;
-  @override
   final bool isGenerated;
 
   @override
   String toString() {
-    return 'WeatherInfo(date: $date, temperature: $temperature, feelsLikeTemperature: $feelsLikeTemperature, windSpeed: $windSpeed, icon: $icon, isGenerated: $isGenerated)';
+    return 'WeatherInfo(date: $date, temperature: $temperature, isGenerated: $isGenerated)';
   }
 
   @override
@@ -209,19 +155,13 @@ class _$WeatherInfoImpl implements _WeatherInfo {
             (identical(other.date, date) || other.date == date) &&
             (identical(other.temperature, temperature) ||
                 other.temperature == temperature) &&
-            (identical(other.feelsLikeTemperature, feelsLikeTemperature) ||
-                other.feelsLikeTemperature == feelsLikeTemperature) &&
-            (identical(other.windSpeed, windSpeed) ||
-                other.windSpeed == windSpeed) &&
-            (identical(other.icon, icon) || other.icon == icon) &&
             (identical(other.isGenerated, isGenerated) ||
                 other.isGenerated == isGenerated));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, date, temperature,
-      feelsLikeTemperature, windSpeed, icon, isGenerated);
+  int get hashCode => Object.hash(runtimeType, date, temperature, isGenerated);
 
   /// Create a copy of WeatherInfo
   /// with the given fields replaced by the non-null parameter values.
@@ -243,9 +183,6 @@ abstract class _WeatherInfo implements WeatherInfo {
   factory _WeatherInfo(
       {required final DateTime date,
       required final double temperature,
-      required final double feelsLikeTemperature,
-      required final double windSpeed,
-      required final String icon,
       required final bool isGenerated}) = _$WeatherInfoImpl;
 
   factory _WeatherInfo.fromJson(Map<String, dynamic> json) =
@@ -255,12 +192,6 @@ abstract class _WeatherInfo implements WeatherInfo {
   DateTime get date;
   @override
   double get temperature;
-  @override
-  double get feelsLikeTemperature;
-  @override
-  double get windSpeed;
-  @override
-  String get icon;
   @override
   bool get isGenerated;
 

@@ -4,9 +4,11 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:zaehlerstand/src/io/database/database_helper.dart';
 import 'package:zaehlerstand/src/io/googlesheets/google_sheets_helper.dart';
+import 'package:zaehlerstand/src/io/open_weather_map/open_weather_map_helper.dart';
 import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
-import 'package:zaehlerstand/src/models/base/reading.dart';
 import 'package:zaehlerstand/src/models/base/progress_update.dart';
+import 'package:zaehlerstand/src/models/base/reading.dart';
+import 'package:zaehlerstand/src/models/base/weather_info.dart';
 
 class DataProvider extends ChangeNotifier {
   static final _log = Logger('DataProvider');
@@ -18,7 +20,7 @@ class DataProvider extends ChangeNotifier {
   int unsyncedCount = 0;
 
   /// List of all meter readings managed by the provider.
-  List<Reading> reading = <Reading>[];
+  List<Reading> readings = <Reading>[];
 
   // All meter readings grouped by year
   Map<int, List<Reading>> groupedReadings = {};
@@ -28,6 +30,9 @@ class DataProvider extends ChangeNotifier {
 
   /// List of all years that have data in reading
   List<int> dataYears = <int>[];
+
+  /// Last weather info
+  late WeatherInfo lastWeatherInfo;
 
   final StreamController<ProgressUpdate> _addReadingProgressController;
   final StreamController<ProgressUpdate> _syncReadingProgressController;
@@ -62,7 +67,7 @@ class DataProvider extends ChangeNotifier {
       // Check database for data and load it if necessary
       await _refreshLists();
 
-      if (reading.isEmpty) {
+      if (readings.isEmpty) {
         await _copyFromGoogleSheetsToDb();
         await _refreshLists();
       }
@@ -74,6 +79,8 @@ class DataProvider extends ChangeNotifier {
         _checkForUnsynchronizedDbRecords();
         notifyListeners();
       }
+
+      await getWeatherInfo();
     } catch (e, stackTrace) {
       _log.severe('Failed to check DB or load from Google Sheets: $e', e, stackTrace);
       return;
@@ -82,6 +89,9 @@ class DataProvider extends ChangeNotifier {
     isLoading = false;
     _log.fine('Initialization finished');
     notifyListeners(); // Notify UI listeners that state has changed
+
+    OpenWeatherMapHelper openWeatherMapHelper = OpenWeatherMapHelper();
+    await openWeatherMapHelper.fetchWeather();
   }
 
   /// Fetches all meter readings from the database and updates the provider's state.
@@ -111,10 +121,16 @@ class DataProvider extends ChangeNotifier {
     isAddingReadings = true;
     notifyListeners();
 
-    List<Reading> intermediateReadings = _createReadingsForIntermediateDays(enteredReading);
+    // TODO: Check network connectivity
+
+    OpenWeatherMapHelper openWeatherMapHelper = OpenWeatherMapHelper();
+    WeatherInfo? weatherInfo = await openWeatherMapHelper.fetchWeather() ?? readings.first.weatherInfo.copyWith(isGenerated: true);
+    
+    // Calculate intermediate readings in case some readings are missing
+    List<Reading> intermediateReadings = _createReadingsForIntermediateDays(enteredReading, weatherInfo.temperature);
 
     // Add the entered reading to the intermediateReadings list
-    Reading readingFromInput = Reading.fromInput(enteredReading);
+    Reading readingFromInput = Reading.fromInput(enteredReading, weatherInfo.date, weatherInfo.temperature);
     _log.fine('Adding user-entered reading: ${readingFromInput.toString()}.');
     intermediateReadings.add(readingFromInput);
 
@@ -181,23 +197,6 @@ class DataProvider extends ChangeNotifier {
     return numberOfReadings;
   }
 
-  /// Check if database has data
-  Future<int> _checkIfDbHasData() async {
-    _log.fine('Checking if database has data');
-
-    // Query the database for the number of meter readings
-    int numberOfReadings = await DatabaseHelper.countReadings();
-    _log.fine('Database currently contains $numberOfReadings entries');
-
-    if (numberOfReadings <= 0) {
-      // If the database is empty, fetch data from Google Sheets
-      numberOfReadings = await _copyFromGoogleSheetsToDb();
-    }
-
-    _log.fine('Database now contains $numberOfReadings entries');
-    return numberOfReadings;
-  }
-
   /// Get the years where data has been stored for
   Future<List<int>> _getDataYears() async {
     // Query the database for distinct years
@@ -208,8 +207,8 @@ class DataProvider extends ChangeNotifier {
 
   /// Get all meter readings
   Future<void> _getAllReadings() async {
-    reading = await DatabaseHelper.getAllReadings();
-    _log.fine('Fetched ${reading.length} meter readings');
+    readings = await DatabaseHelper.getAllReadings();
+    _log.fine('Fetched ${readings.length} meter readings');
   }
 
   /// Calculate the daily consumption
@@ -218,16 +217,16 @@ class DataProvider extends ChangeNotifier {
     groupedDailyConsumptions.clear();
 
     // Iterate through the list of reading
-    for (int i = 0; i < reading.length; i++) {
-      Reading currentReading = reading[i];
+    for (int i = 0; i < readings.length; i++) {
+      Reading currentReading = readings[i];
 
       // Determine the year of the current reading
       int year = currentReading.date.year;
 
       // For the last entry, consumption is 0
       int consumption = 0;
-      if (i < reading.length - 1) {
-        Reading nextReading = reading[i + 1];
+      if (i < readings.length - 1) {
+        Reading nextReading = readings[i + 1];
         consumption = currentReading.reading - nextReading.reading;
       }
 
@@ -245,12 +244,31 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> getWeatherInfo() async {
+    _log.fine('Getting data from open weather map');
+    OpenWeatherMapHelper openWeatherMapHelper = OpenWeatherMapHelper();
+    WeatherInfo? fetchedWeatherInfo = await openWeatherMapHelper.fetchWeather();
+
+    if (fetchedWeatherInfo != null) {
+      lastWeatherInfo = fetchedWeatherInfo;
+      _log.fine('Successfully loaded data from open weather map: ${lastWeatherInfo.toString()}');
+    } else if (fetchedWeatherInfo == null && readings.isNotEmpty) {
+      lastWeatherInfo = readings.first.weatherInfo;
+      _log.warning('Failed to load data from open weather map. Defaulting to last known weather info: ${lastWeatherInfo.toString()}');
+    } else {
+      _log.warning('Failed to load data from open weather map and no previous readings found. Creating default: ${lastWeatherInfo.toString()}');
+      lastWeatherInfo = WeatherInfo.fromInput(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 12), 99.99);
+    }
+
+    notifyListeners();
+  }
+
   void _groupReadingsByYear() {
     // Remove all entries
     groupedReadings.clear();
 
     // Iterate through the reading list
-    for (var reading in reading) {
+    for (var reading in readings) {
       int year = reading.date.year; // Extract the year from the date
 
       // If the year is not yet a key in the map, initialize an empty list for it
@@ -274,17 +292,17 @@ class DataProvider extends ChangeNotifier {
     return synchronizedReadings.length;
   }
 
-  List<Reading> _createReadingsForIntermediateDays(int enteredReading) {
+  List<Reading> _createReadingsForIntermediateDays(int enteredReading, double enteredTemperature) {
     DateTime currentDate = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 12);
 
     // Find the most recent meter reading before the current date, or create a default one if none exist
     _log.fine('Fetching the previous meter reading before $currentDate.');
-    Reading previousReading = reading.isNotEmpty
-        ? reading.firstWhere(
+    Reading previousReading = readings.isNotEmpty
+        ? readings.firstWhere(
             (reading) => reading.date.isBefore(currentDate),
-            orElse: () => reading.first,
+            orElse: () => readings.first,
           )
-        : Reading.fromInput(enteredReading);
+        : Reading.fromInput(enteredReading, currentDate, enteredTemperature);
 
     int daysBetweenReadings = currentDate.difference(previousReading.date).inDays;
     _log.fine('Days between readings: $daysBetweenReadings.');
@@ -298,13 +316,19 @@ class DataProvider extends ChangeNotifier {
       int totalConsumption = enteredReading - previousReading.reading;
       double averageConsumption = totalConsumption / daysBetweenReadings;
       double previousReadingValue = previousReading.reading.toDouble();
+
+      double totalTemperatureShift = enteredTemperature - previousReading.weatherInfo.temperature;
+      double averageTemperatureShift = totalTemperatureShift / daysBetweenReadings;
+      double previousTemperatureValue = previousReading.weatherInfo.temperature;
+
       _log.fine('Total consumption: $totalConsumption, Average consumption: $averageConsumption.');
       DateTime targetDate = previousReading.date;
 
       for (var i = 0; i < daysBetweenReadings - 1; i++) {
         previousReadingValue = previousReadingValue + averageConsumption;
+        previousTemperatureValue = previousTemperatureValue + averageTemperatureShift;
         targetDate = targetDate.add(const Duration(days: 1));
-        Reading calculatedReading = Reading.fromGenerateData(targetDate, previousReadingValue.toInt());
+        Reading calculatedReading = Reading.fromGenerateData(targetDate, previousReadingValue.toInt(), previousTemperatureValue);
 
         _log.fine('Generated intermediate reading: ${calculatedReading.toString()}');
         newReadings.add(calculatedReading);
@@ -320,7 +344,7 @@ class DataProvider extends ChangeNotifier {
     await _getAllReadings();
     _groupReadingsByYear();
     _calculateDailyConsumptionAndGroupByYear();
-    unsyncedCount = reading.where((reading) => !reading.isSynced).length;
+    unsyncedCount = readings.where((reading) => !reading.isSynced).length;
 
     _log.fine('All lists updated.');
   }
@@ -328,7 +352,7 @@ class DataProvider extends ChangeNotifier {
   Future<void> _checkForUnsynchronizedDbRecords() async {
     isSynchronizingToGoogleSheets = true;
 
-    final List<Reading> unsynchronizedReadings = reading.where((reading) => !reading.isSynced).toList();
+    final List<Reading> unsynchronizedReadings = readings.where((reading) => !reading.isSynced).toList();
     if (unsynchronizedReadings.isNotEmpty) {
       await _syncToGoogleSheets(
         unsynchronizedReadings,

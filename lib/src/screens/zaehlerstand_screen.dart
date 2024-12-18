@@ -72,11 +72,11 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
   }
 
   String _getFirstTwoDigitsFromNewestReading(DataProvider dataProvider) {
-    if (dataProvider.reading.isEmpty) {
+    if (dataProvider.readings.isEmpty) {
       return '';
     }
 
-    Reading reading = dataProvider.reading.first;
+    Reading reading = dataProvider.readings.first;
     var readingAsString = reading.reading.toString();
     int currentLength = readingAsString.length;
 
@@ -86,8 +86,8 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
 
     int targetPosition = currentLength - 3;
 
-    return dataProvider.reading.isNotEmpty ? readingAsString.substring(0, targetPosition) : '';
+    return dataProvider.readings.isNotEmpty ? readingAsString.substring(0, targetPosition) : '';
   }
 
-  int _getMinimumValue(DataProvider dataProvider) => dataProvider.reading.isNotEmpty ? dataProvider.reading.first.reading : 0;
+  int _getMinimumValue(DataProvider dataProvider) => dataProvider.readings.isNotEmpty ? dataProvider.readings.first.reading : 0;
 }

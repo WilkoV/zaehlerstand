@@ -12,9 +12,6 @@ extension WeatherInfoLogic on WeatherInfo {
     List<String> result = [
       getFormattedDate(),
       temperature.toString(),
-      feelsLikeTemperature.toString(),
-      windSpeed.toString(),
-      icon,
       isGenerated.toString(),
     ];
 
@@ -28,13 +25,10 @@ extension WeatherInfoLogic on WeatherInfo {
     // Parse each element from the list to its respective type
     DateTime date = parseDate(list[0]);
     double temperature = double.parse(list[1]);
-    double feelsLikeTemperature = double.parse(list[2]);
-    double windSpeed = double.parse(list[3]);
-    String icon = list[4];
     bool isGenerated = list[3].toLowerCase() == 'true';
 
     // Create and return a new MeterReading instance
-    WeatherInfo weatherInfo = WeatherInfo(date: date, temperature: temperature, feelsLikeTemperature: feelsLikeTemperature, windSpeed: windSpeed, icon: icon, isGenerated: isGenerated);
+    WeatherInfo weatherInfo = WeatherInfo(date: date, temperature: temperature, isGenerated: isGenerated);
 
     _log.fine('Created WeatherInfo = ${weatherInfo.toString()}');
 
@@ -43,14 +37,32 @@ extension WeatherInfoLogic on WeatherInfo {
 
   /// Formats the [date] of the current [MeterReading] instance to `dd.MM.yyyy`.
   String getFormattedDate() {
+    String transformedDate = formateDate(date);
+
+    return transformedDate;
+  }
+
+  static String formateDate(DateTime date) {
     _log.fine('Formatting date: ${date.toString()}');
 
-    // Define date format and format the DateTime object
     DateFormat dateFormat = DateFormat('dd.MM.yyyy');
     String transformedDate = dateFormat.format(date);
 
     _log.fine('Formatted date: $transformedDate');
+
     return transformedDate;
+  }
+
+  String getFormattedTemperature() {
+    String formattedValue = formateDouble(temperature);
+
+    return formattedValue;
+  }
+
+  static String formateDouble(double value) {
+    var formatter = NumberFormat('0.0', 'de_DE');
+    String formattedValue = formatter.format(value);
+    return formattedValue;
   }
 
   /// Parses a date string in the format `dd.MM.yyyy` into a [DateTime] object.
@@ -61,7 +73,22 @@ extension WeatherInfoLogic on WeatherInfo {
     DateFormat dateFormat = DateFormat('dd.MM.yyyy');
     DateTime date = dateFormat.parse(dateString);
 
+    _log.fine('Parsing date: ${dateString.toString()}');
     _log.fine('Parsed date is $date');
     return date;
+  }
+
+  static double? parseStringToDouble(String value) {
+    // Check if the value has a decimal point and convert it to the correct format.
+    if (value.contains(',')) {
+      value = value.replaceAll(',', '.'); // Only replace comma with dot
+    }
+
+    try {
+      return double.tryParse(value); // Attempt to parse the value as a double.
+    } catch (e) {
+      _log.warning("Invalid number format: $value");
+      return null;
+    }
   }
 }
