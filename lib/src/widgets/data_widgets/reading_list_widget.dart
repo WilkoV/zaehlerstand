@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
-import 'package:zaehlerstand/src/widgets/data_view/reading_card.dart';
+import 'package:zaehlerstand/src/widgets/data_widgets/reading_card.dart';
 
 class ReadingListWidget extends StatelessWidget {
   final int year;

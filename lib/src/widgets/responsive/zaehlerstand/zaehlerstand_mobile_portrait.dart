@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
-import 'package:zaehlerstand/src/widgets/data_view/years_tabs.dart';
+import 'package:zaehlerstand/src/widgets/data_widgets/years_tabs.dart';
 import 'package:zaehlerstand/src/widgets/responsive/progress_indicators/add_reading_progress_indicator_mobile/add_reading_progress_indicator_responsive_layout.dart';
 import 'package:zaehlerstand/src/widgets/responsive/progress_indicators/synchronizing_to_google_sheets_progress_indicator/synchronizing_to_google_sheets_progress_indicator_responsive_layout.dart';
 
