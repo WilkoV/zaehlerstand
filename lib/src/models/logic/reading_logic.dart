@@ -127,8 +127,8 @@ extension ReadingLogic on Reading {
   }
 
   
-  String getFirstTwoDigitsFromReading() {
-    String readingAsString = reading.toString();
+  String getFirstTwoDigitsFromReading(int avgDailyConsumption) {
+    String readingAsString = (reading + avgDailyConsumption).toString();
     int stringLength = readingAsString.length;
 
     if (stringLength < 3) {
@@ -138,5 +138,17 @@ extension ReadingLogic on Reading {
     int targetPosition = stringLength - 3;
 
     return readingAsString.substring(0, targetPosition);
+  }
+
+  static String formatDailyConsumption(int dailyConsumption) {
+    return '$dailyConsumption m³';
+  }
+
+  static String formattedBool(bool value) {
+    return value ? 'Ja' : 'Nein';
+  }
+
+  String formattedIsSynced() {
+    return formattedBool(isSynced);
   }
 }

@@ -3,9 +3,10 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/models/base/reading.dart';
+import 'package:zaehlerstand/src/models/logic/reading_logic.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/responsive/zaehlerstand/zaehlerstand_responsive_layout.dart';
-import 'package:zaehlerstand/src/widgets/zaehlerstand/show_reading_dialog.dart';
+import 'package:zaehlerstand/src/widgets/dialogs/reading_dialog.dart';
 import 'package:zaehlerstand/src/widgets/zaehlerstand/zaehlerstand_drawer.dart';
 
 class ZaehlerstandScreen extends StatefulWidget {
@@ -54,7 +55,7 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
                 builder: (context) => ReadingDialog(
                   minimalReadingValue: _getMinimumValue(dataProvider),
                   zaehlerstandController: TextEditingController(
-                    text: _getFirstTwoDigitsFromNewestReading(dataProvider),
+                    text: dataProvider.getFirstReading().getFirstTwoDigitsFromReading(dataProvider.getAverageDailyConsumption(7)),
                   ),
                 ),
               );
@@ -69,24 +70,6 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
         );
       },
     );
-  }
-
-  String _getFirstTwoDigitsFromNewestReading(DataProvider dataProvider) {
-    if (dataProvider.readings.isEmpty) {
-      return '';
-    }
-
-    Reading reading = dataProvider.readings.first;
-    var readingAsString = reading.reading.toString();
-    int currentLength = readingAsString.length;
-
-    if (currentLength < 3) {
-      return '';
-    }
-
-    int targetPosition = currentLength - 3;
-
-    return dataProvider.readings.isNotEmpty ? readingAsString.substring(0, targetPosition) : '';
   }
 
   int _getMinimumValue(DataProvider dataProvider) => dataProvider.readings.isNotEmpty ? dataProvider.readings.first.reading : 0;

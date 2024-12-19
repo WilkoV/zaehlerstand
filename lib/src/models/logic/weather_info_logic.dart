@@ -59,6 +59,12 @@ extension WeatherInfoLogic on WeatherInfo {
     return formattedValue;
   }
 
+  String getFormattedTemperatureWithUnit() {
+    String formattedValue = '${getFormattedTemperature()} °C';
+
+    return formattedValue;
+  }
+
   static String formateDouble(double value) {
     var formatter = NumberFormat('0.0', 'de_DE');
     String formattedValue = formatter.format(value);

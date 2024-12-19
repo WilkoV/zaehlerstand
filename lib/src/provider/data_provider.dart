@@ -125,7 +125,7 @@ class DataProvider extends ChangeNotifier {
 
     OpenWeatherMapHelper openWeatherMapHelper = OpenWeatherMapHelper();
     WeatherInfo? weatherInfo = await openWeatherMapHelper.fetchWeather() ?? readings.first.weatherInfo.copyWith(isGenerated: true);
-    
+
     // Calculate intermediate readings in case some readings are missing
     List<Reading> intermediateReadings = _createReadingsForIntermediateDays(enteredReading, weatherInfo.temperature);
 
@@ -368,5 +368,36 @@ class DataProvider extends ChangeNotifier {
     isSynchronizingToGoogleSheets = false;
 
     notifyListeners();
+  }
+
+  Reading getFirstReading() {
+    return readings.isNotEmpty ? readings.first : Reading.fromInput(0, DateTime.now(), 0.0);
+  }
+
+  int getAverageDailyConsumption(int numberOfDays) {
+    if (readings.isEmpty) {
+      return 0;
+    }
+
+    // get consumption based on groupedDailyConsumptions for the last numberOfDays
+    int totalConsumption = 0;
+    int totalDays = 0;
+
+    for (var year in groupedDailyConsumptions.keys) {
+      List<DailyConsumption> dailyConsumptions = groupedDailyConsumptions[year]!;
+      for (var dailyConsumption in dailyConsumptions) {
+        totalConsumption += dailyConsumption.value;
+        totalDays++;
+        if (totalDays >= numberOfDays) {
+          break;
+        }
+      }
+
+      if (totalDays >= numberOfDays) {
+        break;
+      }
+    }
+
+    return totalConsumption ~/ totalDays;
   }
 }
