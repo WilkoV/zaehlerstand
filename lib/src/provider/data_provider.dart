@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
+import 'package:zaehlerstand/src/io/connectivity/connectivity_helper.dart';
 import 'package:zaehlerstand/src/io/database/database_helper.dart';
 import 'package:zaehlerstand/src/io/googlesheets/google_sheets_helper.dart';
 import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
@@ -62,7 +63,7 @@ class DataProvider extends ChangeNotifier {
       // Check database for data and load it if necessary
       await _refreshLists();
 
-      if (readings.isEmpty) {
+      if (readings.isEmpty && await ConnectivityHelper.isConnected()) {
         await _copyFromGoogleSheetsToDb();
         await _refreshLists();
       }
@@ -70,7 +71,7 @@ class DataProvider extends ChangeNotifier {
       notifyListeners();
 
       // Check if the DB has records that are not saved to google sheets
-      if (unsyncedCount > 0) {
+      if (unsyncedCount > 0 && await ConnectivityHelper.isConnected()) {
         _checkForUnsynchronizedDbRecords();
         notifyListeners();
       }
@@ -129,16 +130,20 @@ class DataProvider extends ChangeNotifier {
     notifyListeners();
 
     // Sync the readings with Google Sheets
-    int numberOfRecordsAdded = await _syncToGoogleSheets(
-      intermediateReadings,
-      (progress) {
-        _addReadingProgressController.add(progress);
-        _log.fine('addReading progress: ${progress.current} of ${progress.total}');
-      },
-    );
+    int numberOfRecordsAdded = 0;
 
-    isAddingReadings = false;
-    await _refreshLists();
+    if (await ConnectivityHelper.isConnected()) {
+      numberOfRecordsAdded = await _syncToGoogleSheets(
+        intermediateReadings,
+        (progress) {
+          _addReadingProgressController.add(progress);
+          _log.fine('addReading progress: ${progress.current} of ${progress.total}');
+        },
+      );
+
+      isAddingReadings = false;
+      await _refreshLists();
+    }
 
     notifyListeners();
 
