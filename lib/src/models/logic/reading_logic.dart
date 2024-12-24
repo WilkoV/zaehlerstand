@@ -1,8 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:zaehlerstand/src/models/base/reading.dart';
-import 'package:zaehlerstand/src/models/base/weather_info.dart';
-import 'package:zaehlerstand/src/models/logic/weather_info_logic.dart';
 
 extension ReadingLogic on Reading {
   static final Logger _log = Logger('ReadingLogic');
@@ -13,15 +11,7 @@ extension ReadingLogic on Reading {
     _log.fine('Converting Reading to a List<String>');
 
     // Convert each property of the reading into a string
-    List<String> result = [
-      getFormattedDate(),
-      enteredReading.toString(),
-      reading.toString(),
-      isGenerated.toString(),
-      weatherInfo.date.toString(),
-      weatherInfo.temperature.toString(),
-      weatherInfo.isGenerated.toString(),
-    ];
+    List<String> result = [getFormattedDate(), enteredReading.toString(), reading.toString(), isGenerated.toString()];
 
     _log.fine('Converted Reading $result');
     return result;
@@ -33,15 +23,7 @@ extension ReadingLogic on Reading {
     _log.fine('Converting Reading to a List<dynamic>');
 
     // Maintain types while converting properties to a list
-    List<dynamic> result = [
-      getFormattedDate(),
-      enteredReading,
-      reading,
-      isGenerated,
-      weatherInfo.getFormattedDate(),
-      weatherInfo.getFormattedTemperature(),
-      weatherInfo.isGenerated,
-    ];
+    List<dynamic> result = [getFormattedDate(), enteredReading, reading, isGenerated];
 
     _log.fine('Converted Reading $result');
     return result;
@@ -57,13 +39,9 @@ extension ReadingLogic on Reading {
     int enteredReading = int.parse(list[1]);
     int reading = int.parse(list[2]);
     bool isGenerated = list[3].toLowerCase() == 'true';
-    DateTime weatherDate = parseDate(list[4]);
-    double temperature = double.parse(list[5]);
-    bool weatherIsGenerated = list[6].toLowerCase() == 'true';
 
     // Create and return a new Reading instance
-    Reading readingFromStringList =
-        Reading(date: date, enteredReading: enteredReading, reading: reading, isGenerated: isGenerated, isSynced: true, weatherInfo: WeatherInfo(date: weatherDate, temperature: temperature, isGenerated: weatherIsGenerated));
+    Reading readingFromStringList = Reading(date: date, enteredReading: enteredReading, reading: reading, isGenerated: isGenerated, isSynced: true);
 
     _log.fine('Created Reading = ${readingFromStringList.toString()}');
     return readingFromStringList;
@@ -126,7 +104,6 @@ extension ReadingLogic on Reading {
     return dayOfYear;
   }
 
-  
   String getFirstTwoDigitsFromReading(int avgDailyConsumption) {
     String readingAsString = (reading + avgDailyConsumption).toString();
     int stringLength = readingAsString.length;
@@ -146,6 +123,10 @@ extension ReadingLogic on Reading {
 
   static String formattedBool(bool value) {
     return value ? 'Ja' : 'Nein';
+  }
+  
+  String formattedIsGenerated() {
+    return formattedBool(isGenerated);
   }
 
   String formattedIsSynced() {

@@ -22,6 +22,7 @@
       "subprojects",
       "Symbolication",
       "upsert",
-      "upserts"
+      "upserts",
+      "wifi"
    ]
 }

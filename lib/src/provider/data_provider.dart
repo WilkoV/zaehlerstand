@@ -4,11 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:zaehlerstand/src/io/database/database_helper.dart';
 import 'package:zaehlerstand/src/io/googlesheets/google_sheets_helper.dart';
-import 'package:zaehlerstand/src/io/open_weather_map/open_weather_map_helper.dart';
 import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
 import 'package:zaehlerstand/src/models/base/progress_update.dart';
 import 'package:zaehlerstand/src/models/base/reading.dart';
-import 'package:zaehlerstand/src/models/base/weather_info.dart';
 
 class DataProvider extends ChangeNotifier {
   static final _log = Logger('DataProvider');
@@ -30,9 +28,6 @@ class DataProvider extends ChangeNotifier {
 
   /// List of all years that have data in reading
   List<int> dataYears = <int>[];
-
-  /// Last weather info
-  late WeatherInfo lastWeatherInfo;
 
   final StreamController<ProgressUpdate> _addReadingProgressController;
   final StreamController<ProgressUpdate> _syncReadingProgressController;
@@ -79,8 +74,6 @@ class DataProvider extends ChangeNotifier {
         _checkForUnsynchronizedDbRecords();
         notifyListeners();
       }
-
-      await getWeatherInfo();
     } catch (e, stackTrace) {
       _log.severe('Failed to check DB or load from Google Sheets: $e', e, stackTrace);
       return;
@@ -89,9 +82,6 @@ class DataProvider extends ChangeNotifier {
     isLoading = false;
     _log.fine('Initialization finished');
     notifyListeners(); // Notify UI listeners that state has changed
-
-    OpenWeatherMapHelper openWeatherMapHelper = OpenWeatherMapHelper();
-    await openWeatherMapHelper.fetchWeather();
   }
 
   /// Fetches all meter readings from the database and updates the provider's state.
@@ -121,16 +111,11 @@ class DataProvider extends ChangeNotifier {
     isAddingReadings = true;
     notifyListeners();
 
-    // TODO: Check network connectivity
-
-    OpenWeatherMapHelper openWeatherMapHelper = OpenWeatherMapHelper();
-    WeatherInfo? weatherInfo = await openWeatherMapHelper.fetchWeather() ?? readings.first.weatherInfo.copyWith(isGenerated: true);
-
     // Calculate intermediate readings in case some readings are missing
-    List<Reading> intermediateReadings = _createReadingsForIntermediateDays(enteredReading, weatherInfo.temperature);
+    List<Reading> intermediateReadings = _createReadingsForIntermediateDays(enteredReading);
 
     // Add the entered reading to the intermediateReadings list
-    Reading readingFromInput = Reading.fromInput(enteredReading, weatherInfo.date, weatherInfo.temperature);
+    Reading readingFromInput = Reading.fromInput(enteredReading);
     _log.fine('Adding user-entered reading: ${readingFromInput.toString()}.');
     intermediateReadings.add(readingFromInput);
 
@@ -244,25 +229,6 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getWeatherInfo() async {
-    _log.fine('Getting data from open weather map');
-    OpenWeatherMapHelper openWeatherMapHelper = OpenWeatherMapHelper();
-    WeatherInfo? fetchedWeatherInfo = await openWeatherMapHelper.fetchWeather();
-
-    if (fetchedWeatherInfo != null) {
-      lastWeatherInfo = fetchedWeatherInfo;
-      _log.fine('Successfully loaded data from open weather map: ${lastWeatherInfo.toString()}');
-    } else if (fetchedWeatherInfo == null && readings.isNotEmpty) {
-      lastWeatherInfo = readings.first.weatherInfo;
-      _log.warning('Failed to load data from open weather map. Defaulting to last known weather info: ${lastWeatherInfo.toString()}');
-    } else {
-      _log.warning('Failed to load data from open weather map and no previous readings found. Creating default: ${lastWeatherInfo.toString()}');
-      lastWeatherInfo = WeatherInfo.fromInput(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 12), 99.99);
-    }
-
-    notifyListeners();
-  }
-
   void _groupReadingsByYear() {
     // Remove all entries
     groupedReadings.clear();
@@ -292,7 +258,7 @@ class DataProvider extends ChangeNotifier {
     return synchronizedReadings.length;
   }
 
-  List<Reading> _createReadingsForIntermediateDays(int enteredReading, double enteredTemperature) {
+  List<Reading> _createReadingsForIntermediateDays(int enteredReading) {
     DateTime currentDate = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 12);
 
     // Find the most recent meter reading before the current date, or create a default one if none exist
@@ -302,7 +268,7 @@ class DataProvider extends ChangeNotifier {
             (reading) => reading.date.isBefore(currentDate),
             orElse: () => readings.first,
           )
-        : Reading.fromInput(enteredReading, currentDate, enteredTemperature);
+        : Reading.fromInput(enteredReading);
 
     int daysBetweenReadings = currentDate.difference(previousReading.date).inDays;
     _log.fine('Days between readings: $daysBetweenReadings.');
@@ -317,18 +283,13 @@ class DataProvider extends ChangeNotifier {
       double averageConsumption = totalConsumption / daysBetweenReadings;
       double previousReadingValue = previousReading.reading.toDouble();
 
-      double totalTemperatureShift = enteredTemperature - previousReading.weatherInfo.temperature;
-      double averageTemperatureShift = totalTemperatureShift / daysBetweenReadings;
-      double previousTemperatureValue = previousReading.weatherInfo.temperature;
-
       _log.fine('Total consumption: $totalConsumption, Average consumption: $averageConsumption.');
       DateTime targetDate = previousReading.date;
 
       for (var i = 0; i < daysBetweenReadings - 1; i++) {
         previousReadingValue = previousReadingValue + averageConsumption;
-        previousTemperatureValue = previousTemperatureValue + averageTemperatureShift;
         targetDate = targetDate.add(const Duration(days: 1));
-        Reading calculatedReading = Reading.fromGenerateData(targetDate, previousReadingValue.toInt(), previousTemperatureValue);
+        Reading calculatedReading = Reading.fromGenerateData(targetDate, previousReadingValue.toInt());
 
         _log.fine('Generated intermediate reading: ${calculatedReading.toString()}');
         newReadings.add(calculatedReading);
@@ -371,7 +332,7 @@ class DataProvider extends ChangeNotifier {
   }
 
   Reading getFirstReading() {
-    return readings.isNotEmpty ? readings.first : Reading.fromInput(0, DateTime.now(), 0.0);
+    return readings.isNotEmpty ? readings.first : Reading.fromInput(0);
   }
 
   int getAverageDailyConsumption(int numberOfDays) {

@@ -13,8 +13,6 @@ _$ReadingImpl _$$ReadingImplFromJson(Map<String, dynamic> json) =>
       reading: (json['reading'] as num).toInt(),
       isGenerated: json['isGenerated'] as bool,
       isSynced: json['isSynced'] as bool,
-      weatherInfo:
-          WeatherInfo.fromJson(json['weatherInfo'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$ReadingImplToJson(_$ReadingImpl instance) =>
@@ -24,5 +22,4 @@ Map<String, dynamic> _$$ReadingImplToJson(_$ReadingImpl instance) =>
       'reading': instance.reading,
       'isGenerated': instance.isGenerated,
       'isSynced': instance.isSynced,
-      'weatherInfo': instance.weatherInfo,
     };

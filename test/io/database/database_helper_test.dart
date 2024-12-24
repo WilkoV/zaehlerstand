@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zaehlerstand/src/io/database/database_helper.dart';
 import 'package:zaehlerstand/src/models/base/reading.dart';
-import 'package:zaehlerstand/src/models/base/weather_info.dart';
 
 void main() {
   setUp(() async {
@@ -26,11 +25,6 @@ void main() {
           isGenerated: false,
           enteredReading: 250,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2022, 5, 15),
-            temperature: 12.3,
-            isGenerated: false,
-          ),
         );
 
         await DatabaseHelper.insertReading(reading);
@@ -38,7 +32,6 @@ void main() {
         final readings = await DatabaseHelper.getAllReadings();
         expect(readings.length, 1);
         expect(readings.first.reading, 250);
-        expect(readings.first.weatherInfo.temperature, 12.3);
       });
 
       test('should upsert meter readings correctly', () async {
@@ -48,11 +41,6 @@ void main() {
           isGenerated: false,
           enteredReading: 250,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2022, 5, 15),
-            temperature: 12.3,
-            isGenerated: false,
-          ),
         );
 
         final updatedReading = Reading(
@@ -61,11 +49,6 @@ void main() {
           isGenerated: true,
           enteredReading: 300,
           isSynced: true,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2022, 5, 15),
-            temperature: 14.4,
-            isGenerated: false,
-          ),
         );
 
         await DatabaseHelper.insertReading(initialReading);
@@ -74,7 +57,6 @@ void main() {
         final readings = await DatabaseHelper.getAllReadings();
         expect(readings.length, 1);
         expect(readings.first.reading, 300);
-        expect(readings.first.weatherInfo.temperature, 14.4);
       });
     });
 
@@ -86,11 +68,6 @@ void main() {
           isGenerated: false,
           enteredReading: 250,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2022, 5, 15),
-            temperature: 14.4,
-            isGenerated: false,
-          ),
         );
 
         final reading2 = Reading(
@@ -99,11 +76,6 @@ void main() {
           isGenerated: false,
           enteredReading: 300,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2022, 6, 10),
-            temperature: 12.1,
-            isGenerated: false,
-          ),
         );
 
         await DatabaseHelper.insertReading(reading1);
@@ -127,11 +99,6 @@ void main() {
           isGenerated: false,
           enteredReading: 250,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2022, 5, 15),
-            temperature: 14.4,
-            isGenerated: false,
-          ),
         );
 
         final reading2 = Reading(
@@ -140,11 +107,6 @@ void main() {
           isGenerated: false,
           enteredReading: 300,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2024, 5, 15),
-            temperature: 12.4,
-            isGenerated: false,
-          ),
         );
 
         await DatabaseHelper.insertReading(reading1);
@@ -168,11 +130,6 @@ void main() {
           isGenerated: false,
           enteredReading: 100,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2022, 1, 1),
-            temperature: 12.4,
-            isGenerated: false,
-          ),
         );
 
         final reading2 = Reading(
@@ -181,11 +138,6 @@ void main() {
           isGenerated: false,
           enteredReading: 200,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2022, 5, 15),
-            temperature: 13.4,
-            isGenerated: false,
-          ),
         );
 
         final reading3 = Reading(
@@ -194,11 +146,6 @@ void main() {
           isGenerated: false,
           enteredReading: 300,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2021, 5, 15),
-            temperature: 13.4,
-            isGenerated: false,
-          ),
         );
 
         await DatabaseHelper.insertReading(reading1);
@@ -224,11 +171,6 @@ void main() {
           isGenerated: false,
           enteredReading: 150,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: now.subtract(const Duration(days: 5)),
-            temperature: 14.4,
-            isGenerated: false,
-          ),
         );
 
         await DatabaseHelper.insertReading(reading);
@@ -251,11 +193,6 @@ void main() {
           isGenerated: false,
           enteredReading: 100,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2022, 1, 1),
-            temperature: 11.1,
-            isGenerated: false,
-          ),
         );
 
         final reading2 = Reading(
@@ -264,11 +201,6 @@ void main() {
           isGenerated: false,
           enteredReading: 200,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2022, 2, 1),
-            temperature: 12.4,
-            isGenerated: false,
-          ),
         );
 
         await DatabaseHelper.insertReading(reading1);
@@ -290,11 +222,6 @@ void main() {
             isGenerated: false,
             enteredReading: 250,
             isSynced: false,
-            weatherInfo: WeatherInfo(
-              date: DateTime(2022, 5, 15),
-              temperature: 13.4,
-              isGenerated: false,
-            ),
           ),
           Reading(
             date: DateTime(2022, 6, 10),
@@ -302,11 +229,6 @@ void main() {
             isGenerated: false,
             enteredReading: 300,
             isSynced: false,
-            weatherInfo: WeatherInfo(
-              date: DateTime(2022, 6, 10),
-              temperature: 11.4,
-              isGenerated: false,
-            ),
           ),
         ];
 
@@ -327,11 +249,6 @@ void main() {
             isGenerated: false,
             enteredReading: 250,
             isSynced: false,
-            weatherInfo: WeatherInfo(
-              date: DateTime(2022, 5, 15),
-              temperature: 13.4,
-              isGenerated: false,
-            ),
           ),
           Reading(
             date: DateTime(2022, 6, 10),
@@ -339,11 +256,6 @@ void main() {
             isGenerated: false,
             enteredReading: 300,
             isSynced: false,
-            weatherInfo: WeatherInfo(
-              date: DateTime(2022, 6, 10),
-              temperature: 13.4,
-              isGenerated: false,
-            ),
           ),
         ];
 
@@ -354,11 +266,6 @@ void main() {
             isGenerated: false,
             enteredReading: 350,
             isSynced: false,
-            weatherInfo: WeatherInfo(
-              date: DateTime(2022, 5, 15),
-              temperature: 13.4,
-              isGenerated: false,
-            ),
           ),
           Reading(
             date: DateTime(2022, 6, 10),
@@ -366,11 +273,6 @@ void main() {
             isGenerated: false,
             enteredReading: 400,
             isSynced: false,
-            weatherInfo: WeatherInfo(
-              date: DateTime(2022, 6, 10),
-              temperature: 12.4,
-              isGenerated: false,
-            ),
           ),
         ];
 
@@ -405,11 +307,6 @@ void main() {
           isGenerated: false,
           enteredReading: 250,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2022, 5, 15),
-            temperature: 13.4,
-            isGenerated: false,
-          ),
         );
         final reading2 = Reading(
           date: DateTime(2022, 6, 10),
@@ -417,11 +314,6 @@ void main() {
           isGenerated: false,
           enteredReading: 300,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2022, 6, 10),
-            temperature: 12.4,
-            isGenerated: false,
-          ),
         );
 
         await DatabaseHelper.insertReading(reading1);
@@ -438,11 +330,6 @@ void main() {
           isGenerated: false,
           enteredReading: 250,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2022, 5, 15),
-            temperature: 13.4,
-            isGenerated: false,
-          ),
         );
         final reading2 = Reading(
           date: DateTime(2022, 6, 10),
@@ -450,11 +337,6 @@ void main() {
           isGenerated: false,
           enteredReading: 300,
           isSynced: false,
-          weatherInfo: WeatherInfo(
-            date: DateTime(2022, 6, 10),
-            temperature: 12.4,
-            isGenerated: false,
-          ),
         );
 
         await DatabaseHelper.insertReading(reading1);
