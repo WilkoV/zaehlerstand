@@ -17,7 +17,7 @@ class DashboardDailyConsumptionRow extends StatelessWidget {
         children: [
           Text('T', style: Theme.of(context).textTheme.headlineLarge),
           ...days.map((day) {
-            return dataProvider.dailyConsumptions.length >= day
+            return dataProvider.dailyConsumptions.length > day
                 ? ReadingConsumptionElement(
                     consumption: dataProvider.dailyConsumptions[day].consumption,
                     consumptionDate: dataProvider.dailyConsumptions.first.date.subtract(Duration(days: day)),

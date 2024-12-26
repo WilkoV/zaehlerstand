@@ -9,6 +9,7 @@ import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
 import 'package:zaehlerstand/src/models/base/monthly_consumption.dart';
 import 'package:zaehlerstand/src/models/base/progress_update.dart';
 import 'package:zaehlerstand/src/models/base/reading.dart';
+import 'package:zaehlerstand/src/models/base/yearly_consumption.dart';
 
 class DataProvider extends ChangeNotifier {
   static final _log = Logger('DataProvider');
@@ -30,6 +31,7 @@ class DataProvider extends ChangeNotifier {
   /// All dailyConsumptions based on reading grouped by year
   Map<int, List<DailyConsumption>> yearlyGroupedDailyConsumptions = {};
   List<MonthlyConsumption> monthlyConsumptions = <MonthlyConsumption>[];
+  List<YearlyConsumption> yearlyConsumptions = <YearlyConsumption>[];
 
   /// List of all years that have data in reading
   List<int> dataYears = <int>[];
@@ -250,6 +252,29 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
+  void _calculateYearlyConsumption() {
+    yearlyConsumptions.clear();
+
+    for (var monthlyConsumption in monthlyConsumptions) {
+      int year = monthlyConsumption.year;
+
+      YearlyConsumption? yearlyConsumption;
+      try {
+        // Try to find existing yearly consumption for the current year
+        yearlyConsumption = yearlyConsumptions.firstWhere((element) => element.year == year);
+        // Update consumption value
+        yearlyConsumption = yearlyConsumption.copyWith(consumption: yearlyConsumption.consumption + monthlyConsumption.consumption);
+        // Replace the old yearly consumption with the updated one
+        yearlyConsumptions.removeWhere((element) => element.year == year);
+      } catch (e) {
+        // If no yearly consumption exists, create a new one
+        yearlyConsumption = YearlyConsumption(year: year, consumption: monthlyConsumption.consumption);
+      }
+
+      yearlyConsumptions.add(yearlyConsumption);
+    }
+  }
+
   void _groupedDailyConsumptionsByYear() {
     yearlyGroupedDailyConsumptions.clear();
 
@@ -343,6 +368,7 @@ class DataProvider extends ChangeNotifier {
     _calculateDailyConsumption();
     _groupedDailyConsumptionsByYear();
     _calculateMonthlyConsumption();
+    _calculateYearlyConsumption();
 
     unsyncedCount = readings.where((reading) => !reading.isSynced).length;
 
