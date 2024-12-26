@@ -6,6 +6,7 @@ import 'package:zaehlerstand/src/io/connectivity/connectivity_helper.dart';
 import 'package:zaehlerstand/src/io/database/database_helper.dart';
 import 'package:zaehlerstand/src/io/googlesheets/google_sheets_helper.dart';
 import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
+import 'package:zaehlerstand/src/models/base/monthly_consumption.dart';
 import 'package:zaehlerstand/src/models/base/progress_update.dart';
 import 'package:zaehlerstand/src/models/base/reading.dart';
 
@@ -24,8 +25,11 @@ class DataProvider extends ChangeNotifier {
   // All meter readings grouped by year
   Map<int, List<Reading>> groupedReadings = {};
 
+  List<DailyConsumption> dailyConsumptions = <DailyConsumption>[];
+
   /// All dailyConsumptions based on reading grouped by year
-  Map<int, List<DailyConsumption>> groupedDailyConsumptions = {};
+  Map<int, List<DailyConsumption>> yearlyGroupedDailyConsumptions = {};
+  List<MonthlyConsumption> monthlyConsumptions = <MonthlyConsumption>[];
 
   /// List of all years that have data in reading
   List<int> dataYears = <int>[];
@@ -201,36 +205,62 @@ class DataProvider extends ChangeNotifier {
     _log.fine('Fetched ${readings.length} meter readings');
   }
 
-  /// Calculate the daily consumption
-  void _calculateDailyConsumptionAndGroupByYear() {
-    // Clear the map to ensure no duplicate data
-    groupedDailyConsumptions.clear();
+  void _calculateDailyConsumption() {
+    dailyConsumptions.clear();
 
-    // Iterate through the list of reading
     for (int i = 0; i < readings.length; i++) {
       Reading currentReading = readings[i];
 
-      // Determine the year of the current reading
-      int year = currentReading.date.year;
-
-      // For the last entry, consumption is 0
       int consumption = 0;
       if (i < readings.length - 1) {
         Reading nextReading = readings[i + 1];
         consumption = currentReading.reading - nextReading.reading;
       }
 
-      // Create a DailyConsumption object
       DailyConsumption dailyConsumption = DailyConsumption(
         date: currentReading.date,
-        value: consumption,
+        consumption: consumption,
       );
 
-      // Add the consumption to the corresponding year in the map
-      if (!groupedDailyConsumptions.containsKey(year)) {
-        groupedDailyConsumptions[year] = [];
+      dailyConsumptions.add(dailyConsumption);
+    }
+  }
+
+  void _calculateMonthlyConsumption() {
+    monthlyConsumptions.clear();
+
+    for (var dailyConsumption in dailyConsumptions) {
+      int year = dailyConsumption.date.year;
+      int month = dailyConsumption.date.month;
+
+      MonthlyConsumption? monthlyConsumption;
+      try {
+        // Try to find existing monthly consumption for the current year & month
+        monthlyConsumption = monthlyConsumptions.firstWhere((element) => element.year == year && element.month == month);
+        // Update consumption value
+        monthlyConsumption = monthlyConsumption.copyWith(consumption: monthlyConsumption.consumption + dailyConsumption.consumption);
+        // Replace the old monthly consumption with the updated one
+        monthlyConsumptions.removeWhere((element) => element.year == year && element.month == month);
+      } catch (e) {
+        // If no monthly consumption exists, create a new one
+        monthlyConsumption = MonthlyConsumption(year: year, month: month, consumption: dailyConsumption.consumption);
       }
-      groupedDailyConsumptions[year]!.add(dailyConsumption);
+
+      monthlyConsumptions.add(monthlyConsumption);
+    }
+  }
+
+  void _groupedDailyConsumptionsByYear() {
+    yearlyGroupedDailyConsumptions.clear();
+
+    for (var dailyConsumption in dailyConsumptions) {
+      int year = dailyConsumption.date.year;
+
+      if (!yearlyGroupedDailyConsumptions.containsKey(year)) {
+        yearlyGroupedDailyConsumptions[year] = [];
+      }
+
+      yearlyGroupedDailyConsumptions[year]!.add(dailyConsumption);
     }
   }
 
@@ -308,8 +338,12 @@ class DataProvider extends ChangeNotifier {
 
     await _getDataYears();
     await _getAllReadings();
+
     _groupReadingsByYear();
-    _calculateDailyConsumptionAndGroupByYear();
+    _calculateDailyConsumption();
+    _groupedDailyConsumptionsByYear();
+    _calculateMonthlyConsumption();
+
     unsyncedCount = readings.where((reading) => !reading.isSynced).length;
 
     _log.fine('All lists updated.');
@@ -349,10 +383,10 @@ class DataProvider extends ChangeNotifier {
     int totalConsumption = 0;
     int totalDays = 0;
 
-    for (var year in groupedDailyConsumptions.keys) {
-      List<DailyConsumption> dailyConsumptions = groupedDailyConsumptions[year]!;
+    for (var year in yearlyGroupedDailyConsumptions.keys) {
+      List<DailyConsumption> dailyConsumptions = yearlyGroupedDailyConsumptions[year]!;
       for (var dailyConsumption in dailyConsumptions) {
-        totalConsumption += dailyConsumption.value;
+        totalConsumption += dailyConsumption.consumption;
         totalDays++;
         if (totalDays >= numberOfDays) {
           break;

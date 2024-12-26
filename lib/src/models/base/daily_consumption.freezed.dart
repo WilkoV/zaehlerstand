@@ -14,17 +14,10 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-DailyConsumption _$DailyConsumptionFromJson(Map<String, dynamic> json) {
-  return _DailyConsumption.fromJson(json);
-}
-
 /// @nodoc
 mixin _$DailyConsumption {
   DateTime get date => throw _privateConstructorUsedError;
-  int get value => throw _privateConstructorUsedError;
-
-  /// Serializes this DailyConsumption to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  int get consumption => throw _privateConstructorUsedError;
 
   /// Create a copy of DailyConsumption
   /// with the given fields replaced by the non-null parameter values.
@@ -39,7 +32,7 @@ abstract class $DailyConsumptionCopyWith<$Res> {
           DailyConsumption value, $Res Function(DailyConsumption) then) =
       _$DailyConsumptionCopyWithImpl<$Res, DailyConsumption>;
   @useResult
-  $Res call({DateTime date, int value});
+  $Res call({DateTime date, int consumption});
 }
 
 /// @nodoc
@@ -58,16 +51,16 @@ class _$DailyConsumptionCopyWithImpl<$Res, $Val extends DailyConsumption>
   @override
   $Res call({
     Object? date = null,
-    Object? value = null,
+    Object? consumption = null,
   }) {
     return _then(_value.copyWith(
       date: null == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      value: null == value
-          ? _value.value
-          : value // ignore: cast_nullable_to_non_nullable
+      consumption: null == consumption
+          ? _value.consumption
+          : consumption // ignore: cast_nullable_to_non_nullable
               as int,
     ) as $Val);
   }
@@ -81,7 +74,7 @@ abstract class _$$DailyConsumptionImplCopyWith<$Res>
       __$$DailyConsumptionImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({DateTime date, int value});
+  $Res call({DateTime date, int consumption});
 }
 
 /// @nodoc
@@ -98,37 +91,34 @@ class __$$DailyConsumptionImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? date = null,
-    Object? value = null,
+    Object? consumption = null,
   }) {
     return _then(_$DailyConsumptionImpl(
       date: null == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      value: null == value
-          ? _value.value
-          : value // ignore: cast_nullable_to_non_nullable
+      consumption: null == consumption
+          ? _value.consumption
+          : consumption // ignore: cast_nullable_to_non_nullable
               as int,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
-class _$DailyConsumptionImpl implements _DailyConsumption {
-  _$DailyConsumptionImpl({required this.date, required this.value});
 
-  factory _$DailyConsumptionImpl.fromJson(Map<String, dynamic> json) =>
-      _$$DailyConsumptionImplFromJson(json);
+class _$DailyConsumptionImpl implements _DailyConsumption {
+  _$DailyConsumptionImpl({required this.date, required this.consumption});
 
   @override
   final DateTime date;
   @override
-  final int value;
+  final int consumption;
 
   @override
   String toString() {
-    return 'DailyConsumption(date: $date, value: $value)';
+    return 'DailyConsumption(date: $date, consumption: $consumption)';
   }
 
   @override
@@ -137,12 +127,12 @@ class _$DailyConsumptionImpl implements _DailyConsumption {
         (other.runtimeType == runtimeType &&
             other is _$DailyConsumptionImpl &&
             (identical(other.date, date) || other.date == date) &&
-            (identical(other.value, value) || other.value == value));
+            (identical(other.consumption, consumption) ||
+                other.consumption == consumption));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, date, value);
+  int get hashCode => Object.hash(runtimeType, date, consumption);
 
   /// Create a copy of DailyConsumption
   /// with the given fields replaced by the non-null parameter values.
@@ -152,27 +142,17 @@ class _$DailyConsumptionImpl implements _DailyConsumption {
   _$$DailyConsumptionImplCopyWith<_$DailyConsumptionImpl> get copyWith =>
       __$$DailyConsumptionImplCopyWithImpl<_$DailyConsumptionImpl>(
           this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$DailyConsumptionImplToJson(
-      this,
-    );
-  }
 }
 
 abstract class _DailyConsumption implements DailyConsumption {
   factory _DailyConsumption(
       {required final DateTime date,
-      required final int value}) = _$DailyConsumptionImpl;
-
-  factory _DailyConsumption.fromJson(Map<String, dynamic> json) =
-      _$DailyConsumptionImpl.fromJson;
+      required final int consumption}) = _$DailyConsumptionImpl;
 
   @override
   DateTime get date;
   @override
-  int get value;
+  int get consumption;
 
   /// Create a copy of DailyConsumption
   /// with the given fields replaced by the non-null parameter values.

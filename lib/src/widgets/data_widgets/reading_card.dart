@@ -24,7 +24,7 @@ class ReadingCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Tagesverbrauch: ${ReadingLogic.formatDailyConsumption(dailyConsumption.value)}", style: Theme.of(context).textTheme.bodyLarge),
+                Text("Tagesverbrauch: ${ReadingLogic.formatDailyConsumption(dailyConsumption.consumption)}", style: Theme.of(context).textTheme.bodyLarge),
                 Text(reading.getFormattedDate(), style: Theme.of(context).textTheme.bodyLarge),
               ],
             ),

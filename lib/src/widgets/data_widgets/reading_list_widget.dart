@@ -21,7 +21,7 @@ class ReadingListWidget extends StatelessWidget {
                 itemCount: dataProvider.groupedReadings[year]!.length,
                 itemBuilder: (context, index) {
                   final reading = dataProvider.groupedReadings[year]![index];
-                  final dailyConsumption = dataProvider.groupedDailyConsumptions[year]![index];
+                  final dailyConsumption = dataProvider.yearlyGroupedDailyConsumptions[year]![index];
       
                   return ReadingCard(dailyConsumption: dailyConsumption, reading: reading);
                 },

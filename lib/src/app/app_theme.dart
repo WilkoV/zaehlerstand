@@ -1,89 +1,90 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_builder/responsive_builder.dart';
+import 'package:zaehlerstand/src/app/app_colors.dart' as app_colors;
 
 class AppTheme {
   // Mobile-specific light theme
   static ThemeData mobileLightTheme = ThemeData(
     brightness: Brightness.light,
-    primaryColor: Colors.blue,
+    primaryColor: app_colors.lightPrimaryColor,
     textTheme: const TextTheme(
-      headlineLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
-      headlineMedium: TextStyle(fontSize: 20, color: Colors.black87),
-      bodyLarge: TextStyle(fontSize: 18, color: Colors.black),
-      bodyMedium: TextStyle(fontSize: 16, color: Colors.black87),
+      headlineLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: app_colors.lightTextLargeColor),
+      headlineMedium: TextStyle(fontSize: 20, color: app_colors.lightTextMediumColor),
+      bodyLarge: TextStyle(fontSize: 18, color: app_colors.lightTextLargeColor),
+      bodyMedium: TextStyle(fontSize: 16, color: app_colors.lightTextMediumColor),
     ),
     inputDecorationTheme: const InputDecorationTheme(
       border: OutlineInputBorder(),
-      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: app_colors.lightPrimaryColor)),
     ),
     colorScheme: const ColorScheme.light(
-      primary: Colors.blue,
+      primary: app_colors.lightPrimaryColor,
       secondary: Colors.orange,
     ),
-    indicatorColor: Colors.blue,
+    indicatorColor: app_colors.lightPrimaryColor,
   );
 
   // Tablet-specific light theme
   static ThemeData tabletLightTheme = ThemeData(
     brightness: Brightness.light,
-    primaryColor: Colors.blue,
+    primaryColor: app_colors.lightPrimaryColor,
     textTheme: const TextTheme(
-      headlineLarge: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.black),
-      headlineMedium: TextStyle(fontSize: 32, fontWeight: FontWeight.w600, color: Colors.black87),
-      bodyLarge: TextStyle(fontSize: 28, color: Colors.black),
-      bodyMedium: TextStyle(fontSize: 24, color: Colors.black87),
+      headlineLarge: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: app_colors.lightTextLargeColor),
+      headlineMedium: TextStyle(fontSize: 32, fontWeight: FontWeight.w600, color: app_colors.lightTextMediumColor),
+      bodyLarge: TextStyle(fontSize: 28, color: app_colors.lightTextLargeColor),
+      bodyMedium: TextStyle(fontSize: 24, color: app_colors.lightTextMediumColor),
     ),
     inputDecorationTheme: const InputDecorationTheme(
       border: OutlineInputBorder(),
-      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.blue)),
+      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: app_colors.lightPrimaryColor)),
     ),
     colorScheme: const ColorScheme.light(
-      primary: Colors.blue,
+      primary: app_colors.lightPrimaryColor,
       secondary: Colors.orange,
     ),
-    indicatorColor: Colors.blue,
+    indicatorColor: app_colors.darkIndicatorColor,
   );
 
   // Mobile-specific dark theme
   static ThemeData mobileDarkTheme = ThemeData(
     brightness: Brightness.dark,
-    primaryColor: Colors.blueGrey,
+    primaryColor: app_colors.darkPrimaryColor,
     textTheme: const TextTheme(
-      headlineLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
-      headlineMedium: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white70),
-      bodyLarge: TextStyle(fontSize: 18, color: Colors.white),
-      bodyMedium: TextStyle(fontSize: 16, color: Colors.white70),
+      headlineLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: app_colors.darkTextLargeColor),
+      headlineMedium: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: app_colors.darkTextMediumColor),
+      bodyLarge: TextStyle(fontSize: 18, color: app_colors.darkTextLargeColor),
+      bodyMedium: TextStyle(fontSize: 16, color: app_colors.darkTextMediumColor),
     ),
     inputDecorationTheme: const InputDecorationTheme(
       border: OutlineInputBorder(),
-      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.blueGrey)),
+      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: app_colors.darkPrimaryColor)),
     ),
     colorScheme: const ColorScheme.dark(
-      primary: Colors.blueGrey,
+      primary: app_colors.darkPrimaryColor,
       secondary: Colors.teal,
     ),
-    indicatorColor: Colors.blue[300],
+    indicatorColor: app_colors.darkIndicatorColor,
   );
 
   // Tablet-specific dark theme
   static ThemeData tabletDarkTheme = ThemeData(
     brightness: Brightness.dark,
-    primaryColor: Colors.blueGrey,
+    primaryColor: app_colors.darkPrimaryColor,
     textTheme: const TextTheme(
-      headlineLarge: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: Colors.white),
-      headlineMedium: TextStyle(fontSize: 32, fontWeight: FontWeight.w600, color: Colors.white70),
-      bodyLarge: TextStyle(fontSize: 28, color: Colors.white),
-      bodyMedium: TextStyle(fontSize: 24, color: Colors.white70),
+      headlineLarge: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: app_colors.darkTextLargeColor),
+      headlineMedium: TextStyle(fontSize: 32, fontWeight: FontWeight.w600, color: app_colors.darkTextMediumColor),
+      bodyLarge: TextStyle(fontSize: 28, color: app_colors.darkTextLargeColor),
+      bodyMedium: TextStyle(fontSize: 24, color: app_colors.darkTextMediumColor),
     ),
     inputDecorationTheme: const InputDecorationTheme(
       border: OutlineInputBorder(),
-      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.blueGrey)),
+      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: app_colors.darkPrimaryColor)),
     ),
     colorScheme: const ColorScheme.dark(
-      primary: Colors.blueGrey,
+      primary: app_colors.darkPrimaryColor,
       secondary: Colors.teal,
     ),
-    indicatorColor: Colors.blue[400],
+    indicatorColor: app_colors.darkIndicatorColor,
   );
 
   // Function to get the appropriate theme based on screen size

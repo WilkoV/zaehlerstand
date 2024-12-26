@@ -78,13 +78,17 @@ extension ReadingLogic on Reading {
 
   /// Formats the [date] of the current [Reading] instance to `dd.MM.yyyy`.
   String getFormattedDate() {
+    return formatDate(date);
+  }
+
+  static String formatDate(DateTime date) {
     _log.fine('Formatting date: ${date.toString()}');
 
-    // Define date format and format the DateTime object
     DateFormat dateFormat = DateFormat('dd.MM.yyyy');
     String transformedDate = dateFormat.format(date);
 
     _log.fine('Formatted date: $transformedDate');
+
     return transformedDate;
   }
 
@@ -124,7 +128,7 @@ extension ReadingLogic on Reading {
   static String formattedBool(bool value) {
     return value ? 'Ja' : 'Nein';
   }
-  
+
   String formattedIsGenerated() {
     return formattedBool(isGenerated);
   }
