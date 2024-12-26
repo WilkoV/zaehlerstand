@@ -31,7 +31,7 @@ class ReadingConsumptionElement extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodyLarge,
                   )
                 : Text(
-                    "--".padLeft(6),
+                    "K/A".padLeft(6, ' '),
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
             ReadingConsumptionArrow(

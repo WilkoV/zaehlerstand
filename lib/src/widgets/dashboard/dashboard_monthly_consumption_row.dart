@@ -11,39 +11,26 @@ class DashboardMonthlyConsumption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<DataProvider>(builder: (context, dataProvider, child) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Text('M', style: Theme.of(context).textTheme.headlineLarge),
-          dataProvider.monthlyConsumptions.isNotEmpty
-              ? ReadingConsumptionElement(
-                  consumption: dataProvider.monthlyConsumptions.first.consumption,
-                  label: '${dataProvider.monthlyConsumptions.first.year}.${dataProvider.monthlyConsumptions.first.month.toString().padLeft(2, '0')}',
-                )
-              : const ReadingConsumptionElement(),
-          dataProvider.monthlyConsumptions.length >= 2
-              ? ReadingConsumptionElement(
-                  consumption: dataProvider.monthlyConsumptions[1].consumption,
-                  label: '${dataProvider.monthlyConsumptions[1].year}.${dataProvider.monthlyConsumptions[1].month.toString().padLeft(2, '0')}',
-                  compareConsumptionWith: dataProvider.monthlyConsumptions.first.consumption,
-                )
-              : const ReadingConsumptionElement(),
-          dataProvider.monthlyConsumptions.length >= 12
-              ? ReadingConsumptionElement(
-                  consumption: dataProvider.monthlyConsumptions[11].consumption,
-                  label: '${dataProvider.monthlyConsumptions[11].year}.${dataProvider.monthlyConsumptions[11].month.toString().padLeft(2, '0')}',
-                  compareConsumptionWith: dataProvider.monthlyConsumptions.first.consumption,
-                )
-              : const ReadingConsumptionElement(),
-          dataProvider.monthlyConsumptions.length >= 24
-              ? ReadingConsumptionElement(
-                  consumption: dataProvider.monthlyConsumptions[23].consumption,
-                  label: '${dataProvider.monthlyConsumptions[23].year}.${dataProvider.monthlyConsumptions[23].month.toString().padLeft(2, '0')}',
-                  compareConsumptionWith: dataProvider.monthlyConsumptions.first.consumption,
-                )
-              : const ReadingConsumptionElement(),
-        ],
-      );
+      List<int> months = [0, 1, 12, 24];
+      return Consumer<DataProvider>(builder: (context, dataProvider, child) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text('M', style: Theme.of(context).textTheme.headlineLarge),
+            ...months.map((month) {
+              return dataProvider.monthlyConsumptions.length > month
+                  ? ReadingConsumptionElement(
+                      consumption: dataProvider.monthlyConsumptions[month].consumption,
+                      label: '${dataProvider.monthlyConsumptions[month].year}.${dataProvider.monthlyConsumptions[month].month.toString().padLeft(2, '0')}',
+                      compareConsumptionWith: dataProvider.monthlyConsumptions.first.consumption,
+                    )
+                  : ReadingConsumptionElement(
+                      label: '${DateTime.now().subtract(Duration(days: month)).year}.${DateTime.now().subtract(Duration(days: month)).month.toString().padLeft(2, '0')}',
+                    );
+            }),
+          ],
+        );
+      });
     });
   }
 }

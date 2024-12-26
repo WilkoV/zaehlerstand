@@ -10,38 +10,23 @@ class DashboardDailyConsumptionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<int> days = [0, 7, 30, 365];
     return Consumer<DataProvider>(builder: (context, dataProvider, child) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Text('T', style: Theme.of(context).textTheme.headlineLarge),
-          dataProvider.dailyConsumptions.isNotEmpty
-              ? ReadingConsumptionElement(
-                  consumption: dataProvider.dailyConsumptions.first.consumption,
-                  consumptionDate: dataProvider.dailyConsumptions.first.date,
-                )
-              : const ReadingConsumptionElement(),
-          dataProvider.dailyConsumptions.length >= 7
-              ? ReadingConsumptionElement(
-                  consumption: dataProvider.dailyConsumptions[7].consumption,
-                  consumptionDate: dataProvider.dailyConsumptions.first.date.subtract(const Duration(days: 7)),
-                  compareConsumptionWith: dataProvider.dailyConsumptions.first.consumption,
-                )
-              : const ReadingConsumptionElement(),
-          dataProvider.dailyConsumptions.length >= 30
-              ? ReadingConsumptionElement(
-                  consumption: dataProvider.dailyConsumptions[30].consumption,
-                  consumptionDate: dataProvider.dailyConsumptions.first.date.subtract(const Duration(days: 30)),
-                  compareConsumptionWith: dataProvider.dailyConsumptions.first.consumption,
-                )
-              : const ReadingConsumptionElement(),
-          dataProvider.dailyConsumptions.length >= 365
-              ? ReadingConsumptionElement(
-                  consumption: dataProvider.dailyConsumptions[365].consumption,
-                  consumptionDate: dataProvider.dailyConsumptions.first.date.subtract(const Duration(days: 365)),
-                  compareConsumptionWith: dataProvider.dailyConsumptions.first.consumption,
-                )
-              : const ReadingConsumptionElement(),
+          ...days.map((day) {
+            return dataProvider.dailyConsumptions.length >= day
+                ? ReadingConsumptionElement(
+                    consumption: dataProvider.dailyConsumptions[day].consumption,
+                    consumptionDate: dataProvider.dailyConsumptions.first.date.subtract(Duration(days: day)),
+                    compareConsumptionWith: dataProvider.dailyConsumptions.first.consumption,
+                  )
+                :  ReadingConsumptionElement(
+                    label: '${DateTime.now().subtract(Duration(days: day)).day}.${DateTime.now().subtract(Duration(days: day)).month.toString().padLeft(2, '0')}.${DateTime.now().subtract(Duration(days: day)).year}',
+                  );
+          }),
         ],
       );
     });
