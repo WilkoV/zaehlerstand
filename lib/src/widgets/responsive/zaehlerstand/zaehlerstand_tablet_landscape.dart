@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
+import 'package:zaehlerstand/src/widgets/dashboard/dashboard.dart';
 import 'package:zaehlerstand/src/widgets/data_widgets/years_tabs.dart';
 import 'package:zaehlerstand/src/widgets/responsive/progress_indicators/add_reading_progress_indicator_mobile/add_reading_progress_indicator_responsive_layout.dart';
 import 'package:zaehlerstand/src/widgets/responsive/progress_indicators/synchronizing_to_google_sheets_progress_indicator/synchronizing_to_google_sheets_progress_indicator_responsive_layout.dart';
@@ -18,11 +19,9 @@ class ZaehlerstandTabletLandscape extends StatelessWidget {
     return Consumer<DataProvider>(
       builder: (context, dataProvider, _) {
         return Scaffold(
-          backgroundColor: Colors.green[300],
           body: Column(
-            // Use Column as the top-level container for vertical layout
             children: [
-              Expanded(
+              const Expanded(
                 flex: 5,
                 child: Row(
                   // Row for horizontal layout
@@ -30,13 +29,11 @@ class ZaehlerstandTabletLandscape extends StatelessWidget {
                     Expanded(
                       flex: 5,
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 6),
-                        child: Container(
-                          color: Colors.green[600],
-                        ),
+                        padding: EdgeInsets.fromLTRB(0, 0, 0, 6),
+                        child: Dashboard(),
                       ),
                     ),
-                    const Expanded(
+                    Expanded(
                       flex: 4,
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(0, 0, 0, 6),

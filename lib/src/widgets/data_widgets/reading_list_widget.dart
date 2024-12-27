@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
-import 'package:zaehlerstand/src/widgets/data_widgets/reading_card.dart';
+import 'package:zaehlerstand/src/widgets/responsive/reading_card/reading_card_responsive_layout.dart';
 
 class ReadingListWidget extends StatelessWidget {
   final int year;
@@ -22,8 +22,8 @@ class ReadingListWidget extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final reading = dataProvider.groupedReadings[year]![index];
                   final dailyConsumption = dataProvider.yearlyGroupedDailyConsumptions[year]![index];
-      
-                  return ReadingCard(dailyConsumption: dailyConsumption, reading: reading);
+
+                  return ReadingCardResponsiveLayout(dailyConsumption: dailyConsumption, reading: reading);
                 },
               ),
       );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
+import 'package:zaehlerstand/src/widgets/dashboard/dashboard.dart';
 import 'package:zaehlerstand/src/widgets/data_widgets/years_tabs.dart';
 import 'package:zaehlerstand/src/widgets/responsive/progress_indicators/add_reading_progress_indicator_mobile/add_reading_progress_indicator_responsive_layout.dart';
 import 'package:zaehlerstand/src/widgets/responsive/progress_indicators/synchronizing_to_google_sheets_progress_indicator/synchronizing_to_google_sheets_progress_indicator_responsive_layout.dart';
@@ -18,16 +19,13 @@ class ZaehlerstandMobilePortrait extends StatelessWidget {
     return Consumer<DataProvider>(
       builder: (context, dataProvider, _) {
         return Scaffold(
-          backgroundColor: Colors.yellow[300],
           body: Column(
             children: [
-              Flexible(
+              const Flexible(
                 flex: 6,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 6),
-                  child: Container(
-                    color: Colors.deepOrange[400],
-                  ),
+                  padding: EdgeInsets.fromLTRB(0, 0, 0, 6),
+                  child: Dashboard()
                 ),
               ),
               const Flexible(
