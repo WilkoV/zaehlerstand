@@ -959,6 +959,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  zaehlerstand_models:
+    dependency: "direct main"
+    description:
+      path: "../zaehlerstand_models"
+      relative: true
+    source: path
+    version: "1.0.0"
 sdks:
   dart: ">=3.5.3 <4.0.0"
   flutter: ">=3.24.0"

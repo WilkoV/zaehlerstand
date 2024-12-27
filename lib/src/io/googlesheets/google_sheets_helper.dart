@@ -1,9 +1,8 @@
 import 'package:gsheets/gsheets.dart';
 import 'package:logging/logging.dart';
 import 'package:zaehlerstand/src/constants/google_sheets_credentials.dart' as gsc;
-import 'package:zaehlerstand/src/models/base/reading.dart';
 import 'package:zaehlerstand/src/models/base/progress_update.dart';
-import 'package:zaehlerstand/src/models/logic/reading_logic.dart';
+import 'package:zaehlerstand_models/zaehlerstand_models.dart';
 
 class GoogleSheetsHelper {
   final Logger _log = Logger('GoogleSheetsHelper');

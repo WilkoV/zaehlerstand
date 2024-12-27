@@ -8,8 +8,8 @@ import 'package:zaehlerstand/src/io/googlesheets/google_sheets_helper.dart';
 import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
 import 'package:zaehlerstand/src/models/base/monthly_consumption.dart';
 import 'package:zaehlerstand/src/models/base/progress_update.dart';
-import 'package:zaehlerstand/src/models/base/reading.dart';
 import 'package:zaehlerstand/src/models/base/yearly_consumption.dart';
+import 'package:zaehlerstand_models/zaehlerstand_models.dart';
 
 class DataProvider extends ChangeNotifier {
   static final _log = Logger('DataProvider');

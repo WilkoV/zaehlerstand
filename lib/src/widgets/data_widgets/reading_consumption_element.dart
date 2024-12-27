@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zaehlerstand/src/models/logic/daily_consumption_logic.dart';
-import 'package:zaehlerstand/src/models/logic/reading_logic.dart';
 import 'package:zaehlerstand/src/widgets/data_widgets/reading_consumption_arrow.dart';
+import 'package:zaehlerstand_models/zaehlerstand_models.dart';
 
 class ReadingConsumptionElement extends StatelessWidget {
   final int? consumption;

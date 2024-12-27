@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart';
-import 'package:zaehlerstand/src/models/base/reading.dart';
+import 'package:zaehlerstand_models/zaehlerstand_models.dart';
 
 class DatabaseHelper {
   // Logger for debugging and monitoring database operations.

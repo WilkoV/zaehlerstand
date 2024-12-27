@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zaehlerstand/src/io/database/database_helper.dart';
-import 'package:zaehlerstand/src/models/base/reading.dart';
+import 'package:zaehlerstand_models/zaehlerstand_models.dart';
 
 void main() {
   setUp(() async {

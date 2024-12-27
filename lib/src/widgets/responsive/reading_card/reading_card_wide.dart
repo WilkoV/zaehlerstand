@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
-import 'package:zaehlerstand/src/models/base/reading.dart';
-import 'package:zaehlerstand/src/models/logic/reading_logic.dart';
+import 'package:zaehlerstand_models/zaehlerstand_models.dart';
 
 class ReadingCardWide extends StatelessWidget {
   final Reading reading;
