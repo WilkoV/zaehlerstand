@@ -1,20 +1,23 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
+import 'package:path_provider/path_provider.dart' as pp;
 import 'package:zaehlerstand/src/io/connectivity/connectivity_helper.dart';
-import 'package:zaehlerstand/src/io/database/database_helper.dart';
-import 'package:zaehlerstand/src/io/googlesheets/google_sheets_helper.dart';
 import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
 import 'package:zaehlerstand/src/models/base/monthly_consumption.dart';
-import 'package:zaehlerstand/src/models/base/progress_update.dart';
 import 'package:zaehlerstand/src/models/base/yearly_consumption.dart';
-import 'package:zaehlerstand_models/zaehlerstand_models.dart';
+import 'package:zaehlerstand_common/zaehlerstand_common.dart';
+import 'package:zaehlerstand/src/constants/google_sheets_credentials.dart' as gsc;
 
 class DataProvider extends ChangeNotifier {
   static final _log = Logger('DataProvider');
 
-  /// Tracks the current status of the provider (e.g., loading, idle, syncing).
+  // Db
+  late DbHelper _dbHelper;
+
+  // Tracks the current status of the provider (e.g., loading, idle, syncing).
   bool isLoading = true;
   bool isAddingReadings = false;
   bool isSynchronizingToGoogleSheets = false;
@@ -23,7 +26,7 @@ class DataProvider extends ChangeNotifier {
   /// List of all meter readings managed by the provider.
   List<Reading> readings = <Reading>[];
 
-  // All meter readings grouped by year
+  /// All meter readings grouped by year
   Map<int, List<Reading>> groupedReadings = {};
 
   List<DailyConsumption> dailyConsumptions = <DailyConsumption>[];
@@ -66,6 +69,11 @@ class DataProvider extends ChangeNotifier {
     isLoading = true;
 
     try {
+      String dbDirectory = await _getDbPath();
+
+      _dbHelper = DbHelper();
+      await _dbHelper.initDb(dbDirectory: dbDirectory);
+
       // Check database for data and load it if necessary
       await _refreshLists();
 
@@ -123,11 +131,12 @@ class DataProvider extends ChangeNotifier {
 
     // Add the entered reading to the intermediateReadings list
     Reading readingFromInput = Reading.fromInput(enteredReading);
+
     _log.fine('Adding user-entered reading: ${readingFromInput.toString()}.');
     intermediateReadings.add(readingFromInput);
 
     // Insert all new meter readings into the database
-    DatabaseHelper.bulkInsert(intermediateReadings);
+    _dbHelper.bulkInsert(intermediateReadings);
     _log.fine('Bulk-inserted new reading(s) into the database.');
 
     // Refresh data views after inserting readings
@@ -161,7 +170,7 @@ class DataProvider extends ChangeNotifier {
     _log.fine('Deleting all meter readings');
 
     // Delete all records and refresh the list
-    await DatabaseHelper.deleteAllReadings();
+    await _dbHelper.deleteAllReadings();
 
     // Update all lists
     await _refreshLists();
@@ -178,14 +187,14 @@ class DataProvider extends ChangeNotifier {
 
     // If the database is empty, fetch data from Google Sheets
     _log.fine('Fetching data from Google Sheets');
-    GoogleSheetsHelper googleSheetsHelper = GoogleSheetsHelper();
+    GoogleSheetsHelper googleSheetsHelper = GoogleSheetsHelper(insertDelay: 3, switchInterval: 40, spreadsheetId: gsc.spreadsheetId, credentials: gsc.credentials);
     List<Reading>? readingsFromSheet = await googleSheetsHelper.fetchAll();
 
     if (readingsFromSheet != null && readingsFromSheet.isNotEmpty) {
       _log.fine('Fetched ${readingsFromSheet.length} entries from Google Sheets');
 
       // Bulk import the fetched data into the database
-      DatabaseHelper.bulkInsert(readingsFromSheet);
+      _dbHelper.bulkInsert(readingsFromSheet);
       numberOfReadings = readingsFromSheet.length;
       _log.fine('Imported readings into the database');
     }
@@ -196,14 +205,14 @@ class DataProvider extends ChangeNotifier {
   /// Get the years where data has been stored for
   Future<List<int>> _getDataYears() async {
     // Query the database for distinct years
-    dataYears = await DatabaseHelper.getReadingsDistinctYears();
+    dataYears = await _dbHelper.getReadingsDistinctYears();
     _log.fine('Fetched ${dataYears.length} distinct years: $dataYears');
     return dataYears;
   }
 
   /// Get all meter readings
   Future<void> _getAllReadings() async {
-    readings = await DatabaseHelper.getAllReadings();
+    readings = await _dbHelper.getAllReadings();
     _log.fine('Fetched ${readings.length} meter readings');
   }
 
@@ -308,11 +317,11 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<int> _syncToGoogleSheets(List<Reading> unsynchronizedReadings, Function(ProgressUpdate) onProgress) async {
-    GoogleSheetsHelper googleSheetsHelper = GoogleSheetsHelper();
+    GoogleSheetsHelper googleSheetsHelper = GoogleSheetsHelper(insertDelay: 3, switchInterval: 40, spreadsheetId: gsc.spreadsheetId, credentials: gsc.credentials);
 
     List<Reading> synchronizedReadings = await googleSheetsHelper.insertRows(unsynchronizedReadings, onProgress);
 
-    await DatabaseHelper.bulkInsert(synchronizedReadings);
+    await _dbHelper.bulkInsert(synchronizedReadings);
 
     _log.fine('Completed adding meter readings. Total records added: ${synchronizedReadings.length}.');
     return synchronizedReadings.length;
@@ -425,5 +434,25 @@ class DataProvider extends ChangeNotifier {
     }
 
     return totalConsumption ~/ totalDays;
+  }
+
+  static Future<String> _getDbPath() async {
+    _log.fine('Determining database path.');
+
+    if (Platform.isAndroid || Platform.isIOS) {
+      // Mobile platforms: Store in application documents directory.
+      final directory = await pp.getApplicationDocumentsDirectory();
+      _log.fine('Database path for mobile: ${directory.path}');
+      return directory.path;
+    } else if (Platform.isWindows) {
+      // Windows: Store in a temporary system directory.
+      final dir = await Directory.systemTemp.createTemp();
+      _log.fine('Database path for Windows: ${dir.path}');
+      return dir.path;
+    } else {
+      // Unsupported platform: Log and throw an error.
+      _log.severe('Unsupported platform encountered.');
+      throw UnsupportedError("This platform is not supported");
+    }
   }
 }

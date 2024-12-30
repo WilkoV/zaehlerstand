@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zaehlerstand/src/models/base/progress_update.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
+import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
 class SynchronizingToGoogleSheetsProgressIndicatorMobile extends StatelessWidget {
   const SynchronizingToGoogleSheetsProgressIndicatorMobile({super.key});
@@ -18,7 +18,7 @@ class SynchronizingToGoogleSheetsProgressIndicatorMobile extends StatelessWidget
           builder: (context, snapshot) {
             // If the stream is not providing any data or is waiting, hide the progress bar
             if (!snapshot.hasData || snapshot.connectionState == ConnectionState.waiting) {
-              return const SizedBox.shrink();  // Hide the progress bar if no data or waiting
+              return const SizedBox.shrink(); // Hide the progress bar if no data or waiting
             }
 
             final progress = snapshot.data!;
@@ -26,7 +26,7 @@ class SynchronizingToGoogleSheetsProgressIndicatorMobile extends StatelessWidget
 
             // Avoid displaying the progress bar for 0% progress if not desired
             if (progressValue == 0.0 && progress.current == 0) {
-              return const SizedBox.shrink();  // Hide if the progress is 0%
+              return const SizedBox.shrink(); // Hide if the progress is 0%
             }
 
             return Padding(

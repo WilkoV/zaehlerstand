@@ -811,10 +811,10 @@ packages:
     dependency: "direct main"
     description:
       name: sqlite3_flutter_libs
-      sha256: "7ae52b23366e5295005022e62fa093f64bfe190810223ea0ebf733a4cd140bce"
+      sha256: "73016db8419f019e807b7a5e5fbf2a7bd45c165fed403b8e7681230f3a102785"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.26"
+    version: "0.5.28"
   stack_trace:
     dependency: transitive
     description:
@@ -847,6 +847,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  synchronized:
+    dependency: transitive
+    description:
+      name: synchronized
+      sha256: "69fe30f3a8b04a0be0c15ae6490fc859a78ef4c43ae2dd5e8a623d45bfcf9225"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.3.0+3"
   term_glyph:
     dependency: transitive
     description:
@@ -959,10 +967,10 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
-  zaehlerstand_models:
+  zaehlerstand_common:
     dependency: "direct main"
     description:
-      path: "../zaehlerstand_models"
+      path: "../zaehlerstand_common"
       relative: true
     source: path
     version: "1.0.0"

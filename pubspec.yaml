@@ -49,8 +49,8 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.26
   flutter_localizations:
     sdk: flutter
-  zaehlerstand_models:
-    path: ../zaehlerstand_models
+  zaehlerstand_common:
+    path: ../zaehlerstand_common
 
 dev_dependencies:
   flutter_test:

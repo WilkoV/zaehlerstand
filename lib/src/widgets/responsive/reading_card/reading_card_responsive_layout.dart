@@ -3,7 +3,7 @@ import 'package:responsive_builder/responsive_builder.dart';
 import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
 import 'package:zaehlerstand/src/widgets/responsive/reading_card/reading_card_narrow.dart';
 import 'package:zaehlerstand/src/widgets/responsive/reading_card/reading_card_wide.dart';
-import 'package:zaehlerstand_models/zaehlerstand_models.dart';
+import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
 class ReadingCardResponsiveLayout extends StatelessWidget {
   final Reading reading;

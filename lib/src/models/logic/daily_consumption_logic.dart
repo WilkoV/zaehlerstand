@@ -1,4 +1,4 @@
-import 'package:zaehlerstand_models/zaehlerstand_models.dart';
+import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
 extension DailyConsumptionLogic on Reading {
   static String formatDailyConsumption(int dailyConsumption) {
