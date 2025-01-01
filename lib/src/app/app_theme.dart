@@ -13,15 +13,19 @@ class AppTheme {
       bodyLarge: TextStyle(fontSize: 18, color: app_colors.lightTextLargeColor),
       bodyMedium: TextStyle(fontSize: 16, color: app_colors.lightTextMediumColor),
     ),
-    inputDecorationTheme: const InputDecorationTheme(
-      border: OutlineInputBorder(),
+    inputDecorationTheme: InputDecorationTheme(
+      border: const OutlineInputBorder(),
       focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: app_colors.lightPrimaryColor)),
     ),
-    colorScheme: const ColorScheme.light(
+    colorScheme: ColorScheme.light(
       primary: app_colors.lightPrimaryColor,
       secondary: Colors.orange,
     ),
     indicatorColor: app_colors.lightPrimaryColor,
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      selectedItemColor: app_colors.lightSelectedItemColor,
+      unselectedItemColor: app_colors.lightUnselectedItemColor,
+    ),
   );
 
   // Tablet-specific light theme
@@ -34,15 +38,19 @@ class AppTheme {
       bodyLarge: TextStyle(fontSize: 28, color: app_colors.lightTextLargeColor),
       bodyMedium: TextStyle(fontSize: 24, color: app_colors.lightTextMediumColor),
     ),
-    inputDecorationTheme: const InputDecorationTheme(
-      border: OutlineInputBorder(),
+    inputDecorationTheme: InputDecorationTheme(
+      border: const OutlineInputBorder(),
       focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: app_colors.lightPrimaryColor)),
     ),
-    colorScheme: const ColorScheme.light(
+    colorScheme: ColorScheme.light(
       primary: app_colors.lightPrimaryColor,
       secondary: Colors.orange,
     ),
-    indicatorColor: app_colors.darkIndicatorColor,
+    indicatorColor: app_colors.lightPrimaryColor,
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      selectedItemColor: app_colors.lightSelectedItemColor,
+      unselectedItemColor: app_colors.lightUnselectedItemColor,
+    ),
   );
 
   // Mobile-specific dark theme
@@ -64,6 +72,10 @@ class AppTheme {
       secondary: Colors.teal,
     ),
     indicatorColor: app_colors.darkIndicatorColor,
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      selectedItemColor: app_colors.darkSelectedItemColor,
+      unselectedItemColor: app_colors.darkUnselectedItemColor,
+    ),
   );
 
   // Tablet-specific dark theme
@@ -85,6 +97,10 @@ class AppTheme {
       secondary: Colors.teal,
     ),
     indicatorColor: app_colors.darkIndicatorColor,
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      selectedItemColor: app_colors.darkSelectedItemColor,
+      unselectedItemColor: app_colors.darkUnselectedItemColor,
+    ),
   );
 
   // Function to get the appropriate theme based on screen size

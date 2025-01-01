@@ -3,8 +3,8 @@ import 'package:logging/logging.dart';
 import 'package:zaehlerstand/src/widgets/dashboard/dashboard.dart';
 import 'package:zaehlerstand/src/widgets/data_widgets/years_tabs.dart';
 
-class ZaehlerstandTabletPortrait extends StatelessWidget {
-  ZaehlerstandTabletPortrait({super.key});
+class DashboardTabletPortrait extends StatelessWidget {
+  DashboardTabletPortrait({super.key});
 
   final Logger _log = Logger('TabletPortrait');
 

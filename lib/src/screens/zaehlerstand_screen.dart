@@ -4,10 +4,9 @@ import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/dialogs/reading_dialog.dart';
-import 'package:zaehlerstand/src/widgets/responsive/zaehlerstand/zaehlerstand_responsive_layout.dart';
+import 'package:zaehlerstand/src/widgets/responsive/dashboard/dashboard_responsive_layout.dart';
 import 'package:zaehlerstand/src/widgets/zaehlerstand/zaehlerstand_drawer.dart';
 import 'package:zaehlerstand_common/zaehlerstand_common.dart';
-
 
 class ZaehlerstandScreen extends StatefulWidget {
   const ZaehlerstandScreen({super.key});
@@ -19,6 +18,15 @@ class ZaehlerstandScreen extends StatefulWidget {
 class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
   late TextEditingController zaehlerstandController;
   final Logger _log = Logger('_ZaehlerstandScreenState');
+
+  int _selectedIndex = 0;
+
+  final List<Widget> _views = [
+    const DashboardResponsiveLayout(),
+    const Center(child: Text('Diagrams View')),
+    const Center(child: Text('Data View')),
+    const Center(child: Text('Settings View')),
+  ];
 
   @override
   void initState() {
@@ -33,6 +41,12 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
     super.dispose();
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<DataProvider>(
@@ -45,7 +59,7 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
           drawer: const ZaehlerstandDrawer(),
           body: Padding(
             padding: const EdgeInsets.only(bottom: 16),
-            child: dataProvider.isLoading ? const Center(child: CircularProgressIndicator()) : const ZaehlerstandResponsiveLayout(),
+            child: dataProvider.isLoading ? const Center(child: CircularProgressIndicator()) : _views[_selectedIndex],
           ),
           floatingActionButton: FloatingActionButton(
             backgroundColor: Theme.of(context).indicatorColor,
@@ -66,6 +80,41 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
               }
             },
             child: const Icon(Icons.add),
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            items: <BottomNavigationBarItem>[
+              const BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.dashboard,
+                ),
+                label: 'Dashboard',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.bar_chart,
+                  size: Theme.of(context).textTheme.headlineLarge!.fontSize,
+                ),
+                label: 'Diagrams',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.date_range,
+                  size: Theme.of(context).textTheme.headlineLarge!.fontSize,
+                ),
+                label: 'Data',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.settings,
+                  size: Theme.of(context).textTheme.headlineLarge!.fontSize,
+                ),
+                label: 'Settings',
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            selectedItemColor: Theme.of(context).primaryColor,
+            onTap: _onItemTapped,
+            iconSize: Theme.of(context).textTheme.bodyLarge!.fontSize!,
           ),
         );
       },
