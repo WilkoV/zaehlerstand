@@ -5,11 +5,12 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart' as pp;
 import 'package:zaehlerstand/src/io/connectivity/connectivity_helper.dart';
+import 'package:zaehlerstand/src/io/http/http_helper.dart';
 import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
 import 'package:zaehlerstand/src/models/base/monthly_consumption.dart';
 import 'package:zaehlerstand/src/models/base/yearly_consumption.dart';
 import 'package:zaehlerstand_common/zaehlerstand_common.dart';
-import 'package:zaehlerstand/src/constants/google_sheets_credentials.dart' as gsc;
+import 'package:zaehlerstand/src/app/app_config.dart' as app_config;
 
 class DataProvider extends ChangeNotifier {
   static final _log = Logger('DataProvider');
@@ -20,7 +21,7 @@ class DataProvider extends ChangeNotifier {
   // Tracks the current status of the provider (e.g., loading, idle, syncing).
   bool isLoading = true;
   bool isAddingReadings = false;
-  bool isSynchronizingToGoogleSheets = false;
+  bool isSynchronizingToServer = false;
   int unsyncedCount = 0;
 
   /// List of all meter readings managed by the provider.
@@ -39,31 +40,15 @@ class DataProvider extends ChangeNotifier {
   /// List of all years that have data in reading
   List<int> dataYears = <int>[];
 
-  final StreamController<ProgressUpdate> _addReadingProgressController;
-  final StreamController<ProgressUpdate> _syncReadingProgressController;
-
-  Stream<ProgressUpdate> get addReadingsProgressStream => _addReadingProgressController.stream;
-  Stream<ProgressUpdate> get syncReadingsProgressStream => _syncReadingProgressController.stream;
-
-  DataProvider()
-      : _addReadingProgressController = StreamController<ProgressUpdate>.broadcast(),
-        _syncReadingProgressController = StreamController<ProgressUpdate>.broadcast() {
-    _log.fine('DataProvider initialized.');
-  }
-
   @override
   void dispose() {
     _log.fine('Disposing DataProvider.');
-
-    // Close StreamControllers
-    _addReadingProgressController.close();
-    _syncReadingProgressController.close();
 
     super.dispose();
   }
 
   /// Initializes the provider by checking if the database has data.
-  /// If the database is empty, data is fetched from Google Sheets and imported.
+  /// If the database is empty, data is fetched from Server and imported.
   Future<void> initialize() async {
     _log.fine('Initialization started');
     isLoading = true;
@@ -78,19 +63,19 @@ class DataProvider extends ChangeNotifier {
       await _refreshLists();
 
       if (readings.isEmpty && await ConnectivityHelper.isConnected()) {
-        await _copyFromGoogleSheetsToDb();
+        await _copyFromServerToDb();
         await _refreshLists();
       }
 
       notifyListeners();
 
-      // Check if the DB has records that are not saved to google sheets
+      // Check if the DB has records that are not saved to server
       if (unsyncedCount > 0 && await ConnectivityHelper.isConnected()) {
         _checkForUnsynchronizedDbRecords();
         notifyListeners();
       }
     } catch (e, stackTrace) {
-      _log.severe('Failed to check DB or load from Google Sheets: $e', e, stackTrace);
+      _log.severe('Failed to check DB or load from Server: $e', e, stackTrace);
       return;
     }
 
@@ -136,7 +121,7 @@ class DataProvider extends ChangeNotifier {
     intermediateReadings.add(readingFromInput);
 
     // Insert all new meter readings into the database
-    _dbHelper.bulkInsert(intermediateReadings);
+    _dbHelper.bulkInsertReadings(intermediateReadings);
     _log.fine('Bulk-inserted new reading(s) into the database.');
 
     // Refresh data views after inserting readings
@@ -144,17 +129,11 @@ class DataProvider extends ChangeNotifier {
 
     notifyListeners();
 
-    // Sync the readings with Google Sheets
+    // Sync the readings with server
     int numberOfRecordsAdded = 0;
 
     if (await ConnectivityHelper.isConnected()) {
-      numberOfRecordsAdded = await _syncToGoogleSheets(
-        intermediateReadings,
-        (progress) {
-          _addReadingProgressController.add(progress);
-          _log.fine('addReading progress: ${progress.current} of ${progress.total}');
-        },
-      );
+      numberOfRecordsAdded = await _syncToServer(intermediateReadings);
 
       isAddingReadings = false;
       await _refreshLists();
@@ -180,24 +159,45 @@ class DataProvider extends ChangeNotifier {
     _log.fine('All meter readings deleted');
   }
 
-  /// Read all data from GoogleSheets and store it in the local database.
+  /// Read all data from server and store it in the local database.
   /// Useful if a new device needs to be initialized
-  Future<int> _copyFromGoogleSheetsToDb() async {
+  Future<int> _copyFromServerToDb() async {
     int numberOfReadings = 0;
 
-    // If the database is empty, fetch data from Google Sheets
-    _log.fine('Fetching data from Google Sheets');
-    GoogleSheetsHelper googleSheetsHelper = GoogleSheetsHelper(insertDelay: 3, switchInterval: 40, spreadsheetId: gsc.spreadsheetId, credentials: gsc.credentials);
-    List<Reading>? readingsFromSheet = await googleSheetsHelper.fetchAll();
+    int maxReadingUpdatedAt = await _dbHelper.getMaxReadingsUpdatedAt();
 
-    if (readingsFromSheet != null && readingsFromSheet.isNotEmpty) {
-      _log.fine('Fetched ${readingsFromSheet.length} entries from Google Sheets');
+    // If the database is empty, fetch data from Server
+    _log.fine('Fetching readings from server');
+    HttpHelper httpHelper = HttpHelper(baseUrl: app_config.zaehlerstandBaseUrl);
+    List<Reading> readingsFromServer = await httpHelper.fetchReadingsAfter(maxReadingUpdatedAt);
+
+    if (readingsFromServer.isNotEmpty) {
+      _log.fine('Fetched ${readingsFromServer.length} readings from server');
 
       // Bulk import the fetched data into the database
-      _dbHelper.bulkInsert(readingsFromSheet);
-      numberOfReadings = readingsFromSheet.length;
+      await _dbHelper.bulkInsertReadings(readingsFromServer);
+      numberOfReadings = readingsFromServer.length;
+
       _log.fine('Imported readings into the database');
     }
+
+    int maxWeatherInfoUpdatedAt = await _dbHelper.getMaxWeatherInfoUpdatedAt();
+
+    // If the database is empty, fetch data from Server
+    _log.fine('Fetching weather info from server');
+    List<WeatherInfo> weatherInfosFromServer = await httpHelper.fetchWeatherInfoAfter(maxWeatherInfoUpdatedAt);
+
+    if (weatherInfosFromServer.isNotEmpty) {
+      _log.fine('Fetched ${weatherInfosFromServer.length} weather infos from server');
+
+      // Bulk import the fetched data into the database
+      await _dbHelper.bulkInsertWeatherInfo(weatherInfosFromServer);
+      numberOfReadings = weatherInfosFromServer.length;
+
+      _log.fine('Imported readings into the database');
+    }
+
+    httpHelper.close();
 
     return numberOfReadings;
   }
@@ -316,15 +316,21 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  Future<int> _syncToGoogleSheets(List<Reading> unsynchronizedReadings, Function(ProgressUpdate) onProgress) async {
-    GoogleSheetsHelper googleSheetsHelper = GoogleSheetsHelper(insertDelay: 3, switchInterval: 40, spreadsheetId: gsc.spreadsheetId, credentials: gsc.credentials);
+  Future<int> _syncToServer(List<Reading> unsynchronizedReadings) async {
+    HttpHelper httpHelper = HttpHelper(baseUrl: app_config.zaehlerstandBaseUrl);
+    bool ok = await httpHelper.bulkInsertReadings(unsynchronizedReadings);
 
-    List<Reading> synchronizedReadings = await googleSheetsHelper.insertRows(unsynchronizedReadings, onProgress);
+    if (ok) {
+      List<Reading> updatedReadings = readings.map((reading) {
+        return reading.copyWith(isSynced: true);
+      }).toList();
 
-    await _dbHelper.bulkInsert(synchronizedReadings);
+      await _dbHelper.bulkInsertReadings(updatedReadings);
+      _log.fine('Completed adding meter readings. Total records added: ${updatedReadings.length}.');
+      return updatedReadings.length;
+    }
 
-    _log.fine('Completed adding meter readings. Total records added: ${synchronizedReadings.length}.');
-    return synchronizedReadings.length;
+    return 0;
   }
 
   List<Reading> _createReadingsForIntermediateDays(int enteredReading) {
@@ -385,22 +391,16 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> _checkForUnsynchronizedDbRecords() async {
-    isSynchronizingToGoogleSheets = true;
+    isSynchronizingToServer = true;
 
     final List<Reading> unsynchronizedReadings = readings.where((reading) => !reading.isSynced).toList();
     if (unsynchronizedReadings.isNotEmpty) {
-      await _syncToGoogleSheets(
-        unsynchronizedReadings,
-        (progress) {
-          _syncReadingProgressController.add(progress);
-          _log.fine('Check for unsynchronized progress: ${progress.current} of ${progress.total}');
-        },
-      );
+      await _syncToServer(unsynchronizedReadings);
     }
 
     await _refreshLists();
 
-    isSynchronizingToGoogleSheets = false;
+    isSynchronizingToServer = false;
 
     notifyListeners();
   }
