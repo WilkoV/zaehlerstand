@@ -5,12 +5,11 @@ import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/app/zaehlerstand_app.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
-import 'package:zaehlerstand/src/provider/theme_provider.dart';
+import 'package:zaehlerstand/src/provider/settings_provider.dart';
 
 Future<void> main() async {
   final Logger log = Logger('Main');
-  final ThemeProvider themeProvider = ThemeProvider();
-  final DataProvider dataProvider = DataProvider();
+  final SettingsProvider settingsProvider = SettingsProvider();
 
   if (kReleaseMode) {
     // In release mode, set log level to WARNING
@@ -31,16 +30,17 @@ Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  await themeProvider.loadTheme();
-  log.fine('ThemeProvider initialized successfully.');
+  await settingsProvider.loadSettings();
+  log.fine('SettingsProvider initialized successfully.');
 
   log.fine('Starting the ZaehlerstandApp.');
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => themeProvider),
+        ChangeNotifierProvider(create: (_) => settingsProvider),
         ChangeNotifierProvider<DataProvider>(
-          create: (_) => dataProvider..initialize(),
+          create: (context) => DataProvider(context) // Pass context here
+            ..initialize(), // Call initialize after creation
           lazy: true,
         ),
       ],

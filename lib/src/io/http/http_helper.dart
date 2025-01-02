@@ -16,14 +16,12 @@ class HttpHelper {
   HttpHelper({
     required this.baseUrl,
     http.Client? client,
-    this.timeout = const Duration(seconds: 10), // Default timeout
+    this.timeout = const Duration(seconds: 30),
   }) : client = client ?? http.Client();
 
   // Helper method to handle requests with timeout
   Future<http.Response> _getWithTimeout(Uri url) async {
-    return await client
-        .get(url)
-        .timeout(timeout, onTimeout: () => throw TimeoutException('Request timed out for $url'));
+    return await client.get(url).timeout(timeout, onTimeout: () => throw TimeoutException('Request timed out for $url'));
   }
 
   // Method to fetch all readings and return a list of Reading objects
@@ -76,11 +74,13 @@ class HttpHelper {
 
     try {
       final payload = jsonEncode(readings.map((reading) => reading.toJson()).toList());
-      final response = await client.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: payload,
-      ).timeout(timeout, onTimeout: () => throw TimeoutException('Request timed out for $url'));
+      final response = await client
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: payload,
+          )
+          .timeout(timeout, onTimeout: () => throw TimeoutException('Request timed out for $url'));
 
       if (response.statusCode == 200) {
         _log.info('Bulk import completed successfully');

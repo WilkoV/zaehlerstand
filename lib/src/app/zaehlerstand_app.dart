@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:zaehlerstand/src/app/app_theme.dart';
-import 'package:zaehlerstand/src/provider/theme_provider.dart';
+import 'package:zaehlerstand/src/provider/settings_provider.dart';
 import 'package:zaehlerstand/src/screens/zaehlerstand_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -11,8 +11,8 @@ class ZaehlerstandApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
+    return Consumer<SettingsProvider>(
+      builder: (context, settingsProvider, child) {
         return SafeArea(
           child: ResponsiveApp(
             builder: (context) => MaterialApp(
@@ -20,7 +20,7 @@ class ZaehlerstandApp extends StatelessWidget {
               debugShowCheckedModeBanner: false,
               theme: AppTheme.getResponsiveTheme(context),
               darkTheme: AppTheme.getResponsiveTheme(context, isDarkMode: true),
-              themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+              themeMode: settingsProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
               localizationsDelegates: const [
                 GlobalMaterialLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,

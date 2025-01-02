@@ -23,9 +23,8 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
 
   final List<Widget> _views = [
     const DashboardResponsiveLayout(),
-    const Center(child: Text('Diagrams View')),
-    const Center(child: Text('Data View')),
-    const Center(child: Text('Settings View')),
+    const Center(child: Text('Diagramme')),
+    const Center(child: Text('Daten')),
   ];
 
   @override
@@ -94,21 +93,14 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
                   Icons.bar_chart,
                   size: Theme.of(context).textTheme.headlineLarge!.fontSize,
                 ),
-                label: 'Diagrams',
+                label: 'Diagramme',
               ),
               BottomNavigationBarItem(
                 icon: Icon(
                   Icons.date_range,
                   size: Theme.of(context).textTheme.headlineLarge!.fontSize,
                 ),
-                label: 'Data',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.settings,
-                  size: Theme.of(context).textTheme.headlineLarge!.fontSize,
-                ),
-                label: 'Settings',
+                label: 'Daten',
               ),
             ],
             currentIndex: _selectedIndex,

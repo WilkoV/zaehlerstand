@@ -1,22 +1,30 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart' as pp;
+import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/io/connectivity/connectivity_helper.dart';
 import 'package:zaehlerstand/src/io/http/http_helper.dart';
 import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
 import 'package:zaehlerstand/src/models/base/monthly_consumption.dart';
 import 'package:zaehlerstand/src/models/base/yearly_consumption.dart';
+import 'package:zaehlerstand/src/provider/settings_provider.dart';
 import 'package:zaehlerstand_common/zaehlerstand_common.dart';
-import 'package:zaehlerstand/src/app/app_config.dart' as app_config;
 
 class DataProvider extends ChangeNotifier {
   static final _log = Logger('DataProvider');
 
   // Db
   late DbHelper _dbHelper;
+  late String _serverAddress;
+  late String _serverPort;
+  late final VoidCallback _settingsListener;
+  late final SettingsProvider _settingsProvider;
+
+  String _oldServerAddress = '';
+  String _oldServerPort = '';
 
   // Tracks the current status of the provider (e.g., loading, idle, syncing).
   bool isLoading = true;
@@ -40,10 +48,44 @@ class DataProvider extends ChangeNotifier {
   /// List of all years that have data in reading
   List<int> dataYears = <int>[];
 
+  DataProvider(BuildContext context) {
+    // Inject the server address from SettingsProvider
+    _settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    _serverAddress = _settingsProvider.serverAddress;
+    _serverPort = _settingsProvider.serverPort;
+    _oldServerAddress = _serverAddress;
+    _oldServerPort = _oldServerPort;
+
+    // Listen for changes in SettingsProvider and rebuild HttpHelper
+    _settingsListener = () async {
+      _serverAddress = _settingsProvider.serverAddress;
+      _serverPort = _settingsProvider.serverPort;
+
+      if (_serverAddress != _oldServerAddress || _serverPort != _oldServerPort) {
+        _log.info('Server configuration changed');
+
+        isLoading = true;
+        notifyListeners();
+
+        await _copyFromServerToDb();
+        await _refreshLists();
+
+        isLoading = false;
+        notifyListeners();
+      }
+
+      _oldServerAddress = _serverAddress;
+      _oldServerPort = _serverPort;
+    };
+
+    _settingsProvider.addListener(_settingsListener);
+  }
+
   @override
   void dispose() {
     _log.fine('Disposing DataProvider.');
 
+    _settingsProvider.removeListener(_settingsListener);
     super.dispose();
   }
 
@@ -163,17 +205,15 @@ class DataProvider extends ChangeNotifier {
   /// Useful if a new device needs to be initialized
   Future<int> _copyFromServerToDb() async {
     int numberOfReadings = 0;
-
     int maxReadingUpdatedAt = await _dbHelper.getMaxReadingsUpdatedAt();
 
     // If the database is empty, fetch data from Server
     _log.fine('Fetching readings from server');
-    HttpHelper httpHelper = HttpHelper(baseUrl: app_config.zaehlerstandBaseUrl);
+    HttpHelper httpHelper = HttpHelper(baseUrl: 'http://$_serverAddress:$_serverPort');
     List<Reading> readingsFromServer = await httpHelper.fetchReadingsAfter(maxReadingUpdatedAt);
 
+    _log.fine('Fetched ${readingsFromServer.length} readings from server');
     if (readingsFromServer.isNotEmpty) {
-      _log.fine('Fetched ${readingsFromServer.length} readings from server');
-
       // Bulk import the fetched data into the database
       await _dbHelper.bulkInsertReadings(readingsFromServer);
       numberOfReadings = readingsFromServer.length;
@@ -186,10 +226,9 @@ class DataProvider extends ChangeNotifier {
     // If the database is empty, fetch data from Server
     _log.fine('Fetching weather info from server');
     List<WeatherInfo> weatherInfosFromServer = await httpHelper.fetchWeatherInfoAfter(maxWeatherInfoUpdatedAt);
+    _log.fine('Fetched ${weatherInfosFromServer.length} weather infos from server');
 
     if (weatherInfosFromServer.isNotEmpty) {
-      _log.fine('Fetched ${weatherInfosFromServer.length} weather infos from server');
-
       // Bulk import the fetched data into the database
       await _dbHelper.bulkInsertWeatherInfo(weatherInfosFromServer);
       numberOfReadings = weatherInfosFromServer.length;
@@ -317,7 +356,7 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<int> _syncToServer(List<Reading> unsynchronizedReadings) async {
-    HttpHelper httpHelper = HttpHelper(baseUrl: app_config.zaehlerstandBaseUrl);
+    HttpHelper httpHelper = HttpHelper(baseUrl: 'http://$_serverAddress:$_serverPort');
     bool ok = await httpHelper.bulkInsertReadings(unsynchronizedReadings);
 
     if (ok) {
