@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart' as pp;
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/io/connectivity/connectivity_helper.dart';
 import 'package:zaehlerstand/src/io/http/http_helper.dart';
+import 'package:zaehlerstand/src/models/base/average_consumption.dart';
 import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
 import 'package:zaehlerstand/src/models/base/monthly_consumption.dart';
 import 'package:zaehlerstand/src/models/base/yearly_consumption.dart';
@@ -44,6 +45,7 @@ class DataProvider extends ChangeNotifier {
   Map<int, List<DailyConsumption>> yearlyGroupedDailyConsumptions = {};
   List<MonthlyConsumption> monthlyConsumptions = <MonthlyConsumption>[];
   List<YearlyConsumption> yearlyConsumptions = <YearlyConsumption>[];
+  List<AverageConsumption> averageConsumptions = <AverageConsumption>[];
 
   /// List of all years that have data in reading
   List<int> dataYears = <int>[];
@@ -300,6 +302,38 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
+  void _calculateAverageConsumption() {
+    averageConsumptions.clear();
+
+    final now = DateTime.now();
+
+    // Filter and calculate averages for each period
+    int calculateAverage(Iterable<DailyConsumption> consumptions) {
+      if (consumptions.isEmpty) {
+        return 0;
+      }
+
+      final total = consumptions.fold<int>(0, (sum, item) => sum + item.consumption);
+      return (total / consumptions.length).round();
+    }
+
+    // Last 7 days
+    final Iterable<DailyConsumption> last7Days = dailyConsumptions.where((dailyConsumption) => dailyConsumption.date.isAfter(now.subtract(const Duration(days: 7))));
+    averageConsumptions.add(AverageConsumption(period: '7 Tage', consumption: calculateAverage(last7Days)));
+
+    // Last 30 days
+    final Iterable<DailyConsumption> last30Days = dailyConsumptions.where((dailyConsumption) => dailyConsumption.date.isAfter(now.subtract(const Duration(days: 30))));
+    averageConsumptions.add(AverageConsumption(period: '30 Tage', consumption: calculateAverage(last30Days)));
+
+    // This year
+    final Iterable<DailyConsumption> thisYear = dailyConsumptions.where((entry) => entry.date.year == now.year);
+    averageConsumptions.add(AverageConsumption(period: '${now.year}', consumption: calculateAverage(thisYear)));
+
+    // Total
+    final int averageTotal = calculateAverage(dailyConsumptions);
+    averageConsumptions.add(AverageConsumption(period: 'Total', consumption: averageTotal));
+  }
+
   void _calculateYearlyConsumption() {
     yearlyConsumptions.clear();
 
@@ -423,6 +457,7 @@ class DataProvider extends ChangeNotifier {
     _groupedDailyConsumptionsByYear();
     _calculateMonthlyConsumption();
     _calculateYearlyConsumption();
+    _calculateAverageConsumption();
 
     unsyncedCount = readings.where((reading) => !reading.isSynced).length;
 

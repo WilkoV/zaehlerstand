@@ -5,14 +5,12 @@ import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
 class ReadingConsumptionElement extends StatelessWidget {
   final int? consumption;
-  final DateTime? consumptionDate;
   final int? compareConsumptionWith;
   final String? label;
 
   const ReadingConsumptionElement({
     super.key,
     this.consumption,
-    this.consumptionDate,
     this.compareConsumptionWith,
     this.label,
   });
@@ -41,13 +39,7 @@ class ReadingConsumptionElement extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8.0),
-        if (consumptionDate != null)
-          Text(
-            ReadingLogic.formatDate(consumptionDate!),
-            style: Theme.of(context).textTheme.bodyMedium,
-            textAlign: TextAlign.center,
-          )
-        else if (label != null)
+        if (label != null)
           Text(
             label!,
             style: Theme.of(context).textTheme.bodyMedium,
