@@ -11,7 +11,7 @@ class Dashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<DataProvider>(
       builder: (context, dataProvider, child) {
-        final elements = _buildElements(dataProvider, context); // Pass context here
+        final elements = _buildElements(dataProvider, context);
         return GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 5,
@@ -23,9 +23,8 @@ class Dashboard extends StatelessWidget {
           itemBuilder: (context, index) {
             final element = elements[index];
             return Align(
-              // Keep the Align widget for consistent centering
               alignment: Alignment.center,
-              child: _buildGridItem(element, context), // Use a separate function
+              child: _buildGridItem(element, context), 
             );
           },
         );
