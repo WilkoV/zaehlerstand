@@ -15,8 +15,8 @@ class Dashboard extends StatelessWidget {
         return GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 5,
-            mainAxisSpacing: 4.0,
-            crossAxisSpacing: 4.0,
+            mainAxisSpacing: 0.0,
+            crossAxisSpacing: 0.0,
             childAspectRatio: 1.5,
           ),
           itemCount: elements.length,
@@ -24,7 +24,7 @@ class Dashboard extends StatelessWidget {
             final element = elements[index];
             return Align(
               alignment: Alignment.center,
-              child: _buildGridItem(element, context), 
+              child: _buildGridItem(element, context),
             );
           },
         );
@@ -81,9 +81,18 @@ class Dashboard extends StatelessWidget {
     }
   }
 
+  void _addTypeLabel(List<Map<String, dynamic>> elements, String label) {
+    elements.add({
+      'type': 'type',
+      'label': label,
+    });
+  }
+
   Widget _buildGridItem(Map<String, dynamic> element, BuildContext context) {
+    Widget content;
+
     if (element['type'] == 'type') {
-      return Text(
+      content = Text(
         element['label'],
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.headlineLarge?.copyWith(
@@ -91,20 +100,27 @@ class Dashboard extends StatelessWidget {
             ),
       );
     } else if (element['type'] == 'day' || element['type'] == 'month' || element['type'] == 'year' || element['type'] == 'average') {
-      return ReadingConsumptionElement(
+      content = ReadingConsumptionElement(
         consumption: element['consumption'],
         label: element['label'],
         compareConsumptionWith: element['compareWith'],
       );
     } else {
-      return ReadingConsumptionElement(label: element['label']);
+      content = ReadingConsumptionElement(label: element['label']);
     }
-  }
 
-  void _addTypeLabel(List<Map<String, dynamic>> elements, String label) {
-    elements.add({
-      'type': 'type',
-      'label': label,
-    });
+    // Add divider to the bottom of the content
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Divider(
+          thickness: 2,
+          height: 2,
+        ),
+        Expanded(
+          child: Center(child: content),
+        ),
+      ],
+    );
   }
 }

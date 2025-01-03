@@ -26,6 +26,7 @@ class AppTheme {
       selectedItemColor: app_colors.lightSelectedItemColor,
       unselectedItemColor: app_colors.lightUnselectedItemColor,
     ),
+    dividerColor: app_colors.lightPrimaryColor,
   );
 
   // Tablet-specific light theme
@@ -51,6 +52,7 @@ class AppTheme {
       selectedItemColor: app_colors.lightSelectedItemColor,
       unselectedItemColor: app_colors.lightUnselectedItemColor,
     ),
+    dividerColor: app_colors.lightPrimaryColor,
   );
 
   // Mobile-specific dark theme
@@ -76,6 +78,7 @@ class AppTheme {
       selectedItemColor: app_colors.darkSelectedItemColor,
       unselectedItemColor: app_colors.darkUnselectedItemColor,
     ),
+    dividerColor: app_colors.darkPrimaryColor,
   );
 
   // Tablet-specific dark theme
@@ -101,6 +104,7 @@ class AppTheme {
       selectedItemColor: app_colors.darkSelectedItemColor,
       unselectedItemColor: app_colors.darkUnselectedItemColor,
     ),
+    dividerColor: app_colors.darkPrimaryColor,
   );
 
   // Function to get the appropriate theme based on screen size
