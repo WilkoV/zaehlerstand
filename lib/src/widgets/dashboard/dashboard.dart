@@ -17,7 +17,7 @@ class Dashboard extends StatelessWidget {
             crossAxisCount: 5,
             mainAxisSpacing: 0.0,
             crossAxisSpacing: 0.0,
-            childAspectRatio: 1.5,
+            childAspectRatio: 1.3,
           ),
           itemCount: elements.length,
           itemBuilder: (context, index) {
@@ -39,8 +39,19 @@ class Dashboard extends StatelessWidget {
     final years = [0, 1, 2, 3];
 
     _addTypeLabel(elements, 'T');
-    _addConsumptionData('day', elements, dataProvider.dailyConsumptions, days,
-        (day) => ReadingLogic.formatDate(dataProvider.dailyConsumptions.isNotEmpty ? dataProvider.dailyConsumptions.first.date.subtract(Duration(days: day)) : DateTime.now().subtract(Duration(days: day))));
+    _addConsumptionData(
+      'day',
+      elements,
+      dataProvider.dailyConsumptions,
+      days,
+      (day) => ReadingLogic.formatDate(
+        dataProvider.dailyConsumptions.isNotEmpty
+            ? dataProvider.dailyConsumptions.first.date.subtract(Duration(days: day))
+            : DateTime.now().subtract(
+                Duration(days: day),
+              ),
+      ),
+    );
 
     _addTypeLabel(elements, 'M');
     _addConsumptionData(
@@ -69,8 +80,12 @@ class Dashboard extends StatelessWidget {
         elements.add({
           'type': type,
           'consumption': data[index].consumption,
-          'label': labelGenerator(index),
           'compareWith': data.isNotEmpty ? data.first.consumption : null,
+          'minTemperature': data[index].minTemperature,
+          'maxTemperature': data[index].maxTemperature,
+          'minFeelsLike': data[index].minFeelsLike,
+          'maxFeelsLike': data[index].maxFeelsLike,
+          'label': labelGenerator(index),
         });
       } else {
         elements.add({
@@ -102,8 +117,13 @@ class Dashboard extends StatelessWidget {
     } else if (element['type'] == 'day' || element['type'] == 'month' || element['type'] == 'year' || element['type'] == 'average') {
       content = ReadingConsumptionElement(
         consumption: element['consumption'],
-        label: element['label'],
         compareConsumptionWith: element['compareWith'],
+        minTemperature: element['minTemperature'],
+        maxTemperature: element['maxTemperature'],
+        minFeelsLike: element['minFeelsLike'],
+        maxFeelsLike: element['maxFeelsLike'],
+        label: element['label'],
+
       );
     } else {
       content = ReadingConsumptionElement(label: element['label']);

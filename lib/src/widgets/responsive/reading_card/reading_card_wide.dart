@@ -27,6 +27,14 @@ class ReadingCardWide extends StatelessWidget {
                 Text(reading.getFormattedDate(), style: Theme.of(context).textTheme.bodyLarge),
               ],
             ),
+            if (dailyConsumption.minTemperature != null || dailyConsumption.maxTemperature != null)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Min. Temperatur: ${dailyConsumption.minTemperature}', style: Theme.of(context).textTheme.bodyMedium),
+                  Text('Max. Temperatur: ${dailyConsumption.maxTemperature}', style: Theme.of(context).textTheme.bodyMedium),
+                ],
+              ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

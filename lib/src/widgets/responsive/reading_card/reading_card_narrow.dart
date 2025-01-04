@@ -22,6 +22,11 @@ class ReadingCardNarrow extends StatelessWidget {
           children: [
             Text('Tagesverbrauch: ${ReadingLogic.formatDailyConsumption(dailyConsumption.consumption)}', style: Theme.of(context).textTheme.bodyLarge),
             Text('Datum: ${reading.getFormattedDate()}', style: Theme.of(context).textTheme.bodyLarge),
+            if (dailyConsumption.minTemperature != null || dailyConsumption.maxTemperature != null)
+             Text('Min. Temperatur: ${dailyConsumption.minTemperature}', style: Theme.of(context).textTheme.bodyMedium),
+            if (dailyConsumption.minTemperature != null || dailyConsumption.maxTemperature != null)
+             Text('Max. Temperatur: ${dailyConsumption.maxTemperature}', style: Theme.of(context).textTheme.bodyMedium),
+                
             Text('Zählerstand: ${reading.reading}', style: Theme.of(context).textTheme.bodyMedium),
             Text('Generiert: ${reading.isGenerated ? 'Ja' : 'Nein'}', style: Theme.of(context).textTheme.bodyMedium),
             reading.isSynced

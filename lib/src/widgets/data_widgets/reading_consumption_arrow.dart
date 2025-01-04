@@ -18,18 +18,8 @@ class ReadingConsumptionArrow extends StatelessWidget {
             ? Icon(Icons.arrow_upward, color: _getArrowColor(), size: Theme.of(context).textTheme.bodyLarge!.fontSize!)
             : consumption! < compareConsumptionWith!
                 ? Icon(Icons.arrow_downward, color: _getArrowColor(), size: Theme.of(context).textTheme.bodyLarge!.fontSize!)
-                : Row(
-                    children: [
-                      Icon(Icons.arrow_upward, color: _getArrowColor(), size: Theme.of(context).textTheme.bodyLarge!.fontSize!),
-                      Icon(Icons.arrow_downward, color: _getArrowColor(), size: Theme.of(context).textTheme.bodyLarge!.fontSize!),
-                    ],
-                  )
-        : Row(
-            children: [
-              Icon(Icons.arrow_upward, color: _getArrowColor(), size: Theme.of(context).textTheme.bodyLarge!.fontSize!),
-              Icon(Icons.arrow_downward, color: _getArrowColor(), size: Theme.of(context).textTheme.bodyLarge!.fontSize!),
-            ],
-          );
+                : const SizedBox()
+        : const SizedBox();
   }
 
   Color _getArrowColor() {

@@ -7,5 +7,9 @@ class DailyConsumption with _$DailyConsumption {
   factory DailyConsumption({
     required DateTime date,
     required int consumption,
+    double? minTemperature,
+    double? maxTemperature,
+    double? minFeelsLike,
+    double? maxFeelsLike,
   }) = _DailyConsumption;
 }

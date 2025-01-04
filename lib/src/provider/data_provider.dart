@@ -33,10 +33,11 @@ class DataProvider extends ChangeNotifier {
   bool isSynchronizingToServer = false;
   int unsyncedCount = 0;
 
-  /// List of all meter readings managed by the provider.
+  /// List of all readings managed by the provider.
   List<Reading> readings = <Reading>[];
+  List<WeatherInfo> weatherInfos = <WeatherInfo>[];
 
-  /// All meter readings grouped by year
+  /// All readings grouped by year
   Map<int, List<Reading>> groupedReadings = {};
 
   List<DailyConsumption> dailyConsumptions = <DailyConsumption>[];
@@ -128,18 +129,20 @@ class DataProvider extends ChangeNotifier {
     notifyListeners(); // Notify UI listeners that state has changed
   }
 
-  /// Fetches all meter readings from the database and updates the provider's state.
+  /// Fetches all readings from the database and updates the provider's state.
   Future<void> getAllReadings() async {
-    _log.fine('Fetching all meter readings from the database');
+    _log.fine('Fetching all readings from the database');
 
     // Load readings from the database
     await _getAllReadings();
+    await _getAllWeatherInfos();
+
     await _refreshLists();
 
     notifyListeners();
   }
 
-  /// Fetches a list of distinct years for which meter readings exist.
+  /// Fetches a list of distinct years for which readings exist.
   Future<void> getDataYears() async {
     _log.fine('Fetching distinct years from the database');
 
@@ -150,7 +153,7 @@ class DataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Adds a new meter reading to the database and refreshes the list of readings.
+  /// Adds a new reading to the database and refreshes the list of readings.
   Future<int> addReading(int enteredReading) async {
     isAddingReadings = true;
     notifyListeners();
@@ -164,7 +167,7 @@ class DataProvider extends ChangeNotifier {
     _log.fine('Adding user-entered reading: ${readingFromInput.toString()}.');
     intermediateReadings.add(readingFromInput);
 
-    // Insert all new meter readings into the database
+    // Insert all new readings into the database
     _dbHelper.bulkInsertReadings(intermediateReadings);
     _log.fine('Bulk-inserted new reading(s) into the database.');
 
@@ -188,9 +191,9 @@ class DataProvider extends ChangeNotifier {
     return numberOfRecordsAdded;
   }
 
-  /// Deletes all meter readings from the database and refreshes the list.
+  /// Deletes all readings from the database and refreshes the list.
   Future<void> deleteAllReadings() async {
-    _log.fine('Deleting all meter readings');
+    _log.fine('Deleting all readings');
 
     // Delete all records and refresh the list
     await _dbHelper.deleteAllReadings();
@@ -200,7 +203,7 @@ class DataProvider extends ChangeNotifier {
     notifyListeners();
 
     isLoading = false;
-    _log.fine('All meter readings deleted');
+    _log.fine('All readings deleted');
   }
 
   /// Read all data from server and store it in the local database.
@@ -251,10 +254,16 @@ class DataProvider extends ChangeNotifier {
     return dataYears;
   }
 
-  /// Get all meter readings
+  /// Get all readings
   Future<void> _getAllReadings() async {
     readings = await _dbHelper.getAllReadings();
-    _log.fine('Fetched ${readings.length} meter readings');
+    _log.fine('Fetched ${readings.length} readings');
+  }
+
+  /// Get all weather infos
+  Future<void> _getAllWeatherInfos() async {
+    weatherInfos = await _dbHelper.getAllWeatherInfo();
+    _log.fine('Fetched ${weatherInfos.length} weather infos');
   }
 
   void _calculateDailyConsumption() {
@@ -273,6 +282,20 @@ class DataProvider extends ChangeNotifier {
         date: currentReading.date,
         consumption: consumption,
       );
+
+      WeatherInfo? weatherInfo;
+
+      try {
+        // Add weather info to daily consumption
+        weatherInfo = weatherInfos.firstWhere((element) => element.date == currentReading.date);
+        _log.info('Found weather info for ${currentReading.date}: $weatherInfo');
+        dailyConsumption = dailyConsumption.copyWith(
+          minTemperature: weatherInfo.minTemperature,
+          maxTemperature: weatherInfo.maxTemperature,
+          minFeelsLike: weatherInfo.minFeelsLike,
+          maxFeelsLike: weatherInfo.maxFeelsLike,
+        );
+      } catch (_) {}
 
       dailyConsumptions.add(dailyConsumption);
     }
@@ -399,7 +422,7 @@ class DataProvider extends ChangeNotifier {
       }).toList();
 
       await _dbHelper.bulkInsertReadings(updatedReadings);
-      _log.fine('Completed adding meter readings. Total records added: ${updatedReadings.length}.');
+      _log.fine('Completed adding readings. Total records added: ${updatedReadings.length}.');
       return updatedReadings.length;
     }
 
@@ -409,8 +432,8 @@ class DataProvider extends ChangeNotifier {
   List<Reading> _createReadingsForIntermediateDays(int enteredReading) {
     DateTime currentDate = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 12);
 
-    // Find the most recent meter reading before the current date, or create a default one if none exist
-    _log.fine('Fetching the previous meter reading before $currentDate.');
+    // Find the most recent reading before the current date, or create a default one if none exist
+    _log.fine('Fetching the previous reading before $currentDate.');
     Reading previousReading = readings.isNotEmpty
         ? readings.firstWhere(
             (reading) => reading.date.isBefore(currentDate),
@@ -425,7 +448,7 @@ class DataProvider extends ChangeNotifier {
 
     // Check if we need to generate readings for intermediate days
     if (daysBetweenReadings > 1) {
-      _log.fine('Generating intermediate meter readings for missing days.');
+      _log.fine('Generating intermediate readings for missing days.');
 
       int totalConsumption = enteredReading - previousReading.reading;
       double averageConsumption = totalConsumption / daysBetweenReadings;
@@ -451,6 +474,7 @@ class DataProvider extends ChangeNotifier {
 
     await _getDataYears();
     await _getAllReadings();
+    await _getAllWeatherInfos();
 
     _groupReadingsByYear();
     _calculateDailyConsumption();
