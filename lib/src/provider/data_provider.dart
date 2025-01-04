@@ -431,6 +431,8 @@ class DataProvider extends ChangeNotifier {
       return updatedReadings.length;
     }
 
+    httpHelper.close();
+
     return 0;
   }
 
