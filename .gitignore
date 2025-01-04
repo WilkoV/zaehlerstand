@@ -44,7 +44,7 @@ app.*.map.json
 sqlite3.def
 sqlite3.dll
 
-# Don't publish freezd generated files
+# Don't publish freezed generated files
 **/*.freezed.dart
 
 # Don't publish credentials
