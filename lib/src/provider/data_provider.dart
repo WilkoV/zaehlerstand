@@ -217,6 +217,11 @@ class DataProvider extends ChangeNotifier {
     HttpHelper httpHelper = HttpHelper(baseUrl: 'http://$_serverAddress:$_serverPort');
     List<Reading> readingsFromServer = await httpHelper.fetchReadingsAfter(maxReadingUpdatedAt);
 
+    // Set isSynced to true
+    readingsFromServer = readingsFromServer.map((reading) {
+      return reading.copyWith(isSynced: true);
+    }).toList();
+
     _log.fine('Fetched ${readingsFromServer.length} readings from server');
     if (readingsFromServer.isNotEmpty) {
       // Bulk import the fetched data into the database
