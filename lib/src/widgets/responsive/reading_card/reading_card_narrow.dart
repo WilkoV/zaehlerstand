@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
 import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
 class ReadingCardNarrow extends StatelessWidget {
-  final Reading reading;
-  final DailyConsumption dailyConsumption;
+  final ReadingDetail readingDetail;
 
   const ReadingCardNarrow({
     super.key,
-    required this.dailyConsumption,
-    required this.reading,
+    required this.readingDetail,
   });
 
   @override
@@ -20,18 +17,15 @@ class ReadingCardNarrow extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Tagesverbrauch: ${ReadingLogic.formatDailyConsumption(dailyConsumption.consumption)}', style: Theme.of(context).textTheme.bodyLarge),
-            Text('Datum: ${reading.getFormattedDate()}', style: Theme.of(context).textTheme.bodyLarge),
-            if (dailyConsumption.minTemperature != null || dailyConsumption.maxTemperature != null)
-             Text('Min. Temperatur: ${dailyConsumption.minTemperature}', style: Theme.of(context).textTheme.bodyMedium),
-            if (dailyConsumption.minTemperature != null || dailyConsumption.maxTemperature != null)
-             Text('Max. Temperatur: ${dailyConsumption.maxTemperature}', style: Theme.of(context).textTheme.bodyMedium),
-                
-            Text('Zählerstand: ${reading.reading}', style: Theme.of(context).textTheme.bodyMedium),
-            Text('Generiert: ${reading.isGenerated ? 'Ja' : 'Nein'}', style: Theme.of(context).textTheme.bodyMedium),
-            reading.isSynced
-                ? Text('Gesichert: ${reading.formattedIsSynced()}', style: Theme.of(context).textTheme.bodyMedium)
-                : Text('Gesichert: ${reading.formattedIsSynced()}', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red)),
+            if (readingDetail.consumption != null) Text('Tagesverbrauch: ${ReadingLogic.formatDailyConsumption(readingDetail.consumption!.consumption)}', style: Theme.of(context).textTheme.bodyLarge),
+            Text('Datum: ${readingDetail.reading.getFormattedDate()}', style: Theme.of(context).textTheme.bodyLarge),
+            if (readingDetail.weatherInfo != null) Text('Min. Temperatur: ${readingDetail.weatherInfo!.minTemperature}', style: Theme.of(context).textTheme.bodyMedium),
+            if (readingDetail.weatherInfo != null) Text('Max. Temperatur: ${readingDetail.weatherInfo!.maxTemperature}', style: Theme.of(context).textTheme.bodyMedium),
+            Text('Zählerstand: ${readingDetail.reading.reading}', style: Theme.of(context).textTheme.bodyMedium),
+            Text('Generiert: ${readingDetail.reading.isGenerated ? 'Ja' : 'Nein'}', style: Theme.of(context).textTheme.bodyMedium),
+            readingDetail.reading.isSynced
+                ? Text('Gesichert: ${readingDetail.reading.formattedIsSynced()}', style: Theme.of(context).textTheme.bodyMedium)
+                : Text('Gesichert: ${readingDetail.reading.formattedIsSynced()}', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red)),
           ],
         ),
       ),

@@ -10,9 +10,9 @@ class ConnectivityHelper {
     DateTime start = DateTime.now();
     var connectivityResult = await (Connectivity().checkConnectivity());
 
-    if (connectivityResult.contains(ConnectivityResult.mobile) || connectivityResult.contains(ConnectivityResult.wifi)) {
-      int dailyDuration = MeasureDuration.calculateDuration(start, DateTime.now());
-      log.fine('Connectivity check took $dailyDuration ms');
+    if (connectivityResult.contains(ConnectivityResult.wifi)) {
+      int executionDuration = MeasureDuration.calculateDuration(start, DateTime.now());
+      log.fine('Connectivity check took $executionDuration ms');
 
       return true;
     }

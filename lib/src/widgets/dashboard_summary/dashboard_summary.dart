@@ -4,8 +4,8 @@ import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/data_widgets/reading_consumption_element.dart';
 import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
-class Dashboard extends StatelessWidget {
-  const Dashboard({super.key});
+class DashboardSummery extends StatelessWidget {
+  const DashboardSummery({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -38,37 +38,39 @@ class Dashboard extends StatelessWidget {
     final months = [0, 1, 12, 24];
     final years = [0, 1, 2, 3];
 
-    _addTypeLabel(elements, 'T');
-    _addConsumptionData(
-      'day',
-      elements,
-      dataProvider.dailyConsumptions,
-      days,
-      (day) => ReadingLogic.formatDate(
-        dataProvider.dailyConsumptions.isNotEmpty
-            ? dataProvider.dailyConsumptions.first.date.subtract(Duration(days: day))
-            : DateTime.now().subtract(
-                Duration(days: day),
-              ),
-      ),
-    );
+    // TODO: Implement
 
-    _addTypeLabel(elements, 'M');
-    _addConsumptionData(
-        'month', elements, dataProvider.monthlyConsumptions, months, (month) => '${DateTime.now().subtract(Duration(days: month * 30)).year}.${DateTime.now().subtract(Duration(days: month * 30)).month.toString().padLeft(2, '0')}');
+    // _addTypeLabel(elements, 'T');
+    // _addConsumptionData(
+    //   'day',
+    //   elements,
+    //   dataProvider.dailyConsumptions,
+    //   days,
+    //   (day) => ReadingLogic.formatDate(
+    //     dataProvider.dailyConsumptions.isNotEmpty
+    //         ? dataProvider.dailyConsumptions.first.date.subtract(Duration(days: day))
+    //         : DateTime.now().subtract(
+    //             Duration(days: day),
+    //           ),
+    //   ),
+    // );
 
-    _addTypeLabel(elements, 'D');
-    for (var averageConsumption in dataProvider.averageConsumptions) {
-      elements.add({
-        'type': averageConsumption.consumption > 0 ? 'average' : 'default',
-        'consumption': averageConsumption.consumption,
-        'label': averageConsumption.period,
-        'compareWith': dataProvider.averageConsumptions.isNotEmpty ? dataProvider.averageConsumptions.first.consumption : null,
-      });
-    }
+    // _addTypeLabel(elements, 'M');
+    // _addConsumptionData(
+    //     'month', elements, dataProvider.monthlyConsumptions, months, (month) => '${DateTime.now().subtract(Duration(days: month * 30)).year}.${DateTime.now().subtract(Duration(days: month * 30)).month.toString().padLeft(2, '0')}');
 
-    _addTypeLabel(elements, 'J');
-    _addConsumptionData('year', elements, dataProvider.yearlyConsumptions, years, (year) => '${DateTime.now().year - year}');
+    // _addTypeLabel(elements, 'D');
+    // for (var averageConsumption in dataProvider.averageConsumptions) {
+    //   elements.add({
+    //     'type': averageConsumption.consumption > 0 ? 'average' : 'default',
+    //     'consumption': averageConsumption.consumption,
+    //     'label': averageConsumption.period,
+    //     'compareWith': dataProvider.averageConsumptions.isNotEmpty ? dataProvider.averageConsumptions.first.consumption : null,
+    //   });
+    // }
+
+    // _addTypeLabel(elements, 'J');
+    // _addConsumptionData('year', elements, dataProvider.yearlyConsumptions, years, (year) => '${DateTime.now().year - year}');
 
     return elements;
   }

@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:zaehlerstand/src/models/base/daily_consumption.dart';
 import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
 class ReadingCardWide extends StatelessWidget {
-  final Reading reading;
-  final DailyConsumption dailyConsumption;
+  final ReadingDetail readingDetail;
 
   const ReadingCardWide({
     super.key,
-    required this.dailyConsumption,
-    required this.reading,
+    required this.readingDetail,
   });
 
   @override
@@ -23,31 +20,31 @@ class ReadingCardWide extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Tagesverbrauch: ${ReadingLogic.formatDailyConsumption(dailyConsumption.consumption)}', style: Theme.of(context).textTheme.bodyLarge),
-                Text(reading.getFormattedDate(), style: Theme.of(context).textTheme.bodyLarge),
+                if (readingDetail.consumption != null) Text('Tagesverbrauch: ${ReadingLogic.formatDailyConsumption(readingDetail.consumption!.consumption)}', style: Theme.of(context).textTheme.bodyLarge),
+                Text(readingDetail.reading.getFormattedDate(), style: Theme.of(context).textTheme.bodyLarge),
               ],
             ),
-            if (dailyConsumption.minTemperature != null || dailyConsumption.maxTemperature != null)
+            if (readingDetail.weatherInfo != null)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Min. Temperatur: ${dailyConsumption.minTemperature}', style: Theme.of(context).textTheme.bodyMedium),
-                  Text('Max. Temperatur: ${dailyConsumption.maxTemperature}', style: Theme.of(context).textTheme.bodyMedium),
+                  Text('Min. Temperatur: ${readingDetail.weatherInfo!.minTemperature}', style: Theme.of(context).textTheme.bodyMedium),
+                  Text('Max. Temperatur: ${readingDetail.weatherInfo!.maxTemperature}', style: Theme.of(context).textTheme.bodyMedium),
                 ],
               ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Zählerstand: ${reading.reading}', style: Theme.of(context).textTheme.bodyMedium),
-                reading.isSynced
-                    ? Text('Gesichert: ${reading.formattedIsSynced()}', style: Theme.of(context).textTheme.bodyMedium)
-                    : Text('Gesichert: ${reading.formattedIsSynced()}', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red)),
+                Text('Zählerstand: ${readingDetail.reading.reading}', style: Theme.of(context).textTheme.bodyMedium),
+                readingDetail.reading.isSynced
+                    ? Text('Gesichert: ${readingDetail.reading.formattedIsSynced()}', style: Theme.of(context).textTheme.bodyMedium)
+                    : Text('Gesichert: ${readingDetail.reading.formattedIsSynced()}', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.red)),
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Generiert: ${reading.formattedIsGenerated()}', style: Theme.of(context).textTheme.bodyMedium),
+                Text('Generiert: ${readingDetail.reading.formattedIsGenerated()}', style: Theme.of(context).textTheme.bodyMedium),
               ],
             ),
           ],

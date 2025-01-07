@@ -4,6 +4,7 @@ import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/dialogs/reading_dialog.dart';
+import 'package:zaehlerstand/src/widgets/list_reading_details.dart';
 import 'package:zaehlerstand/src/widgets/responsive/dashboard/dashboard_responsive_layout.dart';
 import 'package:zaehlerstand/src/widgets/zaehlerstand/zaehlerstand_drawer.dart';
 import 'package:zaehlerstand_common/zaehlerstand_common.dart';
@@ -24,7 +25,7 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
   final List<Widget> _views = [
     const DashboardResponsiveLayout(),
     const Center(child: Text('Diagramme')),
-    const Center(child: Text('Daten')),
+    const ListReadingDetails(),
   ];
 
   @override
@@ -50,6 +51,7 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
   Widget build(BuildContext context) {
     return Consumer<DataProvider>(
       builder: (context, dataProvider, child) {
+        int minReadingValue = dataProvider.currentReading != null ? dataProvider.currentReading!.reading : 0;
         return Scaffold(
           appBar: AppBar(
             title: Text('Zählerstand', style: Theme.of(context).textTheme.headlineLarge),
@@ -66,9 +68,10 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
               final result = await showDialog<String>(
                 context: context,
                 builder: (context) => ReadingDialog(
-                  minimalReadingValue: _getMinimumValue(dataProvider),
+                  minimalReadingValue: minReadingValue,
+                  // TODO Implement average instead of 0
                   zaehlerstandController: TextEditingController(
-                    text: dataProvider.getFirstReading().getFirstTwoDigitsFromReading(dataProvider.getAverageDailyConsumption(7)),
+                    text: dataProvider.currentReading != null ? dataProvider.currentReading!.getFirstTwoDigitsFromReading(0) : '',
                   ),
                 ),
               );
@@ -112,6 +115,4 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
       },
     );
   }
-
-  int _getMinimumValue(DataProvider dataProvider) => dataProvider.readings.isNotEmpty ? dataProvider.readings.first.reading : 0;
 }

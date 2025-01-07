@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
@@ -22,6 +23,16 @@ class HttpHelper {
   // Helper method to handle requests with timeout
   Future<http.Response> _getWithTimeout(Uri url) async {
     return await client.get(url).timeout(timeout, onTimeout: () => throw TimeoutException('Request timed out for $url'));
+  }
+
+  static Future<bool> isServerReachable(String host, int port) async {
+    try {
+      final result = await Socket.connect(host, port, timeout: Duration(seconds: 5));
+      result.destroy();
+      return true; // Server is reachable
+    } catch (e) {
+      return false; // Server is not reachable
+    }
   }
 
   // Method to fetch all readings and return a list of Reading objects
@@ -95,6 +106,33 @@ class HttpHelper {
     }
   }
 
+  // Method to bulk import weatherInfos
+  Future<bool> bulkInsertWeatherInfos(List<WeatherInfo> weatherInfos) async {
+    final url = Uri.parse('$baseUrl/weather-info/bulk');
+
+    try {
+      final payload = jsonEncode(weatherInfos.map((weatherInfo) => weatherInfo.toJson()).toList());
+      final response = await client
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: payload,
+          )
+          .timeout(timeout, onTimeout: () => throw TimeoutException('Request timed out for $url'));
+
+      if (response.statusCode == 200) {
+        _log.info('Bulk import completed successfully');
+        return true;
+      } else {
+        _log.warning('Failed to bulk import weatherInfos: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      _log.severe('Error during bulk import: $e');
+      return false;
+    }
+  }
+
   // Method to fetch readings after a specific update time and return a list of WeatherInfo objects
   Future<List<WeatherInfo>> fetchWeatherInfoAfter(int updatedAt) async {
     final url = Uri.parse('$baseUrl/weather-info/after/$updatedAt');
@@ -114,6 +152,54 @@ class HttpHelper {
     } catch (e) {
       _log.severe('Error fetching weather info after $updatedAt: $e');
       return <WeatherInfo>[];
+    }
+  }
+
+  // Method to fetch consumptions after a specific update time and return a list of Consumption objects
+  Future<List<Consumption>> fetchConsumptionsAfter(int updatedAt) async {
+    final url = Uri.parse('$baseUrl/consumptions/after/$updatedAt');
+
+    try {
+      final response = await _getWithTimeout(url);
+
+      if (response.statusCode == 200) {
+        // Parse the response body as JSON and map each item to a Consumption object
+        final List<dynamic> jsonResponse = jsonDecode(response.body);
+        final List<Consumption> consumptions = jsonResponse.map((item) => Consumption.fromJson(item as Map<String, dynamic>)).toList();
+        return consumptions;
+      } else {
+        _log.warning('Failed to load consumptions after $updatedAt: ${response.statusCode}');
+        return <Consumption>[];
+      }
+    } catch (e) {
+      _log.severe('Error fetching consumptions after $updatedAt: $e');
+      return <Consumption>[];
+    }
+  }
+
+  Future<bool> bulkInsertConsumptions(List<Consumption> consumptions) async {
+    final url = Uri.parse('$baseUrl/consumptions/bulk');
+
+    try {
+      final payload = jsonEncode(consumptions.map((consumption) => consumption.toJson()).toList());
+      final response = await client
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: payload,
+          )
+          .timeout(timeout, onTimeout: () => throw TimeoutException('Request timed out for $url'));
+
+      if (response.statusCode == 200) {
+        _log.info('Bulk import completed successfully');
+        return true;
+      } else {
+        _log.warning('Failed to bulk import consumptions: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      _log.severe('Error during bulk import: $e');
+      return false;
     }
   }
 
