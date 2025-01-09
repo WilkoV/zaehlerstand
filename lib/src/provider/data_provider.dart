@@ -31,7 +31,7 @@ class DataProvider extends ChangeNotifier {
   List<ReadingDetail> readingsDetails = <ReadingDetail>[];
 
   /// List of all years that have data in reading
-  List<int> dataYears = <int>[];
+  List<int> availableYears = <int>[];
 
   DataProvider(BuildContext context) {
     // Inject the server address from SettingsProvider
@@ -255,6 +255,7 @@ class DataProvider extends ChangeNotifier {
     currentReading = await _dbHelper.getCurrentReading();
 
     readingsDetails = await _dbHelper.getAllReadingsDetails();
+    availableYears = await _dbHelper.getReadingsDistinctYears();
 
     //  TODO: Implement
     // await _getDataYears();

@@ -27,7 +27,7 @@ class HttpHelper {
 
   static Future<bool> isServerReachable(String host, int port) async {
     try {
-      final result = await Socket.connect(host, port, timeout: Duration(seconds: 5));
+      final result = await Socket.connect(host, port, timeout: const Duration(seconds: 5));
       result.destroy();
       return true; // Server is reachable
     } catch (e) {
