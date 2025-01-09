@@ -21,7 +21,8 @@ class _DaddysYearlyViewState extends State<DaddysYearlyView> {
             child: DataTable2(
               dataTextStyle: Theme.of(context).textTheme.bodyLarge,
               dataRowHeight: Theme.of(context).textTheme.bodyLarge!.fontSize! * 1.5 * 2,
-              headingTextStyle: const TextStyle(fontSize: 22, color: Colors.black),
+              headingTextStyle: Theme.of(context).textTheme.bodyLarge,
+              
               columns: const [
                 DataColumn2(label: Text('Name')),
                 DataColumn2(label: Text('Age'), fixedWidth: 100),
