@@ -26,9 +26,11 @@ class DataProvider extends ChangeNotifier {
   bool isAddingReadings = false;
   bool isSynchronizingToServer = false;
 
-  // Data sets for the UI
+  /// Data sets for the UI
   Reading? currentReading;
   List<ReadingDetail> readingsDetails = <ReadingDetail>[];
+  Map<String, Map<String, dynamic>> yearlyViewData = {};
+  Map<String, Map<String, Map<String, dynamic>>> monthlyViewData = <String, Map<String, Map<String, dynamic>>>{};
 
   /// List of all years that have data in reading
   List<int> availableYears = <int>[];
@@ -244,6 +246,53 @@ class DataProvider extends ChangeNotifier {
     return intermediateReadingsDetails;
   }
 
+  Future<void> _createYearlyViewData() async {
+    yearlyViewData.clear();
+
+    List<ReadingDetail> data = await _dbHelper.getAllReadingsDetailsDescAscAsc();
+
+    for (var readingDetail in data) {
+      final year = readingDetail.reading.date.year.toString();
+      final dayMonth = "${readingDetail.reading.date.day.toString().padLeft(2, '0')}.${readingDetail.reading.date.month.toString().padLeft(2, '0')}";
+
+      yearlyViewData[year] ??= {};
+      yearlyViewData[year]![dayMonth] = {
+        "enteredReading": readingDetail.reading.enteredReading,
+        "reading": readingDetail.reading.reading,
+        if (readingDetail.consumption != null) "consumption": readingDetail.consumption?.consumption,
+        if (readingDetail.weatherInfo != null) "minTemperature": readingDetail.weatherInfo?.minTemperature ?? 0.0,
+        if (readingDetail.weatherInfo != null) "maxTemperature": readingDetail.weatherInfo?.maxTemperature ?? 0.0,
+        if (readingDetail.weatherInfo != null) "minFeelsLike": readingDetail.weatherInfo?.minFeelsLike ?? 0.0,
+        if (readingDetail.weatherInfo != null) "maxFeelsLike": readingDetail.weatherInfo?.maxFeelsLike ?? 0.0,
+      };
+    }
+  }
+
+  Future<void> _createCurrentYearData() async {
+    monthlyViewData.clear();
+    final currentYear = DateTime.now().year;
+
+    List<ReadingDetail> data = await _dbHelper.getAllReadingsDetailsDescAscAsc();
+
+    for (var readingDetail in data) {
+      if (readingDetail.reading.date.year == currentYear) {
+        final month = readingDetail.reading.date.month.toString().padLeft(2, '0');
+        final day = readingDetail.reading.date.day.toString().padLeft(2, '0');
+
+        monthlyViewData[month] ??= {};
+        monthlyViewData[month]![day] = {
+          "enteredReading": readingDetail.reading.enteredReading,
+          "reading": readingDetail.reading.reading,
+          if (readingDetail.consumption != null) "consumption": readingDetail.consumption?.consumption,
+          if (readingDetail.weatherInfo != null) "minTemperature": readingDetail.weatherInfo?.minTemperature ?? 0.0,
+          if (readingDetail.weatherInfo != null) "maxTemperature": readingDetail.weatherInfo?.maxTemperature ?? 0.0,
+          if (readingDetail.weatherInfo != null) "minFeelsLike": readingDetail.weatherInfo?.minFeelsLike ?? 0.0,
+          if (readingDetail.weatherInfo != null) "maxFeelsLike": readingDetail.weatherInfo?.maxFeelsLike ?? 0.0,
+        };
+      }
+    }
+  }
+
   Future<void> _refreshLists() async {
     _log.fine('Refreshing data views.');
 
@@ -254,8 +303,11 @@ class DataProvider extends ChangeNotifier {
 
     currentReading = await _dbHelper.getCurrentReading();
 
-    readingsDetails = await _dbHelper.getAllReadingsDetails();
+    readingsDetails = await _dbHelper.getAllReadingsDetailsDescDescDesc();
     availableYears = await _dbHelper.getReadingsDistinctYears();
+
+    _createYearlyViewData();
+    _createCurrentYearData();
 
     //  TODO: Implement
     // await _getDataYears();

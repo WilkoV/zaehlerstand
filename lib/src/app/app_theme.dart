@@ -65,11 +65,11 @@ class AppTheme {
       bodyLarge: TextStyle(fontSize: 18, color: app_colors.darkTextLargeColor),
       bodyMedium: TextStyle(fontSize: 16, color: app_colors.darkTextMediumColor),
     ),
-    inputDecorationTheme: const InputDecorationTheme(
-      border: OutlineInputBorder(),
+    inputDecorationTheme: InputDecorationTheme(
+      border: const OutlineInputBorder(),
       focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: app_colors.darkPrimaryColor)),
     ),
-    colorScheme: const ColorScheme.dark(
+    colorScheme: ColorScheme.dark(
       primary: app_colors.darkPrimaryColor,
       secondary: Colors.teal,
     ),
@@ -91,11 +91,11 @@ class AppTheme {
       bodyLarge: TextStyle(fontSize: 28, color: app_colors.darkTextLargeColor),
       bodyMedium: TextStyle(fontSize: 24, color: app_colors.darkTextMediumColor),
     ),
-    inputDecorationTheme: const InputDecorationTheme(
-      border: OutlineInputBorder(),
+    inputDecorationTheme: InputDecorationTheme(
+      border: const OutlineInputBorder(),
       focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: app_colors.darkPrimaryColor)),
     ),
-    colorScheme: const ColorScheme.dark(
+    colorScheme: ColorScheme.dark(
       primary: app_colors.darkPrimaryColor,
       secondary: Colors.teal,
     ),
