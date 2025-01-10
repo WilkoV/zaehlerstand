@@ -145,10 +145,10 @@ class DataProvider extends ChangeNotifier {
 
     if (intermediateReadingsDetails.isNotEmpty) {
       previousReadingValue = intermediateReadingsDetails.last.reading.reading;
-    }
-
-    for (var readingsDetail in intermediateReadingsDetails) {
-      _log.fine('xxx ${readingsDetail.reading.date.year}/${readingsDetail.reading.date.month}/${readingsDetail.reading.date.day}, ${readingsDetail.reading.reading}, ${readingsDetail.consumption!.consumption}');
+    } if (currentReading != null && currentReading!.date != currentDate) {
+      previousReadingValue = currentReading!.reading;
+    } else if (readingsDetails.isNotEmpty && readingsDetails.length > 2) {
+      previousReadingValue = readingsDetails[1].reading.reading;
     }
 
     // Add the entered reading to the intermediateReadings list
@@ -164,10 +164,6 @@ class DataProvider extends ChangeNotifier {
     _log.fine('Adding user-entered reading: ${readingFromInput.toString()}.');
 
     intermediateReadingsDetails.add(ReadingDetail(reading: readingFromInput, consumption: consumption));
-
-    for (var readingsDetail in intermediateReadingsDetails) {
-      _log.fine('YYY ${readingsDetail.reading.date.year}/${readingsDetail.reading.date.month}/${readingsDetail.reading.date.day}, ${readingsDetail.reading.reading}, ${readingsDetail.consumption!.consumption}');
-    }
 
     // Insert all new readings into the database
     List<Reading> readings = [];
