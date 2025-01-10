@@ -6,6 +6,7 @@ import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/daddys_view/daddys_view.dart';
 import 'package:zaehlerstand/src/widgets/dialogs/reading_dialog.dart';
 import 'package:zaehlerstand/src/widgets/zaehlerstand/zaehlerstand_drawer.dart';
+import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
 class ZaehlerstandScreen extends StatefulWidget {
   const ZaehlerstandScreen({super.key});
@@ -67,11 +68,9 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
                 context: context,
                 builder: (context) => ReadingDialog(
                   minimalReadingValue: minReadingValue,
-                  // TODO Implement average instead of 0
                   zaehlerstandController: TextEditingController(
-                    // TODO: Reactivate first two digits initialization
-                    // text: dataProvider.currentReading != null ? dataProvider.currentReading!.getFirstTwoDigitsFromReading(0) : '',
-                    text: dataProvider.currentReading != null ? '' : '',
+                    // TODO Implement average instead of 0
+                    text: dataProvider.currentReading != null ? dataProvider.currentReading!.getFirstTwoDigitsFromReading(0) : '',
                   ),
                 ),
               );
