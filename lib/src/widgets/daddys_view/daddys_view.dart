@@ -11,64 +11,52 @@ class DaddysView extends StatefulWidget {
 }
 
 class _DaddysViewState extends State<DaddysView> {
+  String selectedView = 'Täglich';
   @override
   Widget build(BuildContext context) {
     return Consumer<SettingsProvider>(
       builder: (context, settingsProvider, child) {
         return Column(
           children: [
-            // Settings section
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Show Reading Toggle
                 Row(
                   children: [
-                    Text('Verbrauch', style: Theme.of(context).textTheme.bodyMedium),
-                    Switch(
-                      value: settingsProvider.showConsumption,
-                      onChanged: (value) {
-                        settingsProvider.toggleShowConsumption();
+                    Text('Ansicht: ', style: Theme.of(context).textTheme.bodyMedium),
+                    DropdownButton<String>(
+                      value: selectedView,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedView = newValue!;
+                        });
                       },
+                      items: <String>['Täglich', 'Wöchentlich', 'Monatlich', 'Jährlich'].map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(
+                            value,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ],
                 ),
-                // Show Reading Toggle
-                Row(
-                  children: [
-                    Text('Zählerstand', style: Theme.of(context).textTheme.bodyMedium),
-                    Switch(
-                      value: settingsProvider.showReading,
-                      onChanged: (value) {
-                        settingsProvider.toggleShowReading();
-                      },
-                    ),
-                  ],
-                ),
-                // Show Temperature Toggle
-                Row(
-                  children: [
-                    Text('Temperatur', style: Theme.of(context).textTheme.bodyMedium),
-                    Switch(
-                      value: settingsProvider.showTemperature,
-                      onChanged: (value) {
-                        settingsProvider.toggleShowTemperature();
-                      },
-                    ),
-                  ],
-                ),
-                // Show Feels Like Toggle
-                Row(
-                  children: [
-                    Text('Gefühlt', style: Theme.of(context).textTheme.bodyMedium),
-                    Switch(
-                      value: settingsProvider.showFeelsLike,
-                      onChanged: (value) {
-                        settingsProvider.toggleShowFeelsLike();
-                      },
-                    ),
-                  ],
-                ),
+                const SizedBox(width: 16),
+                // Durchschnitt Toggle (only available if "Täglich" is selected)
+                if (selectedView != 'Täglich')
+                  Row(
+                    children: [
+                      Text('Durchschnitt', style: Theme.of(context).textTheme.bodyMedium),
+                      Switch(
+                        value: settingsProvider.showAverage,
+                        onChanged: (value) {
+                          settingsProvider.toggleShowAverage();
+                        },
+                      ),
+                    ],
+                  )
               ],
             ),
             const SizedBox(height: 16), // Spacing between settings and view

@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/daddys_view/daddys_view.dart';
 import 'package:zaehlerstand/src/widgets/dialogs/reading_dialog.dart';
-import 'package:zaehlerstand/src/widgets/zaehlerstand/zaehlerstand_drawer.dart';
+import 'package:zaehlerstand/src/widgets/zaehlerstand_drawer.dart';
 import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
 class ZaehlerstandScreen extends StatefulWidget {

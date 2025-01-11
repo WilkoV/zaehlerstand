@@ -14,6 +14,7 @@ class SettingsProvider extends ChangeNotifier {
   bool _consumption = true;
   bool _showTemperature = true;
   bool _showFeelsLike = false;
+  bool _showAverage = false;
 
   // Getters
   bool get isDarkMode => _isDarkMode;
@@ -23,6 +24,7 @@ class SettingsProvider extends ChangeNotifier {
   bool get showConsumption => _consumption;
   bool get showTemperature => _showTemperature;
   bool get showFeelsLike => _showFeelsLike;
+  bool get showAverage => _showAverage;
 
   // Load settings from SharedPreferences
   Future<void> loadSettings() async {
@@ -36,6 +38,7 @@ class SettingsProvider extends ChangeNotifier {
     _consumption = preferences.getBool('showConsumption') ?? _consumption;
     _showTemperature = preferences.getBool('showTemperature') ?? _showTemperature;
     _showFeelsLike = preferences.getBool('showFeelsLike') ?? _showFeelsLike;
+    _showAverage = preferences.getBool('showFeelsLike') ?? _showAverage;
 
     notifyListeners();
   }
@@ -92,6 +95,14 @@ class SettingsProvider extends ChangeNotifier {
     _showFeelsLike = !_showFeelsLike;
     final preferences = await SharedPreferences.getInstance();
     await preferences.setBool('showFeelsLike', _showFeelsLike);
+    notifyListeners();
+  }
+  
+  // Toggle showAverage
+  Future<void> toggleShowAverage() async {
+    _showAverage = !_showAverage;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool('showAverage', _showAverage);
     notifyListeners();
   }
 }
