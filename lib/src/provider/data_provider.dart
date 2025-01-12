@@ -266,6 +266,7 @@ class DataProvider extends ChangeNotifier {
 
   Future<void> _createCurrentYearData() async {
     monthlyViewData.clear();
+    
     final currentYear = DateTime.now().year;
 
     List<ReadingDetail> data = await _dbHelper.getAllReadingsDetailsDescAscAsc();

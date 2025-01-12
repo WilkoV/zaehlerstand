@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/daddys_view/daddys_view_base.dart';
 
-class DaddysYearlyView extends DaddysViewBase {
-  const DaddysYearlyView({
+class DaddysDetailedDailyView extends DaddysViewBase {
+  const DaddysDetailedDailyView({
     super.key,
     required super.showConsumption,
     required super.showReading,

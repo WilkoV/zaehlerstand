@@ -15,6 +15,7 @@ class SettingsProvider extends ChangeNotifier {
   bool _showTemperature = true;
   bool _showFeelsLike = false;
   bool _showAverage = false;
+  String _daddysSelectedView = 'T#glich';
 
   // Getters
   bool get isDarkMode => _isDarkMode;
@@ -25,6 +26,7 @@ class SettingsProvider extends ChangeNotifier {
   bool get showTemperature => _showTemperature;
   bool get showFeelsLike => _showFeelsLike;
   bool get showAverage => _showAverage;
+  String get daddysSelectedView => _daddysSelectedView;
 
   // Load settings from SharedPreferences
   Future<void> loadSettings() async {
@@ -39,6 +41,7 @@ class SettingsProvider extends ChangeNotifier {
     _showTemperature = preferences.getBool('showTemperature') ?? _showTemperature;
     _showFeelsLike = preferences.getBool('showFeelsLike') ?? _showFeelsLike;
     _showAverage = preferences.getBool('showFeelsLike') ?? _showAverage;
+    _daddysSelectedView = preferences.getString('daddysSelectedView') ?? _daddysSelectedView;
 
     notifyListeners();
   }
@@ -74,6 +77,7 @@ class SettingsProvider extends ChangeNotifier {
     await preferences.setBool('showReading', _showReading);
     notifyListeners();
   }
+
   // Toggle showConsumption
   Future<void> toggleShowConsumption() async {
     _consumption = !_consumption;
@@ -97,12 +101,36 @@ class SettingsProvider extends ChangeNotifier {
     await preferences.setBool('showFeelsLike', _showFeelsLike);
     notifyListeners();
   }
-  
+
   // Toggle showAverage
   Future<void> toggleShowAverage() async {
     _showAverage = !_showAverage;
     final preferences = await SharedPreferences.getInstance();
     await preferences.setBool('showAverage', _showAverage);
+    notifyListeners();
+  }
+
+  // Toggle showAverage
+  Future<void> setShowAverage(bool newValue) async {
+    _showAverage = newValue;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool('showAverage', _showAverage);
+    notifyListeners();
+  }
+
+  // Update daddy's selected view
+  Future<void> updateDaddysSelectedView(String selectedView) async {
+    _daddysSelectedView = selectedView;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString('daddysSelectedView', _daddysSelectedView);
+    notifyListeners();
+  }
+
+  // Update daddy's selected view
+  Future<void> setDaddysSelectedView(String selectedView) async {
+    _daddysSelectedView = selectedView;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString('daddysSelectedView', _daddysSelectedView);
     notifyListeners();
   }
 }
