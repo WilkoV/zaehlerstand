@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
 import 'package:zaehlerstand/src/widgets/daddys_view/daddys_detailed_daily_view.dart';
+import 'package:zaehlerstand/src/widgets/daddys_view/daddys_detailed_monthly_view.dart';
 
 class DaddysView extends StatefulWidget {
   const DaddysView({super.key});
@@ -71,27 +72,21 @@ class _DaddysViewState extends State<DaddysView> {
             const SizedBox(width: 16),
             // Toggle for average view
             selectedView != 'Tag'
-              ? Expanded(
-                flex: 1,
-                child: Row(
-                  children: [
-                    Text('Durchschnitt', style: Theme.of(context).textTheme.bodyMedium),
-                    Switch(
-                      value: showAverage,
-                      onChanged: (value) {
-                        if (selectedView == 'Tag') {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Tägliche Ansicht hat keine Durchschnittswerte')),
-                          );
-                          return;
-                        }
-                        _toggleShowAverage(value);
-                      },
+                ? Expanded(
+                    flex: 1,
+                    child: Row(
+                      children: [
+                        Text('Durchschnitt', style: Theme.of(context).textTheme.bodyMedium),
+                        Switch(
+                          value: showAverage,
+                          onChanged: (value) {
+                            _toggleShowAverage(value);
+                          },
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              )
-              : Expanded(flex: 1, child: Container()),
+                  )
+                : Expanded(flex: 1, child: Container()),
           ],
         ),
         const SizedBox(height: 16),
@@ -116,7 +111,12 @@ class _DaddysViewState extends State<DaddysView> {
       case 'Woche':
         return Text('Wöchentlich / Detail ist nicht implementiert', style: Theme.of(context).textTheme.bodyMedium);
       case 'Monat':
-        return Text('Monatlich / Detail ist nicht implementiert', style: Theme.of(context).textTheme.bodyMedium);
+        return DaddysDetailedMonthlyView(
+          showConsumption: settingsProvider.showConsumption,
+          showReading: settingsProvider.showReading,
+          showTemperature: settingsProvider.showTemperature,
+          showFeelsLike: settingsProvider.showFeelsLike,
+        );
       case 'Jahr':
         return Text('Jährlich / Detail ist nicht implementiert', style: Theme.of(context).textTheme.bodyMedium);
       default:
