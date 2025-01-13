@@ -27,6 +27,7 @@ class DataProvider extends ChangeNotifier {
   bool isSynchronizingToServer = false;
 
   /// Data sets for the UI
+  double last7ConsumptionAverage = 0;
   Reading? currentReading;
   List<ReadingDetail> readingsDetails = <ReadingDetail>[];
   Map<String, Map<String, dynamic>> yearlyDayViewData = {};
@@ -329,9 +330,14 @@ class DataProvider extends ChangeNotifier {
     availableYears = await _dbHelper.getReadingsDistinctYears();
 
     _createYearlyDayViewData();
-
     _createMonthlyDayViewData();
     _createMonthlyAggregationViewData();
+
+    try {
+      last7ConsumptionAverage = await _dbHelper.getAverageConsumptionOfLast7Days();
+    } on Exception catch (e) {
+      _log.severe(e);
+    }
 
     //  TODO: Implement
     // await _getDataYears();

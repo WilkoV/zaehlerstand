@@ -69,8 +69,7 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
                 builder: (context) => ReadingDialog(
                   minimalReadingValue: minReadingValue,
                   zaehlerstandController: TextEditingController(
-                    // TODO Implement average instead of 0
-                    text: dataProvider.currentReading != null ? dataProvider.currentReading!.getFirstTwoDigitsFromReading(0) : '',
+                    text: dataProvider.currentReading != null ? dataProvider.currentReading!.getFirstTwoDigitsFromReading(dataProvider.last7ConsumptionAverage.round()) : '',
                   ),
                 ),
               );
