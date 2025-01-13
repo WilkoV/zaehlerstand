@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
+import 'package:zaehlerstand/src/widgets/daddys_view/daddys_yearly_avg_view.dart';
 import 'package:zaehlerstand/src/widgets/daddys_view/daddys_yearly_sum_view.dart';
 import 'package:zaehlerstand/src/widgets/daddys_view/daddys_yearly_daily_view.dart';
 import 'package:zaehlerstand/src/widgets/daddys_view/daddys_monthly_daily_view.dart';
@@ -53,7 +54,7 @@ class _DaddysViewState extends State<DaddysView> {
               Expanded(
                 flex: 1,
                 child: Row(
-                  children: [ 'Jahr', 'Monat']
+                  children: ['Jahr', 'Monat']
                       .map(
                         (view) => Row(
                           children: [
@@ -152,7 +153,12 @@ class _DaddysViewState extends State<DaddysView> {
   Widget _buildAverageView({required String selectedView, required bool showConsumption, required bool showReading, required bool showTemperature, required bool showFeelsLike}) {
     switch (selectedView) {
       case 'Jahr':
-        return Text('Jahr / Durchschnitt ist nicht implementiert', style: Theme.of(context).textTheme.bodyMedium);
+        return DaddysYearlyAvgView(
+          showConsumption: showConsumption,
+          showReading: showReading,
+          showTemperature: showTemperature,
+          showFeelsLike: showFeelsLike,
+        );
       default:
         return Text('Aggregation nicht möglich', style: Theme.of(context).textTheme.bodyMedium);
     }
