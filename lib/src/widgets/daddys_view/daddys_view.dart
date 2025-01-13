@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
-import 'package:zaehlerstand/src/widgets/daddys_view/daddys_detailed_daily_view.dart';
-import 'package:zaehlerstand/src/widgets/daddys_view/daddys_detailed_monthly_view.dart';
+import 'package:zaehlerstand/src/widgets/daddys_view/daddys_yearly_sum_view.dart';
+import 'package:zaehlerstand/src/widgets/daddys_view/daddys_yearly_daily_view.dart';
+import 'package:zaehlerstand/src/widgets/daddys_view/daddys_monthly_daily_view.dart';
 
 class DaddysView extends StatefulWidget {
   const DaddysView({super.key});
@@ -42,17 +43,19 @@ class _DaddysViewState extends State<DaddysView> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const SizedBox(width: 16),
-            Expanded(
-              flex: 1,
-              child: Row(
-                children: ['Tag', 'Monat', 'Jahr']
-                    .map((view) => Row(
+    return Consumer<SettingsProvider>(builder: (context, settingsProvider, child) {
+      return Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const SizedBox(width: 16),
+              Expanded(
+                flex: 1,
+                child: Row(
+                  children: [ 'Jahr', 'Monat']
+                      .map(
+                        (view) => Row(
                           children: [
                             Radio<String>(
                               value: view,
@@ -65,103 +68,93 @@ class _DaddysViewState extends State<DaddysView> {
                             ),
                             Text(view, style: Theme.of(context).textTheme.bodyMedium),
                           ],
-                        ))
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Row(
+                children: ['Tag', 'Summe', 'Durchschnitt']
+                    .map(
+                      (aggregation) => Row(
+                        children: [
+                          Radio<String>(
+                            value: aggregation,
+                            groupValue: daddysAggregation,
+                            onChanged: (String? newValue) {
+                              if (newValue != null) {
+                                _updateSelectedAggregation(newValue);
+                              }
+                            },
+                          ),
+                          Text(aggregation, style: Theme.of(context).textTheme.bodyMedium),
+                        ],
+                      ),
+                    )
                     .toList(),
               ),
-            ),
-            const SizedBox(width: 16),
-            daddysSelectedView != 'Tag'
-                ? Row(
-                    children: ['Tag', 'Summe', 'Durchschnitt']
-                        .map(
-                          (aggregation) => Row(
-                            children: [
-                              Radio<String>(
-                                value: aggregation,
-                                groupValue: daddysAggregation,
-                                onChanged: (String? newValue) {
-                                  if (newValue != null) {
-                                    _updateSelectedAggregation(newValue);
-                                  }
-                                },
-                              ),
-                              Text(aggregation, style: Theme.of(context).textTheme.bodyMedium),
-                            ],
-                          ),
-                        )
-                        .toList(),
-                  )
-                : const Expanded(
-                    flex: 1,
-                    child: Text('Keine Aggregierung möglich'),
-                  ),
-            const SizedBox(width: 16),
-          ],
-        ),
-        const SizedBox(height: 16),
-        // Display the appropriate view
-        Expanded(
-          child: _buildView(),
-        ),
-      ],
-    );
+              const SizedBox(width: 16),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Display the appropriate view
+          Expanded(child: _buildView(showConsumption: settingsProvider.showConsumption, showReading: settingsProvider.showReading, showTemperature: settingsProvider.showTemperature, showFeelsLike: settingsProvider.showFeelsLike)),
+        ],
+      );
+    });
   }
 
-  Widget _buildView() {
-    final settingsProvider = context.read<SettingsProvider>();
-
+  Widget _buildView({required bool showConsumption, required bool showReading, required bool showTemperature, required bool showFeelsLike}) {
     switch (daddysAggregation) {
       case 'Summe':
-        return _buildSumsView(selectedView: daddysSelectedView, settingsProvider: settingsProvider);
+        return _buildSumsView(selectedView: daddysSelectedView, showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
       case 'Durchschnitt':
-        return _buildAverageView(selectedView: daddysSelectedView, settingsProvider: settingsProvider);
+        return _buildAverageView(selectedView: daddysSelectedView, showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
       default:
-        return _buildDetailView(selectedView: daddysSelectedView, settingsProvider: settingsProvider);
+        return _buildDailyView(selectedView: daddysSelectedView, showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
     }
   }
 
-  Widget _buildDetailView({required String selectedView, required SettingsProvider settingsProvider}) {
+  Widget _buildDailyView({required String selectedView, required bool showConsumption, required bool showReading, required bool showTemperature, required bool showFeelsLike}) {
     switch (selectedView) {
-      case 'Woche':
-        return Text('Wöchentlich / Detail ist nicht implementiert', style: Theme.of(context).textTheme.bodyMedium);
       case 'Monat':
-        return DaddysDetailedMonthlyView(
-          showConsumption: settingsProvider.showConsumption,
-          showReading: settingsProvider.showReading,
-          showTemperature: settingsProvider.showTemperature,
-          showFeelsLike: settingsProvider.showFeelsLike,
+        return DaddysMonthlyDailyView(
+          showConsumption: showConsumption,
+          showReading: showReading,
+          showTemperature: showTemperature,
+          showFeelsLike: showFeelsLike,
         );
-      case 'Jahr':
-        return Text('Jährlich / Detail ist nicht implementiert', style: Theme.of(context).textTheme.bodyMedium);
       default:
-        return DaddysDetailedDailyView(
-          showConsumption: settingsProvider.showConsumption,
-          showReading: settingsProvider.showReading,
-          showTemperature: settingsProvider.showTemperature,
-          showFeelsLike: settingsProvider.showFeelsLike,
+        return DaddysYearlyDailyView(
+          showConsumption: showConsumption,
+          showReading: showReading,
+          showTemperature: showTemperature,
+          showFeelsLike: showFeelsLike,
         );
     }
   }
 
-  Widget _buildSumsView({required String selectedView, required SettingsProvider settingsProvider}) {
+  Widget _buildSumsView({required String selectedView, required bool showConsumption, required bool showReading, required bool showTemperature, required bool showFeelsLike}) {
     switch (selectedView) {
-      case 'Monat':
-        return Text('Monatlich / Summe ist nicht implementiert', style: Theme.of(context).textTheme.bodyMedium);
       case 'Jahr':
-        return Text('Jährlich / Summe ist nicht implementiert', style: Theme.of(context).textTheme.bodyMedium);
+        return DaddysYearlySumView(
+          showConsumption: showConsumption,
+          showReading: showReading,
+          showTemperature: showTemperature,
+          showFeelsLike: showFeelsLike,
+        );
       default:
-        return Text('Täglich / Summe ist nicht implementiert', style: Theme.of(context).textTheme.bodyMedium);
+        return Text('Summierung nicht möglich', style: Theme.of(context).textTheme.bodyMedium);
     }
   }
 
-  Widget _buildAverageView({required String selectedView, required SettingsProvider settingsProvider}) {
+  Widget _buildAverageView({required String selectedView, required bool showConsumption, required bool showReading, required bool showTemperature, required bool showFeelsLike}) {
     switch (selectedView) {
-      case 'Monat':
-        return Text('Monatlich / Durchschnitt ist nicht implementiert', style: Theme.of(context).textTheme.bodyMedium);
       case 'Jahr':
-        return Text('Jährlich / Durchschnitt ist nicht implementiert', style: Theme.of(context).textTheme.bodyMedium);
+        return Text('Jahr / Durchschnitt ist nicht implementiert', style: Theme.of(context).textTheme.bodyMedium);
       default:
-        return Text('Täglich / Durchschnitt ist nicht implementiert', style: Theme.of(context).textTheme.bodyMedium);
+        return Text('Aggregation nicht möglich', style: Theme.of(context).textTheme.bodyMedium);
     }
   }
 }

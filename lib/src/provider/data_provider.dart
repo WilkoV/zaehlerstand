@@ -29,8 +29,9 @@ class DataProvider extends ChangeNotifier {
   /// Data sets for the UI
   Reading? currentReading;
   List<ReadingDetail> readingsDetails = <ReadingDetail>[];
-  Map<String, Map<String, dynamic>> yearlyViewData = {};
-  Map<String, Map<String, Map<String, dynamic>>> monthlyViewData = <String, Map<String, Map<String, dynamic>>>{};
+  Map<String, Map<String, dynamic>> yearlyDayViewData = {};
+  Map<String, Map<String, Map<String, dynamic>>> monthlyDayViewData = <String, Map<String, Map<String, dynamic>>>{};
+  Map<String, Map<String, Map<String, dynamic>>> monthlyAggregationViewData = <String, Map<String, Map<String, dynamic>>>{};
 
   /// List of all years that have data in reading
   List<int> availableYears = <int>[];
@@ -145,7 +146,8 @@ class DataProvider extends ChangeNotifier {
 
     if (intermediateReadingsDetails.isNotEmpty) {
       previousReadingValue = intermediateReadingsDetails.last.reading.reading;
-    } if (currentReading != null && currentReading!.date != currentDate) {
+    }
+    if (currentReading != null && currentReading!.date != currentDate) {
       previousReadingValue = currentReading!.reading;
     } else if (readingsDetails.isNotEmpty && readingsDetails.length > 2) {
       previousReadingValue = readingsDetails[1].reading.reading;
@@ -242,8 +244,8 @@ class DataProvider extends ChangeNotifier {
     return intermediateReadingsDetails;
   }
 
-  Future<void> _createYearlyViewData() async {
-    yearlyViewData.clear();
+  Future<void> _createYearlyDayViewData() async {
+    yearlyDayViewData.clear();
 
     List<ReadingDetail> data = await _dbHelper.getAllReadingsDetailsDescAscAsc();
 
@@ -251,8 +253,8 @@ class DataProvider extends ChangeNotifier {
       final year = readingDetail.reading.date.year.toString();
       final dayMonth = "${readingDetail.reading.date.day.toString().padLeft(2, '0')}.${readingDetail.reading.date.month.toString().padLeft(2, '0')}";
 
-      yearlyViewData[year] ??= {};
-      yearlyViewData[year]![dayMonth] = {
+      yearlyDayViewData[year] ??= {};
+      yearlyDayViewData[year]![dayMonth] = {
         "enteredReading": readingDetail.reading.enteredReading,
         "reading": readingDetail.reading.reading,
         if (readingDetail.consumption != null) "consumption": readingDetail.consumption?.consumption,
@@ -264,9 +266,9 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> _createCurrentYearData() async {
-    monthlyViewData.clear();
-    
+  Future<void> _createMonthlyDayViewData() async {
+    monthlyDayViewData.clear();
+
     final currentYear = DateTime.now().year;
 
     List<ReadingDetail> data = await _dbHelper.getAllReadingsDetailsDescAscAsc();
@@ -276,8 +278,8 @@ class DataProvider extends ChangeNotifier {
         final month = readingDetail.reading.date.month.toString().padLeft(2, '0');
         final day = readingDetail.reading.date.day.toString().padLeft(2, '0');
 
-        monthlyViewData[month] ??= {};
-        monthlyViewData[month]![day] = {
+        monthlyDayViewData[month] ??= {};
+        monthlyDayViewData[month]![day] = {
           "enteredReading": readingDetail.reading.enteredReading,
           "reading": readingDetail.reading.reading,
           if (readingDetail.consumption != null) "consumption": readingDetail.consumption?.consumption,
@@ -287,6 +289,29 @@ class DataProvider extends ChangeNotifier {
           if (readingDetail.weatherInfo != null) "maxFeelsLike": readingDetail.weatherInfo?.maxFeelsLike ?? 0.0,
         };
       }
+    }
+  }
+
+  Future<void> _createMonthlyAggregationViewData() async {
+    monthlyAggregationViewData.clear();
+
+    List<ReadingDetailAggregation> data = await _dbHelper.getMonthlyAggregationDescAsc();
+
+    for (var readingDetailAggregation in data) {
+      final year = readingDetailAggregation.year.toString();
+      final month = readingDetailAggregation.month.toString().padLeft(2, '0');
+
+      monthlyAggregationViewData[year] ??= {};
+      monthlyAggregationViewData[year]![month] = {
+        "minReading": readingDetailAggregation.minReading,
+        "maxReading": readingDetailAggregation.maxReading,
+        if (readingDetailAggregation.consumptionAvg != null) "consumptionAvg": readingDetailAggregation.consumptionAvg,
+        if (readingDetailAggregation.consumptionSum != null) "consumptionSum": readingDetailAggregation.consumptionSum,
+        if (readingDetailAggregation.minTemperature != null) "minTemperature": readingDetailAggregation.minTemperature,
+        if (readingDetailAggregation.maxTemperature != null) "maxTemperature": readingDetailAggregation.maxTemperature,
+        if (readingDetailAggregation.minFeelsLike != null) "minFeelsLike": readingDetailAggregation.minFeelsLike,
+        if (readingDetailAggregation.maxFeelsLike != null) "maxFeelsLike": readingDetailAggregation.maxFeelsLike,
+      };
     }
   }
 
@@ -303,8 +328,10 @@ class DataProvider extends ChangeNotifier {
     readingsDetails = await _dbHelper.getAllReadingsDetailsDescDescDesc();
     availableYears = await _dbHelper.getReadingsDistinctYears();
 
-    _createYearlyViewData();
-    _createCurrentYearData();
+    _createYearlyDayViewData();
+
+    _createMonthlyDayViewData();
+    _createMonthlyAggregationViewData();
 
     //  TODO: Implement
     // await _getDataYears();

@@ -14,7 +14,7 @@ class SettingsProvider extends ChangeNotifier {
   bool _consumption = true;
   bool _showTemperature = true;
   bool _showFeelsLike = false;
-  String _daddysSelectedView = 'Tag';
+  String _daddysSelectedView = 'Jahr';
   String _daddysAggregation = 'Tag';
 
   // Getters

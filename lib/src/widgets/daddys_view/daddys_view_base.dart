@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 abstract class DaddysViewBase extends StatelessWidget {
   final bool showReading;
@@ -36,5 +37,10 @@ abstract class DaddysViewBase extends StatelessWidget {
       factor += 1.2;
     }
     return factor;
+  }
+
+  String getMonthName(String month) {
+    DateTime date = DateTime(2024, int.parse(month));
+    return DateFormat.MMMM('de_DE').format(date);
   }
 }

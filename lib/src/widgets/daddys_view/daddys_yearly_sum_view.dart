@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/daddys_view/daddys_view_base.dart';
 
-class DaddysDetailedDailyView extends DaddysViewBase {
-  const DaddysDetailedDailyView({
+class DaddysYearlySumView extends DaddysViewBase {
+  const DaddysYearlySumView({
     super.key,
     required super.showConsumption,
     required super.showReading,
@@ -17,32 +17,37 @@ class DaddysDetailedDailyView extends DaddysViewBase {
   Widget build(BuildContext context) {
     return Consumer<DataProvider>(
       builder: (context, dataProvider, child) {
-        final yearlyViewData = dataProvider.yearlyViewData;
+        final monthlyAggregationViewData = dataProvider.monthlyAggregationViewData;
 
         double factor = getRowHeightFactor(1.2);
 
-        if (yearlyViewData.isEmpty) {
+        // This view needs to rows for the reading
+        if (showReading) {
+          factor += 1.2;
+        }
+
+        if (monthlyAggregationViewData.isEmpty) {
           return Center(
             child: Text('Keine Daten gefunden', style: Theme.of(context).textTheme.bodyLarge),
           );
         }
 
         // Extract all unique years for the column headers
-        final years = yearlyViewData.keys.toList();
+        final years = monthlyAggregationViewData.keys.toList();
 
         // Generate all periods (days of the year)
-        final periods = _getYearlyPeriodLabels();
+        final periods = _getMonthlySumPeriodLabels();
 
         // Ensure data exists for all periods in all years
         for (final year in years) {
-          yearlyViewData[year] ??= {};
+          monthlyAggregationViewData[year] ??= {};
           for (final period in periods) {
-            yearlyViewData[year]![period];
+            monthlyAggregationViewData[year]![period];
           }
         }
 
         // Calculate screen width based on the number of columns that needed to be displayed
-        double screenWidth = getMinWidth(context, years.length);
+        final double screenWidth = getMinWidth(context, years.length);
 
         return Column(
           children: [
@@ -61,8 +66,8 @@ class DaddysDetailedDailyView extends DaddysViewBase {
                   return DataRow(
                     cells: [
                       DataCell(Text(period)),
-                      ...years.map((year) {
-                        final data = yearlyViewData[year]?[period];
+                      ...years.map((day) {
+                        final data = monthlyAggregationViewData[day]?[period];
 
                         if (data == null) {
                           return const DataCell(Text('-'));
@@ -73,9 +78,10 @@ class DaddysDetailedDailyView extends DaddysViewBase {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              if (showConsumption) Text('${data['consumption']}m³', style: Theme.of(context).textTheme.bodyLarge),
-                              if (showReading) Text('${data['reading']}', style: Theme.of(context).textTheme.bodyMedium),
-                              if (showTemperature && data['minTemperature'] != null) Text('${data['maxTemperature'].toStringAsFixed(1)}/${data['minTemperature'].toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showConsumption) Text('${data['consumptionSum']}m³', style: Theme.of(context).textTheme.bodyLarge),
+                              if (showReading) Text('${data['minReading']} -', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showReading) Text('${data['maxReading']}', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showTemperature && data['minTemperature'] != null) Text('${data['minTemperature'].toStringAsFixed(1)}/${data['maxTemperature'].toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
                               if (showFeelsLike && data['minFeelsLike'] != null) Text('${data['maxFeelsLike'].toStringAsFixed(1)}/${data['minFeelsLike'].toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
                             ],
                           ),
@@ -92,13 +98,10 @@ class DaddysDetailedDailyView extends DaddysViewBase {
     );
   }
 
-  List<String> _getYearlyPeriodLabels() {
-    final int year = DateTime(2024, 1, 1).year;
-    final int daysInYear = DateTime(year, 12, 31).difference(DateTime(year, 1, 1)).inDays + 1;
-
-    return List.generate(daysInYear, (index) {
-      final date = DateTime(year, 1, 1).add(Duration(days: index));
-      return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}';
+  List<String> _getMonthlySumPeriodLabels() {
+    return List.generate(12, (index) {
+      int day = index + 1;
+      return day.toString().padLeft(2, '0');
     });
   }
 }
