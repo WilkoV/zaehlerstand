@@ -38,6 +38,11 @@ class _DaddysViewState extends State<DaddysView> {
     setState(() {
       daddysSelectedView = newValue;
     });
+
+    if (newValue != groupSelectionValueYear && (daddysAggregation == aggregationSelectionValueAvg || daddysAggregation == aggregationSelectionValueSum)) {
+      _updateSelectedAggregation(aggregationSelectionValueDay);
+    }
+
     // Persist the selection to SettingsProvider
     context.read<SettingsProvider>().updateDaddysSelectedView(newValue);
   }
@@ -110,13 +115,28 @@ class _DaddysViewState extends State<DaddysView> {
           ),
           const SizedBox(height: 16),
           // Display the appropriate view
-          Expanded(child: _buildView(showConsumption: settingsProvider.showConsumption, showReading: settingsProvider.showReading, showTemperature: settingsProvider.showTemperature, showFeelsLike: settingsProvider.showFeelsLike)),
+          Expanded(
+              child: _buildView(
+            context: context,
+            showConsumption: settingsProvider.showConsumption,
+            showReading: settingsProvider.showReading,
+            showTemperature: settingsProvider.showTemperature,
+            showFeelsLike: settingsProvider.showFeelsLike,
+          )),
         ],
       );
     });
   }
 
-  Widget _buildView({required bool showConsumption, required bool showReading, required bool showTemperature, required bool showFeelsLike}) {
+  Widget _buildView({required BuildContext context, required bool showConsumption, required bool showReading, required bool showTemperature, required bool showFeelsLike}) {
+    if (daddysSelectedView == groupSelectionValueMonth) {
+      return DaddysMonthlyDailyView(showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
+    }
+
+    if (daddysSelectedView == groupSelectionValueWeek) {
+      return DaddysWeeklyDailyView(showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
+    }
+
     switch (daddysAggregation) {
       case aggregationSelectionValueSum:
         return _buildSumsView(selectedView: daddysSelectedView, showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);

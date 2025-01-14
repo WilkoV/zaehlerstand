@@ -34,8 +34,6 @@ class DaddysWeeklyDailyView extends DaddysViewBase {
         // Generate all periods (days of the year)
         final periods = _getWeeklyDailyPeriodLabels();
 
-        print('yyy $periods');
-
         // Ensure data exists for all periods in all years
         for (final week in weeks) {
           weeklyDailyViewData[week] ??= {};
