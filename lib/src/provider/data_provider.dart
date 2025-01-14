@@ -259,10 +259,10 @@ class DataProvider extends ChangeNotifier {
         "enteredReading": readingDetail.reading.enteredReading,
         "reading": readingDetail.reading.reading,
         if (readingDetail.consumption != null) "consumption": readingDetail.consumption?.consumption,
-        if (readingDetail.weatherInfo != null) "minTemperature": readingDetail.weatherInfo?.minTemperature ?? 0.0,
-        if (readingDetail.weatherInfo != null) "maxTemperature": readingDetail.weatherInfo?.maxTemperature ?? 0.0,
-        if (readingDetail.weatherInfo != null) "minFeelsLike": readingDetail.weatherInfo?.minFeelsLike ?? 0.0,
-        if (readingDetail.weatherInfo != null) "maxFeelsLike": readingDetail.weatherInfo?.maxFeelsLike ?? 0.0,
+        if (readingDetail.weatherInfo != null) "minTemperature": readingDetail.weatherInfo?.minTemperature,
+        if (readingDetail.weatherInfo != null) "maxTemperature": readingDetail.weatherInfo?.maxTemperature,
+        if (readingDetail.weatherInfo != null) "minFeelsLike": readingDetail.weatherInfo?.minFeelsLike,
+        if (readingDetail.weatherInfo != null) "maxFeelsLike": readingDetail.weatherInfo?.maxFeelsLike,
       };
     }
   }
@@ -284,10 +284,10 @@ class DataProvider extends ChangeNotifier {
           "enteredReading": readingDetail.reading.enteredReading,
           "reading": readingDetail.reading.reading,
           if (readingDetail.consumption != null) "consumption": readingDetail.consumption?.consumption,
-          if (readingDetail.weatherInfo != null) "minTemperature": readingDetail.weatherInfo?.minTemperature ?? 0.0,
-          if (readingDetail.weatherInfo != null) "maxTemperature": readingDetail.weatherInfo?.maxTemperature ?? 0.0,
-          if (readingDetail.weatherInfo != null) "minFeelsLike": readingDetail.weatherInfo?.minFeelsLike ?? 0.0,
-          if (readingDetail.weatherInfo != null) "maxFeelsLike": readingDetail.weatherInfo?.maxFeelsLike ?? 0.0,
+          if (readingDetail.weatherInfo != null) "minTemperature": readingDetail.weatherInfo?.minTemperature,
+          if (readingDetail.weatherInfo != null) "maxTemperature": readingDetail.weatherInfo?.maxTemperature,
+          if (readingDetail.weatherInfo != null) "minFeelsLike": readingDetail.weatherInfo?.minFeelsLike,
+          if (readingDetail.weatherInfo != null) "maxFeelsLike": readingDetail.weatherInfo?.maxFeelsLike,
         };
       }
     }
