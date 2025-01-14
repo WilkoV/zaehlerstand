@@ -17,6 +17,12 @@ class _DaddysViewState extends State<DaddysView> {
   late String daddysSelectedView;
   late String daddysAggregation;
 
+  static const String selectionValueYear = 'Jahr';
+  static const String selectionValueMonth = 'Monat';
+  static const String selectionValueDay = 'Tag';
+  static const String selectionValueSum = 'Summe';
+  static const String selectionValueAvg = 'Durchschnitt';
+
   @override
   void initState() {
     super.initState();
@@ -54,7 +60,7 @@ class _DaddysViewState extends State<DaddysView> {
               Expanded(
                 flex: 1,
                 child: Row(
-                  children: ['Jahr', 'Monat']
+                  children: [selectionValueYear, selectionValueMonth]
                       .map(
                         (view) => Row(
                           children: [
@@ -75,26 +81,28 @@ class _DaddysViewState extends State<DaddysView> {
                 ),
               ),
               const SizedBox(width: 16),
-              Row(
-                children: ['Tag', 'Summe', 'Durchschnitt']
-                    .map(
-                      (aggregation) => Row(
-                        children: [
-                          Radio<String>(
-                            value: aggregation,
-                            groupValue: daddysAggregation,
-                            onChanged: (String? newValue) {
-                              if (newValue != null) {
-                                _updateSelectedAggregation(newValue);
-                              }
-                            },
-                          ),
-                          Text(aggregation, style: Theme.of(context).textTheme.bodyMedium),
-                        ],
-                      ),
+              settingsProvider.daddysSelectedView == selectionValueYear
+                  ? Row(
+                      children: [selectionValueDay, selectionValueSum, selectionValueAvg]
+                          .map(
+                            (aggregation) => Row(
+                              children: [
+                                Radio<String>(
+                                  value: aggregation,
+                                  groupValue: daddysAggregation,
+                                  onChanged: (String? newValue) {
+                                    if (newValue != null) {
+                                      _updateSelectedAggregation(newValue);
+                                    }
+                                  },
+                                ),
+                                Text(aggregation, style: Theme.of(context).textTheme.bodyMedium),
+                              ],
+                            ),
+                          )
+                          .toList(),
                     )
-                    .toList(),
-              ),
+                  : const SizedBox(width: 100),
               const SizedBox(width: 16),
             ],
           ),
@@ -108,9 +116,9 @@ class _DaddysViewState extends State<DaddysView> {
 
   Widget _buildView({required bool showConsumption, required bool showReading, required bool showTemperature, required bool showFeelsLike}) {
     switch (daddysAggregation) {
-      case 'Summe':
+      case selectionValueSum:
         return _buildSumsView(selectedView: daddysSelectedView, showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
-      case 'Durchschnitt':
+      case selectionValueAvg:
         return _buildAverageView(selectedView: daddysSelectedView, showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
       default:
         return _buildDailyView(selectedView: daddysSelectedView, showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
@@ -119,7 +127,7 @@ class _DaddysViewState extends State<DaddysView> {
 
   Widget _buildDailyView({required String selectedView, required bool showConsumption, required bool showReading, required bool showTemperature, required bool showFeelsLike}) {
     switch (selectedView) {
-      case 'Monat':
+      case selectionValueMonth:
         return DaddysMonthlyDailyView(
           showConsumption: showConsumption,
           showReading: showReading,
@@ -138,7 +146,7 @@ class _DaddysViewState extends State<DaddysView> {
 
   Widget _buildSumsView({required String selectedView, required bool showConsumption, required bool showReading, required bool showTemperature, required bool showFeelsLike}) {
     switch (selectedView) {
-      case 'Jahr':
+      case selectionValueYear:
         return DaddysYearlySumView(
           showConsumption: showConsumption,
           showReading: showReading,
@@ -152,7 +160,7 @@ class _DaddysViewState extends State<DaddysView> {
 
   Widget _buildAverageView({required String selectedView, required bool showConsumption, required bool showReading, required bool showTemperature, required bool showFeelsLike}) {
     switch (selectedView) {
-      case 'Jahr':
+      case selectionValueYear:
         return DaddysYearlyAvgView(
           showConsumption: showConsumption,
           showReading: showReading,
