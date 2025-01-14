@@ -50,7 +50,6 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
   Widget build(BuildContext context) {
     return Consumer<DataProvider>(
       builder: (context, dataProvider, child) {
-        int minReadingValue = dataProvider.currentReading != null ? dataProvider.currentReading!.reading : 0;
         return Scaffold(
           appBar: AppBar(
             title: Text('Zählerstand', style: Theme.of(context).textTheme.headlineLarge),
@@ -66,12 +65,18 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
             onPressed: () async {
               final result = await showDialog<String>(
                 context: context,
-                builder: (context) => ReadingDialog(
-                  minimalReadingValue: minReadingValue,
-                  zaehlerstandController: TextEditingController(
-                    text: dataProvider.currentReading != null ? dataProvider.currentReading!.getFirstTwoDigitsFromReading(dataProvider.last7ConsumptionAverage.round()) : '',
-                  ),
-                ),
+                builder: (context) {
+                  int minReadingValue = dataProvider.currentReading != null ? dataProvider.currentReading!.reading : 0;
+                  int numberOfDays = dataProvider.currentReading != null ? DateTime.now().difference(dataProvider.currentReading!.date).inDays : 0;
+                  int avgDailyConsumption = dataProvider.last7ConsumptionAverage.round();
+
+                  return ReadingDialog(
+                    minimalReadingValue: minReadingValue,
+                    zaehlerstandController: TextEditingController(
+                      text: dataProvider.currentReading != null ? dataProvider.currentReading!.getFirstTwoDigitsFromReading(avgDailyConsumption: avgDailyConsumption, numberOfDays: numberOfDays) : '',
+                    ),
+                  );
+                },
               );
 
               if (result != null) {
