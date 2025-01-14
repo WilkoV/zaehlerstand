@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/daddys_view/daddys_view_base.dart';
+import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
 class DaddysYearlySumView extends DaddysViewBase {
   const DaddysYearlySumView({
@@ -67,7 +68,7 @@ class DaddysYearlySumView extends DaddysViewBase {
                     cells: [
                       DataCell(Text(period)),
                       ...years.map((day) {
-                        final data = monthlyAggregationViewData[day]?[period];
+                        final ReadingDetailAggregation? data = monthlyAggregationViewData[day]?[period]?['aggregation']!;
 
                         if (data == null) {
                           return const DataCell(Text('-'));
@@ -78,11 +79,11 @@ class DaddysYearlySumView extends DaddysViewBase {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              if (showConsumption) Text('${data['consumptionSum']}m³', style: Theme.of(context).textTheme.bodyLarge),
-                              if (showReading) Text('${data['minReading']} -', style: Theme.of(context).textTheme.bodyMedium),
-                              if (showReading) Text('${data['maxReading']}', style: Theme.of(context).textTheme.bodyMedium),
-                              if (showTemperature && data['minTemperature'] != null) Text('${data['minTemperature'].toStringAsFixed(1)}/${data['maxTemperature'].toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
-                              if (showFeelsLike && data['minFeelsLike'] != null) Text('${data['maxFeelsLike'].toStringAsFixed(1)}/${data['minFeelsLike'].toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showConsumption) Text('${data.consumptionSum}m³', style: Theme.of(context).textTheme.bodyLarge),
+                              if (showReading) Text('${data.minReading} -', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showReading) Text('${data.maxReading}', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showTemperature && data.minTemperature != null) Text('${data.minTemperature!.toStringAsFixed(1)}/${data.maxTemperature!.toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showFeelsLike && data.minFeelsLike != null) Text('${data.minFeelsLike!.toStringAsFixed(1)}/${data.maxFeelsLike!.toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
                             ],
                           ),
                         );

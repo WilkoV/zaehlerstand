@@ -32,7 +32,7 @@ class DataProvider extends ChangeNotifier {
   List<ReadingDetail> readingsDetails = <ReadingDetail>[];
   Map<String, Map<String, dynamic>> yearlyDayViewData = {};
   Map<String, Map<String, Map<String, dynamic>>> monthlyDayViewData = <String, Map<String, Map<String, dynamic>>>{};
-  Map<String, Map<String, Map<String, dynamic>>> monthlyAggregationViewData = <String, Map<String, Map<String, dynamic>>>{};
+  Map<String, Map<String, Map<String, ReadingDetailAggregation>>> monthlyAggregationViewData = <String, Map<String, Map<String, ReadingDetailAggregation>>>{};
 
   /// List of all years that have data in reading
   List<int> availableYears = <int>[];
@@ -299,20 +299,11 @@ class DataProvider extends ChangeNotifier {
     List<ReadingDetailAggregation> data = await _dbHelper.getMonthlyAggregationDescAsc();
 
     for (var readingDetailAggregation in data) {
-      final year = readingDetailAggregation.year.toString();
-      final month = readingDetailAggregation.month.toString().padLeft(2, '0');
+      final String year = readingDetailAggregation.year.toString();
+      final String month = readingDetailAggregation.month.toString().padLeft(2, '0');
 
       monthlyAggregationViewData[year] ??= {};
-      monthlyAggregationViewData[year]![month] = {
-        "minReading": readingDetailAggregation.minReading,
-        "maxReading": readingDetailAggregation.maxReading,
-        if (readingDetailAggregation.consumptionAvg != null) "consumptionAvg": readingDetailAggregation.consumptionAvg,
-        if (readingDetailAggregation.consumptionSum != null) "consumptionSum": readingDetailAggregation.consumptionSum,
-        if (readingDetailAggregation.minTemperature != null) "minTemperature": readingDetailAggregation.minTemperature,
-        if (readingDetailAggregation.maxTemperature != null) "maxTemperature": readingDetailAggregation.maxTemperature,
-        if (readingDetailAggregation.minFeelsLike != null) "minFeelsLike": readingDetailAggregation.minFeelsLike,
-        if (readingDetailAggregation.maxFeelsLike != null) "maxFeelsLike": readingDetailAggregation.maxFeelsLike,
-      };
+      monthlyAggregationViewData[year]![month] = {'aggregation': readingDetailAggregation};
     }
   }
 
