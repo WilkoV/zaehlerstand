@@ -30,7 +30,7 @@ class DataProvider extends ChangeNotifier {
   double last7ConsumptionAverage = 0;
   Reading? currentReading;
   List<ReadingDetail> readingsDetails = <ReadingDetail>[];
-  Map<String, Map<String, dynamic>> yearlyDayViewData = {};
+  Map<String, Map<String, ReadingDetail>> yearlyDayViewData = {};
   Map<String, Map<String, Map<String, ReadingDetail>>> monthlyDayViewData = <String, Map<String, Map<String, ReadingDetail>>>{};
   Map<String, Map<String, Map<String, ReadingDetailAggregation>>> monthlyAggregationViewData = <String, Map<String, Map<String, ReadingDetailAggregation>>>{};
 
@@ -255,15 +255,7 @@ class DataProvider extends ChangeNotifier {
       final dayMonth = "${readingDetail.reading.date.day.toString().padLeft(2, '0')}.${readingDetail.reading.date.month.toString().padLeft(2, '0')}";
 
       yearlyDayViewData[year] ??= {};
-      yearlyDayViewData[year]![dayMonth] = {
-        "enteredReading": readingDetail.reading.enteredReading,
-        "reading": readingDetail.reading.reading,
-        if (readingDetail.consumption != null) "consumption": readingDetail.consumption?.consumption,
-        if (readingDetail.weatherInfo != null) "minTemperature": readingDetail.weatherInfo?.minTemperature,
-        if (readingDetail.weatherInfo != null) "maxTemperature": readingDetail.weatherInfo?.maxTemperature,
-        if (readingDetail.weatherInfo != null) "minFeelsLike": readingDetail.weatherInfo?.minFeelsLike,
-        if (readingDetail.weatherInfo != null) "maxFeelsLike": readingDetail.weatherInfo?.maxFeelsLike,
-      };
+      yearlyDayViewData[year]![dayMonth] = readingDetail;
     }
   }
 
