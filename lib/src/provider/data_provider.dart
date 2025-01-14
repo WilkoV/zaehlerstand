@@ -33,6 +33,7 @@ class DataProvider extends ChangeNotifier {
   Map<String, Map<String, ReadingDetail>> yearlyDayViewData = {};
   Map<String, Map<String, Map<String, ReadingDetail>>> monthlyDayViewData = <String, Map<String, Map<String, ReadingDetail>>>{};
   Map<String, Map<String, Map<String, ReadingDetailAggregation>>> monthlyAggregationViewData = <String, Map<String, Map<String, ReadingDetailAggregation>>>{};
+  Map<String, Map<String, Map<String, WeeklyReadingDetail>>> weeklyAggregationViewData = <String, Map<String, Map<String, WeeklyReadingDetail>>>{};
 
   /// List of all years that have data in reading
   List<int> availableYears = <int>[];
@@ -291,6 +292,20 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> _createWeeklyAggregationViewData() async {
+    weeklyAggregationViewData.clear();
+
+    List<WeeklyReadingDetail> data = await _dbHelper.getWeeklyReadingDetailsDescAsc();
+
+    for (var weeklyReadingDetailAggregation in data) {
+      final String week = weeklyReadingDetailAggregation.week.toString();
+      final String dayInWeek = weeklyReadingDetailAggregation.dayInWeek.toString().padLeft(2, '0');
+
+      weeklyAggregationViewData[week] ??= {};
+      weeklyAggregationViewData[week]![dayInWeek] = {'aggregation': weeklyReadingDetailAggregation};
+    }
+  }
+
   Future<void> _refreshLists() async {
     _log.fine('Refreshing data views.');
 
@@ -307,6 +322,7 @@ class DataProvider extends ChangeNotifier {
     _createYearlyDayViewData();
     _createMonthlyDayViewData();
     _createMonthlyAggregationViewData();
+    _createWeeklyAggregationViewData();
 
     try {
       last7ConsumptionAverage = await _dbHelper.getAverageConsumptionOfLast7Days();

@@ -43,4 +43,19 @@ abstract class DaddysViewBase extends StatelessWidget {
     DateTime date = DateTime(2024, int.parse(month));
     return DateFormat.MMMM('de_DE').format(date);
   }
+
+  String getDayName(String day) {
+    final int target = int.parse(day);
+    final Map<int, String> daysOfWeek = {
+      0: "Montag",
+      1: "Dienstag",
+      2: "Mittwoch",
+      3: "Donnerstag",
+      4: "Freitag",
+      5: "Samstag",
+      6: "Sonntag",
+    };
+
+    return daysOfWeek[target]!;
+  }
 }
