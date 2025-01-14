@@ -55,7 +55,7 @@ class DaddysYearlyDailyView extends DaddysViewBase {
                 dataTextStyle: Theme.of(context).textTheme.bodyLarge,
                 dataRowHeight: Theme.of(context).textTheme.bodyLarge!.fontSize! * factor,
                 columns: [
-                  const DataColumn2(label: Text(''), size: ColumnSize.S),
+                  const DataColumn2(label: Text(''), size: ColumnSize.M),
                   ...years.map((year) => DataColumn2(label: Text(year))),
                 ],
                 rows: periods.map((period) {
