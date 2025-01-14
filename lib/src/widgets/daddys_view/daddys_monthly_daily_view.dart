@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/daddys_view/daddys_view_base.dart';
+import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
 class DaddysMonthlyDailyView extends DaddysViewBase {
   const DaddysMonthlyDailyView({
@@ -62,7 +63,7 @@ class DaddysMonthlyDailyView extends DaddysViewBase {
                     cells: [
                       DataCell(Text(period)),
                       ...months.map((day) {
-                        final data = monthlyDailyViewData[day]?[period];
+                        final ReadingDetail? data = monthlyDailyViewData[day]?[period]?['readingDetail'];
 
                         if (data == null) {
                           return const DataCell(Text('-'));
@@ -73,10 +74,11 @@ class DaddysMonthlyDailyView extends DaddysViewBase {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              if (showConsumption) Text('${data['consumption']}m³', style: Theme.of(context).textTheme.bodyLarge),
-                              if (showReading) Text('${data['reading']}', style: Theme.of(context).textTheme.bodyMedium),
-                              if (showTemperature && data['minTemperature'] != null) Text('${data['minTemperature'].toStringAsFixed(1)}/${data['maxTemperature'].toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
-                              if (showFeelsLike && data['minFeelsLike'] != null) Text('${data['maxFeelsLike'].toStringAsFixed(1)}/${data['minFeelsLike'].toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showConsumption && data.consumption != null) Text('${data.consumption!.consumption}m³', style: Theme.of(context).textTheme.bodyLarge),
+                              if (showReading) Text('${data.reading.reading}', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showTemperature && data.weatherInfo != null)
+                                Text('${data.weatherInfo!.minTemperature.toStringAsFixed(1)}/${data.weatherInfo!.maxTemperature.toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showFeelsLike && data.weatherInfo != null) Text('${data.weatherInfo!.minFeelsLike.toStringAsFixed(1)}/${data.weatherInfo!.maxFeelsLike.toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
                             ],
                           ),
                         );
