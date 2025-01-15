@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
+import 'package:zaehlerstand/src/models/base/reading_dialog_result.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/daddys_view/daddys_view.dart';
 import 'package:zaehlerstand/src/widgets/dialogs/reading_dialog.dart';
@@ -63,25 +64,34 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
           floatingActionButton: FloatingActionButton(
             backgroundColor: Theme.of(context).indicatorColor,
             onPressed: () async {
-              final result = await showDialog<String>(
+              final result = await showDialog<ReadingDialogResult>(
                 context: context,
                 builder: (context) {
                   int minReadingValue = dataProvider.currentReading != null ? dataProvider.currentReading!.reading : 0;
+                  DateTime minimalDateValue = dataProvider.currentReading?.date != null ? dataProvider.currentReading!.date.add(const Duration(days: 1)) : DateTime.now();
                   int numberOfDays = dataProvider.currentReading != null ? DateTime.now().difference(dataProvider.currentReading!.date).inDays : 0;
                   int avgDailyConsumption = dataProvider.last7ConsumptionAverage.round();
 
                   return ReadingDialog(
                     minimalReadingValue: minReadingValue,
+                    minimalDateValue: minimalDateValue,
                     zaehlerstandController: TextEditingController(
-                      text: dataProvider.currentReading != null ? dataProvider.currentReading!.getFirstTwoDigitsFromReading(avgDailyConsumption: avgDailyConsumption, numberOfDays: numberOfDays) : '',
+                      text: dataProvider.currentReading != null
+                          ? dataProvider.currentReading!.getFirstTwoDigitsFromReading(
+                              avgDailyConsumption: avgDailyConsumption,
+                              numberOfDays: numberOfDays,
+                            )
+                          : '',
+                    ),
+                    dateController: TextEditingController(
+                      text: ReadingLogic.formatDate(DateTime.now()),
                     ),
                   );
                 },
               );
 
               if (result != null) {
-                dataProvider.addReading(int.parse(result));
-                _log.fine(result);
+                dataProvider.addReading(result.reading, result.date);
               }
             },
             child: const Icon(Icons.add),

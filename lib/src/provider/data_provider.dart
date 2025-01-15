@@ -123,7 +123,7 @@ class DataProvider extends ChangeNotifier {
   }
 
   /// Adds a new reading to the database and refreshes the list of readings.
-  Future<int> addReading(int enteredReading) async {
+  Future<int> addReading(int enteredReading, DateTime targetDate) async {
     _log.info('Adding reading $enteredReading');
 
     isAddingReadings = true;
@@ -132,14 +132,14 @@ class DataProvider extends ChangeNotifier {
     List<ReadingDetail> intermediateReadingsDetails = <ReadingDetail>[];
 
     // Calculate intermediate days
-    DateTime currentDate = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 12);
+    DateTime currentDate = targetDate;
     Reading? previousReading = currentReading ?? Reading.fromInput(enteredReading);
-    int daysBetweenReadings = currentDate.difference(previousReading.date).inDays - 1;
+    int daysBetweenReadings = currentDate.difference(previousReading.date).inDays;
 
     _log.info('No of intermediate days: $daysBetweenReadings');
 
     // Calculate intermediate readings in case some readings are missing
-    if (daysBetweenReadings > 1) {
+    if (daysBetweenReadings >= 1) {
       intermediateReadingsDetails = await _createReadingsForIntermediateDays(enteredReading: enteredReading, daysBetweenReadings: daysBetweenReadings, previousReading: previousReading);
     }
 
@@ -148,17 +148,16 @@ class DataProvider extends ChangeNotifier {
 
     if (intermediateReadingsDetails.isNotEmpty) {
       previousReadingValue = intermediateReadingsDetails.last.reading.reading;
-    }
-    if (currentReading != null && currentReading!.date != currentDate) {
+    } else if (currentReading != null && currentReading!.date != currentDate) {
       previousReadingValue = currentReading!.reading;
     } else if (readingsDetails.isNotEmpty && readingsDetails.length > 2) {
       previousReadingValue = readingsDetails[1].reading.reading;
     }
 
     // Add the entered reading to the intermediateReadings list
-    Reading readingFromInput = Reading.fromInput(enteredReading);
+    Reading readingFromInput = Reading.fromInput(enteredReading).copyWith(date: DateTime(currentDate.year, currentDate.month, currentDate.day, 12));
     Consumption consumption = Consumption(
-      date: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 12),
+      date: DateTime(currentDate.year, currentDate.month, currentDate.day, 12),
       consumption: readingFromInput.reading - previousReadingValue,
       isGenerated: false,
       isSynced: false,
@@ -319,10 +318,10 @@ class DataProvider extends ChangeNotifier {
     readingsDetails = await _dbHelper.getAllReadingsDetailsDescDescDesc();
     availableYears = await _dbHelper.getReadingsDistinctYears();
 
-    _createYearlyDayViewData();
-    _createMonthlyDayViewData();
-    _createMonthlyAggregationViewData();
-    _createWeeklyAggregationViewData();
+    await _createYearlyDayViewData();
+    await _createMonthlyDayViewData();
+    await _createMonthlyAggregationViewData();
+    await _createWeeklyAggregationViewData();
 
     try {
       last7ConsumptionAverage = await _dbHelper.getAverageConsumptionOfLast7Days();
