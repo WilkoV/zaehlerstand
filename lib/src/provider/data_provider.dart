@@ -305,6 +305,11 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> refreshDisplay() async {
+    await _refreshLists();
+    notifyListeners();
+  }
+
   Future<void> _refreshLists() async {
     _log.fine('Refreshing data views.');
 

@@ -15,7 +15,7 @@ class ZaehlerstandScreen extends StatefulWidget {
   State<ZaehlerstandScreen> createState() => _ZaehlerstandScreenState();
 }
 
-class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
+class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> with WidgetsBindingObserver {
   late TextEditingController zaehlerstandController;
 
   int _selectedIndex = 0;
@@ -30,13 +30,27 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
   void initState() {
     super.initState();
     FlutterNativeSplash.remove();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    // Dispose of the controller to avoid memory leaks.
+    WidgetsBinding.instance.removeObserver(this);
     zaehlerstandController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _refreshData();
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  Future<void> _refreshData() async {
+    final dataProvider = Provider.of<DataProvider>(context, listen: false);
+    await dataProvider.refreshDisplay();
   }
 
   void _onItemTapped(int index) {
