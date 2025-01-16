@@ -53,3 +53,4 @@ key.properties
 **/*.jks
 lib/src/constants/google_sheets_credentials.dart
 lib/src/constants/open_weather_map_credentials.dart
+signing.properties
