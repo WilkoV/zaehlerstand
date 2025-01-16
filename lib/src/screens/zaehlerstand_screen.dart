@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/models/base/reading_dialog_result.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
@@ -18,7 +17,6 @@ class ZaehlerstandScreen extends StatefulWidget {
 
 class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> {
   late TextEditingController zaehlerstandController;
-  final Logger _log = Logger('_ZaehlerstandScreenState');
 
   int _selectedIndex = 0;
 
