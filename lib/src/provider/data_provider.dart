@@ -16,7 +16,7 @@ class DataProvider extends ChangeNotifier {
   late String _serverAddress;
   late String _serverPort;
   late final VoidCallback _settingsListener;
-  late final SettingsProvider _settingsProvider;
+  late final SettingsProvider settingsProvider;
 
   String _oldServerAddress = '';
   String _oldServerPort = '';
@@ -38,18 +38,16 @@ class DataProvider extends ChangeNotifier {
   /// List of all years that have data in reading
   List<int> availableYears = <int>[];
 
-  DataProvider(BuildContext context) {
-    // Inject the server address from SettingsProvider
-    _settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
-    _serverAddress = _settingsProvider.serverAddress;
-    _serverPort = _settingsProvider.serverPort;
+  DataProvider(this.settingsProvider) {
+    _serverAddress = settingsProvider.serverAddress;
+    _serverPort = settingsProvider.serverPort;
     _oldServerAddress = _serverAddress;
     _oldServerPort = _oldServerPort;
 
     // Listen for changes in SettingsProvider and rebuild HttpHelper
     _settingsListener = () async {
-      _serverAddress = _settingsProvider.serverAddress;
-      _serverPort = _settingsProvider.serverPort;
+      _serverAddress = settingsProvider.serverAddress;
+      _serverPort = settingsProvider.serverPort;
 
       if (_serverAddress != _oldServerAddress || _serverPort != _oldServerPort) {
         _log.info('Server configuration changed');
@@ -57,14 +55,7 @@ class DataProvider extends ChangeNotifier {
         isLoading = true;
         notifyListeners();
 
-        SyncManager syncManager = SyncManager();
-        await syncManager.initialize();
-        bool changedOnFromDb = await syncManager.copyFromServer(_serverAddress, int.parse(_serverPort));
-        bool changedOnSync = await syncManager.syncUnsyncedData(_serverAddress, int.parse(_serverPort));
-
-        if (changedOnFromDb || changedOnSync) {
-          await _refreshLists();
-        }
+        await _syncAndRefreshLists();
 
         isLoading = false;
         notifyListeners();
@@ -74,14 +65,14 @@ class DataProvider extends ChangeNotifier {
       _oldServerPort = _serverPort;
     };
 
-    _settingsProvider.addListener(_settingsListener);
+    settingsProvider.addListener(_settingsListener);
   }
 
   @override
   void dispose() {
     _log.fine('Disposing DataProvider.');
 
-    _settingsProvider.removeListener(_settingsListener);
+    settingsProvider.removeListener(_settingsListener);
     super.dispose();
   }
 
@@ -100,17 +91,8 @@ class DataProvider extends ChangeNotifier {
       await _dbHelper.initDb(dbDirectory: dbDirectory);
 
       // Check database for data and load it if necessary
-      await _refreshLists();
+      final didUpdate = await _syncAndRefreshLists();
 
-      notifyListeners();
-
-      SyncManager syncManager = SyncManager();
-      await syncManager.initialize();
-      await syncManager.copyFromServer(_serverAddress, int.parse(_serverPort));
-      await syncManager.syncUnsyncedData(_serverAddress, int.parse(_serverPort));
-      //   // _checkForUnsynchronizedDbRecords();
-      //   notifyListeners();
-      // }
     } catch (e, stackTrace) {
       _log.severe('Failed to check DB or load from Server: $e', e, stackTrace);
       return;
@@ -186,10 +168,11 @@ class DataProvider extends ChangeNotifier {
     _log.fine('Bulk-inserted new consumption(s) into the database.');
 
     // Refresh data views after inserting readings
+    final didUpdate = await _syncAndRefreshLists();
 
-    await _refreshLists();
-
-    notifyListeners();
+    if (didUpdate) {
+      notifyListeners();
+    }
 
     return intermediateReadingsDetails.length;
   }
@@ -306,17 +289,24 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> refreshDisplay() async {
-    await _refreshLists();
-    notifyListeners();
+    final didUpdate = await _syncAndRefreshLists();
+
+    if (didUpdate) {
+      notifyListeners();
+    }
   }
 
-  Future<void> _refreshLists() async {
+  Future<bool> _syncAndRefreshLists() async {
     _log.fine('Refreshing data views.');
 
     SyncManager syncManager = SyncManager();
     await syncManager.initialize();
-    await syncManager.copyFromServer(_serverAddress, int.parse(_serverPort));
-    await syncManager.syncUnsyncedData(_serverAddress, int.parse(_serverPort));
+    final bool fromServer = await syncManager.copyFromServer(_serverAddress, int.parse(_serverPort));
+    final bool toServer = await syncManager.syncUnsyncedData(_serverAddress, int.parse(_serverPort));
+
+    if (!fromServer && !toServer) {
+      return false;
+    }
 
     currentReading = await _dbHelper.getCurrentReading();
 
@@ -343,5 +333,7 @@ class DataProvider extends ChangeNotifier {
     // unsyncedCount = readings.where((reading) => !reading.isSynced).length;
 
     _log.fine('All lists updated.');
+
+    return true;
   }
 }
