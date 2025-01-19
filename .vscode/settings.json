@@ -25,6 +25,7 @@
       "Symbolication",
       "upsert",
       "upserts",
-      "wifi"
+      "wifi",
+      "workmanager"
    ]
 }

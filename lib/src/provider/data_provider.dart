@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'dart:isolate';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/io/db/db_path.dart';
 import 'package:zaehlerstand/src/io/sync/sync_manager.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
@@ -38,6 +39,11 @@ class DataProvider extends ChangeNotifier {
   /// List of all years that have data in reading
   List<int> availableYears = <int>[];
 
+  // Isolate name server
+  static const String isolateNameServerPortName = 'sync_port';
+  static const String isolateNameServerTriggerWord = 'syncTriggered';
+  final ReceivePort _receivePort = ReceivePort();
+
   DataProvider(this.settingsProvider) {
     _serverAddress = settingsProvider.serverAddress;
     _serverPort = settingsProvider.serverPort;
@@ -66,10 +72,34 @@ class DataProvider extends ChangeNotifier {
     };
 
     settingsProvider.addListener(_settingsListener);
+
+    // Processing triggers from the background task
+    IsolateNameServer.registerPortWithName(_receivePort.sendPort, isolateNameServerPortName);
+
+    // Listen for messages
+    _receivePort.listen((message) async {
+      _log.fine('Isolated name server got message $message');
+      if (message == isolateNameServerTriggerWord) {
+        _log.info('Background task triggered _syncAndRefreshLists via $message on isolated name server');
+
+        bool didChange = await _syncAndRefreshLists();
+
+        if (didChange) {
+          notifyListeners();
+        }
+
+        _log.fine('_syncAndRefreshLists returned $didChange');
+      }
+    });
   }
 
   @override
   void dispose() {
+    _log.fine('Disposing IsolateNameServer.');
+
+    IsolateNameServer.removePortNameMapping(isolateNameServerPortName);
+    _receivePort.close();
+
     _log.fine('Disposing DataProvider.');
 
     settingsProvider.removeListener(_settingsListener);
@@ -91,8 +121,7 @@ class DataProvider extends ChangeNotifier {
       await _dbHelper.initDb(dbDirectory: dbDirectory);
 
       // Check database for data and load it if necessary
-      final didUpdate = await _syncAndRefreshLists();
-
+      await _syncAndRefreshLists();
     } catch (e, stackTrace) {
       _log.severe('Failed to check DB or load from Server: $e', e, stackTrace);
       return;
@@ -299,12 +328,13 @@ class DataProvider extends ChangeNotifier {
   Future<bool> _syncAndRefreshLists() async {
     _log.fine('Refreshing data views.');
 
+
     SyncManager syncManager = SyncManager();
     await syncManager.initialize();
     final bool fromServer = await syncManager.copyFromServer(_serverAddress, int.parse(_serverPort));
     final bool toServer = await syncManager.syncUnsyncedData(_serverAddress, int.parse(_serverPort));
 
-    if (!fromServer && !toServer) {
+    if (!fromServer && !toServer && readingsDetails.isNotEmpty) {
       return false;
     }
 
