@@ -50,7 +50,7 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> with WidgetsBin
 
   Future<void> _refreshData() async {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
-    await dataProvider.refreshDisplay();
+    await dataProvider.syncAndRefreshDisplay();
   }
 
   void _onItemTapped(int index) {
