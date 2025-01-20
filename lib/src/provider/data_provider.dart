@@ -40,7 +40,7 @@ class DataProvider extends ChangeNotifier {
   List<int> availableYears = <int>[];
 
   // Isolate name server
-  static const String isolateNameServerPortName = 'sync_port';
+  static const String isolateNameServerPortName = 'zaehlerstandSyncPort';
   static const String isolateNameServerTriggerWord = 'syncTriggered';
   final ReceivePort _receivePort = ReceivePort();
 
@@ -48,7 +48,7 @@ class DataProvider extends ChangeNotifier {
     _serverAddress = settingsProvider.serverAddress;
     _serverPort = settingsProvider.serverPort;
     _oldServerAddress = _serverAddress;
-    _oldServerPort = _oldServerPort;
+    _oldServerPort = _serverPort;
 
     // Listen for changes in SettingsProvider and rebuild HttpHelper
     _settingsListener = () async {
@@ -317,7 +317,7 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> refreshDisplay() async {
+  Future<void> syncAndRefreshDisplay() async {
     final didUpdate = await _syncAndRefreshLists();
 
     if (didUpdate) {
@@ -327,7 +327,6 @@ class DataProvider extends ChangeNotifier {
 
   Future<bool> _syncAndRefreshLists() async {
     _log.fine('Refreshing data views.');
-
 
     SyncManager syncManager = SyncManager();
     await syncManager.initialize();
