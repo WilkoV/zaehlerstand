@@ -74,7 +74,12 @@ class DataProvider extends ChangeNotifier {
     settingsProvider.addListener(_settingsListener);
 
     // Processing triggers from the background task
-    IsolateNameServer.registerPortWithName(_receivePort.sendPort, isolateNameServerPortName);
+    final existingPort = IsolateNameServer.lookupPortByName(DataProvider.isolateNameServerPortName);
+    if (existingPort != null) {
+      _log.warning('Port already registered. Skipping new registration.');
+    } else {
+      IsolateNameServer.registerPortWithName(_receivePort.sendPort, DataProvider.isolateNameServerPortName);
+    }
 
     // Listen for messages
     _receivePort.listen((message) async {
@@ -318,6 +323,14 @@ class DataProvider extends ChangeNotifier {
   }
 
   Future<void> syncAndRefreshDisplay() async {
+    final didUpdate = await _syncAndRefreshLists();
+
+    if (didUpdate) {
+      notifyListeners();
+    }
+  }
+
+  Future<void> sync() async {
     final didUpdate = await _syncAndRefreshLists();
 
     if (didUpdate) {

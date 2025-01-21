@@ -2,6 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsProvider extends ChangeNotifier {
+  static const darkModeKey = 'isDarkMode';
+  static const serverAdressKey = 'serverAddress';
+  static const serverPortKey = 'serverPort';
+  static const showReadingKey = 'showReading';
+  static const showConsumptionKey = 'showConsumption';
+  static const daddysSelectedViewKey = 'daddysSelectedView';
+  static const showTemperatureKey = 'showTemperature';
+  static const showFeelsLikeKey = 'showFeelsLike';
+  static const daddysAggregationKey = 'daddysAggregation';
+
   // Fields for theme
   bool _isDarkMode = false;
 
@@ -32,16 +42,16 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> loadSettings() async {
     final preferences = await SharedPreferences.getInstance();
 
-    _isDarkMode = preferences.getBool('isDarkMode') ?? _isDarkMode;
-    _serverAddress = preferences.getString('serverAddress') ?? _serverAddress;
-    _serverPort = preferences.getString('serverPort') ?? _serverPort;
+    _isDarkMode = preferences.getBool(darkModeKey) ?? _isDarkMode;
+    _serverAddress = preferences.getString(serverAdressKey) ?? _serverAddress;
+    _serverPort = preferences.getString(serverPortKey) ?? _serverPort;
 
-    _showReading = preferences.getBool('showReading') ?? _showReading;
-    _consumption = preferences.getBool('showConsumption') ?? _consumption;
-    _showTemperature = preferences.getBool('showTemperature') ?? _showTemperature;
-    _showFeelsLike = preferences.getBool('showFeelsLike') ?? _showFeelsLike;
-    _daddysSelectedView = preferences.getString('daddysSelectedView') ?? _daddysSelectedView;
-    _daddysAggregation = preferences.getString('daddysAggregation') ?? _daddysAggregation;
+    _showReading = preferences.getBool(showReadingKey) ?? _showReading;
+    _consumption = preferences.getBool(showConsumptionKey) ?? _consumption;
+    _showTemperature = preferences.getBool(showTemperatureKey) ?? _showTemperature;
+    _showFeelsLike = preferences.getBool(showFeelsLikeKey) ?? _showFeelsLike;
+    _daddysSelectedView = preferences.getString(daddysSelectedViewKey) ?? _daddysSelectedView;
+    _daddysAggregation = preferences.getString(daddysAggregationKey) ?? _daddysAggregation;
 
     notifyListeners();
   }
@@ -50,7 +60,7 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> toggleTheme() async {
     _isDarkMode = !_isDarkMode;
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setBool('isDarkMode', _isDarkMode);
+    await preferences.setBool(darkModeKey, _isDarkMode);
     notifyListeners();
   }
 
@@ -58,7 +68,7 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> updateServerAddress(String address) async {
     _serverAddress = address;
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setString('serverAddress', _serverAddress);
+    await preferences.setString(serverAdressKey, _serverAddress);
     notifyListeners();
   }
 
@@ -66,7 +76,7 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> updateServerPort(String port) async {
     _serverPort = port;
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setString('serverPort', _serverPort);
+    await preferences.setString(serverPortKey, _serverPort);
     notifyListeners();
   }
 
@@ -74,7 +84,7 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> toggleShowReading() async {
     _showReading = !_showReading;
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setBool('showReading', _showReading);
+    await preferences.setBool(showReadingKey, _showReading);
     notifyListeners();
   }
 
@@ -82,7 +92,7 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> toggleShowConsumption() async {
     _consumption = !_consumption;
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setBool('showConsumption', _consumption);
+    await preferences.setBool(showConsumptionKey, _consumption);
     notifyListeners();
   }
 
@@ -90,7 +100,7 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> toggleShowTemperature() async {
     _showTemperature = !_showTemperature;
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setBool('showTemperature', _showTemperature);
+    await preferences.setBool(showTemperatureKey, _showTemperature);
     notifyListeners();
   }
 
@@ -98,16 +108,15 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> toggleShowFeelsLike() async {
     _showFeelsLike = !_showFeelsLike;
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setBool('showFeelsLike', _showFeelsLike);
+    await preferences.setBool(showFeelsLikeKey, _showFeelsLike);
     notifyListeners();
   }
-
 
   // Toggle showAverage
   Future<void> setShowDaddysAggregation(String newValue) async {
     _daddysAggregation = newValue;
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setString('daddysAggregation', _daddysAggregation);
+    await preferences.setString(daddysAggregationKey, _daddysAggregation);
     notifyListeners();
   }
 
@@ -115,7 +124,7 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> updateDaddysSelectedView(String selectedView) async {
     _daddysSelectedView = selectedView;
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setString('daddysSelectedView', _daddysSelectedView);
+    await preferences.setString(daddysSelectedViewKey, _daddysSelectedView);
     notifyListeners();
   }
 
@@ -123,7 +132,7 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> setDaddysSelectedView(String selectedView) async {
     _daddysSelectedView = selectedView;
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setString('daddysSelectedView', _daddysSelectedView);
+    await preferences.setString(daddysSelectedViewKey, _daddysSelectedView);
     notifyListeners();
   }
 }
