@@ -8,6 +8,8 @@ import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 class DaddysWeeklyDailyView extends DaddysViewBase {
   const DaddysWeeklyDailyView({
     super.key,
+    required super.minColumns,
+    required super.showLongNames,
     required super.showConsumption,
     required super.showReading,
     required super.showTemperature,
@@ -55,8 +57,8 @@ class DaddysWeeklyDailyView extends DaddysViewBase {
                 dataTextStyle: Theme.of(context).textTheme.bodyLarge,
                 dataRowHeight: Theme.of(context).textTheme.bodyLarge!.fontSize! * factor,
                 columns: [
-                  const DataColumn2(label: Text(''), size: ColumnSize.M),
-                  ...weeks.map((month) => DataColumn2(label: Text(month))),
+                  const DataColumn2(label: Text(''), size: ColumnSize.S),
+                ...weeks.map((week) => DataColumn2(label: Text('${int.parse(week) + 1}'))),
                 ],
                 rows: periods.map((period) {
                   return DataRow(

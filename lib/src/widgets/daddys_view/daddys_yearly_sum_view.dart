@@ -8,6 +8,8 @@ import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 class DaddysYearlySumView extends DaddysViewBase {
   const DaddysYearlySumView({
     super.key,
+    required super.minColumns,
+    required super.showLongNames,
     required super.showConsumption,
     required super.showReading,
     required super.showTemperature,
@@ -60,13 +62,13 @@ class DaddysYearlySumView extends DaddysViewBase {
                 dataTextStyle: Theme.of(context).textTheme.bodyLarge,
                 dataRowHeight: Theme.of(context).textTheme.bodyLarge!.fontSize! * factor,
                 columns: [
-                  const DataColumn2(label: Text(''), size: ColumnSize.M),
+                  const DataColumn2(label: Text(''), size: ColumnSize.S),
                   ...years.map((year) => DataColumn2(label: Text(year))),
                 ],
                 rows: periods.map((period) {
                   return DataRow(
                     cells: [
-                      DataCell(Text(getMonthName(period))),
+                      DataCell(Text(getMonthName(period), style: Theme.of(context).textTheme.bodyLarge)),
                       ...years.map((month) {
                         final ReadingDetailAggregation? data = monthlyAggregationViewData[month]?[period]?['aggregation']!;
 

@@ -8,6 +8,8 @@ import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 class DaddysYearlyAvgView extends DaddysViewBase {
   const DaddysYearlyAvgView({
     super.key,
+    required super.minColumns,
+    required super.showLongNames,
     required super.showConsumption,
     required super.showReading,
     required super.showTemperature,
@@ -60,7 +62,7 @@ class DaddysYearlyAvgView extends DaddysViewBase {
                 dataTextStyle: Theme.of(context).textTheme.bodyLarge,
                 dataRowHeight: Theme.of(context).textTheme.bodyLarge!.fontSize! * factor,
                 columns: [
-                  const DataColumn2(label: Text(''), size: ColumnSize.M),
+                  const DataColumn2(label: Text(''), size: ColumnSize.S),
                   ...years.map((year) => DataColumn2(label: Text(year))),
                 ],
                 rows: periods.map((period) {
@@ -82,8 +84,8 @@ class DaddysYearlyAvgView extends DaddysViewBase {
                               if (showConsumption) Text('${data.consumptionAvg!.toStringAsFixed(1)}m³', style: Theme.of(context).textTheme.bodyLarge),
                               if (showReading) Text('${data.minReading} -', style: Theme.of(context).textTheme.bodyMedium),
                               if (showReading) Text('${data.maxReading}', style: Theme.of(context).textTheme.bodyMedium),
-                              if (showTemperature && data.minTemperature != null) Text('${data.minTemperature!.toStringAsFixed(1)}/${data.maxTemperature!.toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
-                              if (showFeelsLike && data.minFeelsLike != null) Text('${data.minFeelsLike!.toStringAsFixed(1)}/${data.maxFeelsLike!.toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showTemperature && data.minTemperature != null) Text('${data.minTemperature!.toStringAsFixed(1)}/${data.maxTemperature!.toStringAsFixed(1)}°', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showFeelsLike && data.minFeelsLike != null) Text('${data.minFeelsLike!.toStringAsFixed(1)}/${data.maxFeelsLike!.toStringAsFixed(1)}°', style: Theme.of(context).textTheme.bodyMedium),
                             ],
                           ),
                         );

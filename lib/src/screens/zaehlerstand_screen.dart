@@ -3,8 +3,8 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/models/base/reading_dialog_result.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
-import 'package:zaehlerstand/src/widgets/daddys_view/daddys_view.dart';
 import 'package:zaehlerstand/src/widgets/dialogs/reading_dialog.dart';
+import 'package:zaehlerstand/src/widgets/responsive/daddys_view/daddys_view_responsive_layout.dart';
 import 'package:zaehlerstand/src/widgets/zaehlerstand_drawer.dart';
 import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
@@ -23,7 +23,7 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> with WidgetsBin
   final List<Widget> _views = [
     const Center(child: Text('Dashboard')),
     const Center(child: Text('Diagramme')),
-    const DaddysView(),
+    const DaddysViewResponsiveLayout(),
   ];
 
   @override

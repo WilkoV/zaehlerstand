@@ -8,6 +8,8 @@ import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 class DaddysYearlyDailyView extends DaddysViewBase {
   const DaddysYearlyDailyView({
     super.key,
+    required super.minColumns,
+    required super.showLongNames,
     required super.showConsumption,
     required super.showReading,
     required super.showTemperature,
@@ -55,7 +57,7 @@ class DaddysYearlyDailyView extends DaddysViewBase {
                 dataTextStyle: Theme.of(context).textTheme.bodyLarge,
                 dataRowHeight: Theme.of(context).textTheme.bodyLarge!.fontSize! * factor,
                 columns: [
-                  const DataColumn2(label: Text(''), size: ColumnSize.M),
+                  const DataColumn2(label: Text(''), size: ColumnSize.S),
                   ...years.map((year) => DataColumn2(label: Text(year))),
                 ],
                 rows: periods.map((period) {
@@ -78,7 +80,8 @@ class DaddysYearlyDailyView extends DaddysViewBase {
                               if (showReading) Text('${data.reading.reading}', style: Theme.of(context).textTheme.bodyMedium),
                               if (showTemperature && data.weatherInfo != null)
                                 Text('${data.weatherInfo!.minFeelsLike.toStringAsFixed(1)}/${data.weatherInfo!.maxTemperature.toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
-                              if (showFeelsLike && data.weatherInfo != null) Text('${data.weatherInfo!.minFeelsLike.toStringAsFixed(1)}/${data.weatherInfo!.maxFeelsLike.toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showFeelsLike && data.weatherInfo != null) 
+                                Text('${data.weatherInfo!.minFeelsLike.toStringAsFixed(1)}/${data.weatherInfo!.maxFeelsLike.toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
                             ],
                           ),
                         );

@@ -7,14 +7,14 @@ import 'package:zaehlerstand/src/widgets/daddys_view/daddys_yearly_sum_view.dart
 import 'package:zaehlerstand/src/widgets/daddys_view/daddys_yearly_daily_view.dart';
 import 'package:zaehlerstand/src/widgets/daddys_view/daddys_monthly_daily_view.dart';
 
-class DaddysView extends StatefulWidget {
-  const DaddysView({super.key});
+class DaddysViewTabletPortrait extends StatefulWidget {
+  const DaddysViewTabletPortrait({super.key});
 
   @override
-  State<DaddysView> createState() => _DaddysViewState();
+  State<DaddysViewTabletPortrait> createState() => _DaddysViewTabletPortraitState();
 }
 
-class _DaddysViewState extends State<DaddysView> {
+class _DaddysViewTabletPortraitState extends State<DaddysViewTabletPortrait> {
   late String daddysSelectedView;
   late String daddysAggregation;
 
@@ -130,11 +130,11 @@ class _DaddysViewState extends State<DaddysView> {
 
   Widget _buildView({required BuildContext context, required bool showConsumption, required bool showReading, required bool showTemperature, required bool showFeelsLike}) {
     if (daddysSelectedView == groupSelectionValueMonth) {
-      return DaddysMonthlyDailyView(showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
+      return DaddysMonthlyDailyView(minColumns: 3, showLongNames: true, showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
     }
 
     if (daddysSelectedView == groupSelectionValueWeek) {
-      return DaddysWeeklyDailyView(showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
+      return DaddysWeeklyDailyView(minColumns: 3, showLongNames: false, showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
     }
 
     switch (daddysAggregation) {
@@ -150,18 +150,18 @@ class _DaddysViewState extends State<DaddysView> {
   Widget _buildGroupView({required String selectedView, required bool showConsumption, required bool showReading, required bool showTemperature, required bool showFeelsLike}) {
     switch (selectedView) {
       case groupSelectionValueMonth:
-        return DaddysMonthlyDailyView(showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
+        return DaddysMonthlyDailyView(minColumns: 3, showLongNames: true, showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
       case groupSelectionValueWeek:
-        return DaddysWeeklyDailyView(showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
+        return DaddysWeeklyDailyView(minColumns: 3, showLongNames: false, showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
       default:
-        return DaddysYearlyDailyView(showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
+        return DaddysYearlyDailyView(minColumns: 3, showLongNames: true, showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
     }
   }
 
   Widget _buildSumsView({required String selectedView, required bool showConsumption, required bool showReading, required bool showTemperature, required bool showFeelsLike}) {
     switch (selectedView) {
       case groupSelectionValueYear:
-        return DaddysYearlySumView(showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
+        return DaddysYearlySumView(minColumns: 3, showLongNames: false, showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
       default:
         return Text('Summierung nicht möglich', style: Theme.of(context).textTheme.bodyMedium);
     }
@@ -170,7 +170,7 @@ class _DaddysViewState extends State<DaddysView> {
   Widget _buildAverageView({required String selectedView, required bool showConsumption, required bool showReading, required bool showTemperature, required bool showFeelsLike}) {
     switch (selectedView) {
       case groupSelectionValueYear:
-        return DaddysYearlyAvgView(showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
+        return DaddysYearlyAvgView(minColumns: 3, showLongNames: false, showConsumption: showConsumption, showReading: showReading, showTemperature: showTemperature, showFeelsLike: showFeelsLike);
       default:
         return Text('Aggregation nicht möglich', style: Theme.of(context).textTheme.bodyMedium);
     }

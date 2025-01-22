@@ -30,7 +30,7 @@ Future<void> main() async {
     Logger.root.level = Level.ALL;
     log.fine('Running in debug mode. Log level set to ALL.');
 
-    alarmFrequency = const Duration(minutes: 2);
+    alarmFrequency = const Duration(minutes: 15);
   }
 
   Logger.root.onRecord.listen((record) {
@@ -61,16 +61,17 @@ Future<void> main() async {
     ),
   );
 
+  // Avoid duplicate registrations
   await AndroidAlarmManager.cancel(alarmManagerTaskId);
 
-  await AndroidAlarmManager.periodic(alarmFrequency, alarmManagerTaskId, zaehlerstandCallbackDispatcher);
+  // Initialize background task
+  await AndroidAlarmManager.periodic(alarmFrequency, alarmManagerTaskId, rescheduleOnReboot: true, zaehlerstandCallbackDispatcher);
 
   log.info('AlarmManager periodic task registered with taskId = $alarmManagerTaskId.');
 }
 
 @pragma('vm:entry-point')
 void zaehlerstandCallbackDispatcher() async {
-  var now = DateTime.now().microsecond;
   final int isolateId = Isolate.current.hashCode;
 
   printLogRecord(isolateId, 'AlarmManager triggered for task $alarmManagerTaskId');
