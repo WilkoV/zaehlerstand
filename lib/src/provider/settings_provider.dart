@@ -3,13 +3,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsProvider extends ChangeNotifier {
   static const darkModeKey = 'isDarkMode';
+  
   static const serverAdressKey = 'serverAddress';
   static const serverPortKey = 'serverPort';
+  
   static const showReadingKey = 'showReading';
   static const showConsumptionKey = 'showConsumption';
-  static const daddysSelectedViewKey = 'daddysSelectedView';
   static const showTemperatureKey = 'showTemperature';
   static const showFeelsLikeKey = 'showFeelsLike';
+  
+  static const daddysSelectedViewKey = 'daddysSelectedView';
   static const daddysAggregationKey = 'daddysAggregation';
 
   // Fields for theme

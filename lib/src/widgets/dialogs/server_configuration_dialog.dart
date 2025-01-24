@@ -12,7 +12,7 @@ class ServerConfigurationDialog extends StatelessWidget {
         final serverAddressController = TextEditingController(text: settingsProvider.serverAddress);
         final serverPortController = TextEditingController(text: settingsProvider.serverPort);
 
-        void _saveAndClose() {
+        void saveAndClose() {
           if (serverAddressController.text.isNotEmpty) {
             settingsProvider.updateServerAddress(serverAddressController.text);
           }
@@ -37,7 +37,7 @@ class ServerConfigurationDialog extends StatelessWidget {
                 ),
                 keyboardType: TextInputType.number,
                 autofocus: true,
-                onSubmitted: (_) => _saveAndClose(),
+                onSubmitted: (_) => saveAndClose(),
               ),
               const SizedBox(height: 16),
               TextField(
@@ -49,7 +49,7 @@ class ServerConfigurationDialog extends StatelessWidget {
                   hintText: 'Serverport eingeben',
                 ),
                 keyboardType: TextInputType.number,
-                onSubmitted: (_) => _saveAndClose(),
+                onSubmitted: (_) => saveAndClose(),
               ),
             ],
           ),
@@ -64,7 +64,7 @@ class ServerConfigurationDialog extends StatelessWidget {
               ),
             ),
             TextButton(
-              onPressed: _saveAndClose,
+              onPressed: saveAndClose,
               child: Text(
                 'Speichern',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(

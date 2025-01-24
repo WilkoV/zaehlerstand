@@ -31,10 +31,13 @@ class DataProvider extends ChangeNotifier {
   double last7ConsumptionAverage = 0;
   Reading? currentReading;
   List<ReadingDetail> readingsDetails = <ReadingDetail>[];
+
   Map<String, Map<String, ReadingDetail>> yearlyDayViewData = {};
   Map<String, Map<String, Map<String, ReadingDetail>>> monthlyDayViewData = <String, Map<String, Map<String, ReadingDetail>>>{};
   Map<String, Map<String, Map<String, ReadingDetailAggregation>>> monthlyAggregationViewData = <String, Map<String, Map<String, ReadingDetailAggregation>>>{};
   Map<String, Map<String, Map<String, WeeklyReadingDetail>>> weeklyAggregationViewData = <String, Map<String, Map<String, WeeklyReadingDetail>>>{};
+
+  List<ReadingDetailAggregation> monthlyAggregationViewDataList = <ReadingDetailAggregation>[];
 
   /// List of all years that have data in reading
   List<int> availableYears = <int>[];
@@ -262,7 +265,7 @@ class DataProvider extends ChangeNotifier {
     return intermediateReadingsDetails;
   }
 
-  Future<void> _createYearlyDayViewData() async {
+  Future<void> _getYearlyDayViewData() async {
     yearlyDayViewData.clear();
 
     List<ReadingDetail> data = await _dbHelper.getAllReadingsDetailsDescAscAsc();
@@ -276,7 +279,7 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> _createMonthlyDayViewData() async {
+  Future<void> _getMonthlyDayViewData() async {
     monthlyDayViewData.clear();
 
     final currentYear = DateTime.now().year;
@@ -294,7 +297,7 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> _createMonthlyAggregationViewData() async {
+  Future<void> _getMonthlyAggregationViewData() async {
     monthlyAggregationViewData.clear();
 
     List<ReadingDetailAggregation> data = await _dbHelper.getMonthlyAggregationDescAsc();
@@ -308,7 +311,7 @@ class DataProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> _createWeeklyAggregationViewData() async {
+  Future<void> _getWeeklyAggregationViewData() async {
     weeklyAggregationViewData.clear();
 
     List<WeeklyReadingDetail> data = await _dbHelper.getWeeklyReadingDetailsDescAsc();
@@ -350,15 +353,19 @@ class DataProvider extends ChangeNotifier {
       return false;
     }
 
-    currentReading = await _dbHelper.getCurrentReading();
+    readingsDetails.clear();
+    availableYears.clear();
+    monthlyAggregationViewDataList.clear();
 
+    currentReading = await _dbHelper.getCurrentReading();
     readingsDetails = await _dbHelper.getAllReadingsDetailsDescDescDesc();
     availableYears = await _dbHelper.getReadingsDistinctYears();
+    monthlyAggregationViewDataList = await _dbHelper.getMonthlyAggregationDescDesc();
 
-    await _createYearlyDayViewData();
-    await _createMonthlyDayViewData();
-    await _createMonthlyAggregationViewData();
-    await _createWeeklyAggregationViewData();
+    await _getYearlyDayViewData();
+    await _getMonthlyDayViewData();
+    await _getMonthlyAggregationViewData();
+    await _getWeeklyAggregationViewData();
 
     try {
       last7ConsumptionAverage = await _dbHelper.getAverageConsumptionOfLast7Days();
