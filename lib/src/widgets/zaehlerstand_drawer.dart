@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
+import 'package:zaehlerstand/src/widgets/dialogs/server_configuration_dialog.dart';
 import 'package:zaehlerstand/src/widgets/labeled_divider.dart';
 
 class ZaehlerstandDrawer extends StatelessWidget {
@@ -28,9 +29,7 @@ class ZaehlerstandDrawer extends StatelessWidget {
                       settingsProvider.toggleTheme();
                     },
                   ),
-
                   const LabeledDivider(message: 'Sichtbare Felder', spacing: 8, thickness: 2),
-
                   SwitchListTile(
                     title: Text('Verbrauch', style: Theme.of(context).textTheme.bodyMedium),
                     value: settingsProvider.showConsumption,
@@ -38,7 +37,6 @@ class ZaehlerstandDrawer extends StatelessWidget {
                       settingsProvider.toggleShowConsumption();
                     },
                   ),
-
                   SwitchListTile(
                     title: Text('Zählerstand', style: Theme.of(context).textTheme.bodyMedium),
                     value: settingsProvider.showReading,
@@ -60,62 +58,18 @@ class ZaehlerstandDrawer extends StatelessWidget {
                       settingsProvider.toggleShowFeelsLike();
                     },
                   ),
-
-                  const SizedBox(height: 100), // Spacing between settings and view
-
+                  const SizedBox(height: 100),
                   const LabeledDivider(message: 'Server', spacing: 8, thickness: 2),
-
-                  // Server Address Input
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    child: Text(
-                      'Server Adresse',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: TextField(
-                      controller: TextEditingController(text: settingsProvider.serverAddress)
-                        ..selection = TextSelection.fromPosition(
-                          TextPosition(offset: settingsProvider.serverAddress.length),
-                        ),
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Serveradresse eingeben',
-                      ),
-                      onSubmitted: (value) {
-                        if (value.isNotEmpty) {
-                          settingsProvider.updateServerAddress(value);
-                        }
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _showServerDialog(context);
                       },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                    child: Text(
-                      'Server Port',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: TextField(
-                      controller: TextEditingController(text: settingsProvider.serverPort)
-                        ..selection = TextSelection.fromPosition(
-                          TextPosition(offset: settingsProvider.serverPort.length),
-                        ),
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Server port eingeben',
+                      child: Text(
+                        'Konfigurieren',
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: Theme.of(context).indicatorColor),
                       ),
-                      onSubmitted: (value) {
-                        if (value.isNotEmpty) {
-                          settingsProvider.updateServerAddress(value);
-                        }
-                      },
                     ),
                   ),
                 ],
@@ -124,6 +78,13 @@ class ZaehlerstandDrawer extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showServerDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const ServerConfigurationDialog(),
     );
   }
 }
