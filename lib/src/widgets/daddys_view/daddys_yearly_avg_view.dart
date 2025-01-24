@@ -84,8 +84,8 @@ class DaddysYearlyAvgView extends DaddysViewBase {
                               if (showConsumption) Text('${data.consumptionAvg!.toStringAsFixed(1)}m³', style: Theme.of(context).textTheme.bodyLarge),
                               if (showReading) Text('${data.minReading} -', style: Theme.of(context).textTheme.bodyMedium),
                               if (showReading) Text('${data.maxReading}', style: Theme.of(context).textTheme.bodyMedium),
-                              if (showTemperature && data.minTemperature != null) Text('${data.minTemperature!.toStringAsFixed(1)}/${data.maxTemperature!.toStringAsFixed(1)}°', style: Theme.of(context).textTheme.bodyMedium),
-                              if (showFeelsLike && data.minFeelsLike != null) Text('${data.minFeelsLike!.toStringAsFixed(1)}/${data.maxFeelsLike!.toStringAsFixed(1)}°', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showTemperature && data.minTemperature != null) Text('${data.avgMinTemperature!.toStringAsFixed(1)}/${data.avgMaxTemperature!.toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showFeelsLike && data.minFeelsLike != null) Text('${data.avgMinFeelsLike!.toStringAsFixed(1)}/${data.avgMaxFeelsLike!.toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
                             ],
                           ),
                         );
