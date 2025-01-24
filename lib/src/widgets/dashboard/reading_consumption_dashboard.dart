@@ -131,7 +131,6 @@ class ReadingConsumptionDashboard extends StatelessWidget {
     if (showReading) {
       factor += 1.2;
       factor += 1.2;
-      factor += 1.2;
     }
 
     if (showTemperature) {
@@ -141,6 +140,9 @@ class ReadingConsumptionDashboard extends StatelessWidget {
     if (showFeelsLike) {
       factor += 1.2;
     }
+
+    factor += 1.2;
+
     return factor;
   }
 
