@@ -24,7 +24,7 @@ Future<void> main() async {
     Logger.root.level = Level.WARNING;
     log.fine('Running in release mode. Log level set to WARNING.');
 
-    alarmFrequency = const Duration(hours: 6);
+    alarmFrequency = const Duration(hours: 8);
   } else {
     // In debug mode, set log level to ALL
     Logger.root.level = Level.ALL;
@@ -38,8 +38,7 @@ Future<void> main() async {
     print('[${record.loggerName}] ${record.level.name}: ${record.time}: ${record.message}');
   });
 
-  // TODO: Implement splash screen
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
   await AndroidAlarmManager.initialize();
   log.info('AlarmManager initialized');
