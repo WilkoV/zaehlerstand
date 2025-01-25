@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zaehlerstand/src/models/logic/daily_consumption_logic.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
 import 'package:zaehlerstand/src/widgets/dashboard/reading_avg_consumption_arrowy.dart';
-import 'package:zaehlerstand/src/widgets/dashboard/reading_consumption_arrow.dart';
 
 class ReadingAvgConsumptionElement extends StatelessWidget {
   final String? label;
