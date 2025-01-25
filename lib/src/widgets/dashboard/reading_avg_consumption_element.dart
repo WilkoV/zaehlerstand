@@ -33,6 +33,14 @@ class ReadingAvgConsumptionElement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (consumption == null) {
+      return Center(
+        child: Text(
+          '--',
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+      );
+    }
     return Consumer<SettingsProvider>(
       builder: (context, settingsProvider, child) {
         return Column(
@@ -43,7 +51,7 @@ class ReadingAvgConsumptionElement extends StatelessWidget {
               children: [
                 consumption != null
                     ? Text(
-                      '${consumption!.toStringAsFixed(1).padLeft(6)}m³',
+                        '${consumption!.toStringAsFixed(1).padLeft(6)}m³',
                         style: Theme.of(context).textTheme.bodyLarge,
                       )
                     : Text(

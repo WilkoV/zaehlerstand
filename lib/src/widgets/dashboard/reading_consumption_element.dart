@@ -32,6 +32,14 @@ class ReadingConsumptionElement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (consumption == null) {
+      return Center(
+        child: Text(
+          '--',
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+      );
+    }
     return Consumer<SettingsProvider>(
       builder: (context, settingsProvider, child) {
         return Column(

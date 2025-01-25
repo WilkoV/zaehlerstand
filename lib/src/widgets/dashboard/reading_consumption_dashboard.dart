@@ -68,7 +68,7 @@ class ReadingConsumptionDashboard extends StatelessWidget {
             maxTemperature: data.weatherInfo?.maxTemperature,
             minFeelsLike: data.weatherInfo?.minFeelsLike,
             maxFeelsLike: data.weatherInfo?.maxFeelsLike,
-            // compareConsumptionWith: dailyRow.first == data ? null : dailyRow.first.consumptionSum,
+            compareConsumptionWith: dailyData.first == data ? null : dailyData.first.consumption!.consumption,
             label: data.reading.getFormattedDate(),
           ),
         ),
@@ -95,7 +95,6 @@ class ReadingConsumptionDashboard extends StatelessWidget {
           ),
         ),
       for (var i = monthlyData.length; i < 4; i++) const DataCell(ReadingConsumptionElement()),
-      for (var i = monthlyData.length; i < 4; i++) const DataCell(ReadingConsumptionElement()),
     ];
     return dataCells;
   }
@@ -117,7 +116,6 @@ class ReadingConsumptionDashboard extends StatelessWidget {
             label: '${data.year}.${data.month.toString().padLeft(2, '0')}',
           ),
         ),
-      for (var i = monthlyData.length; i < 4; i++) const DataCell(ReadingConsumptionElement()),
       for (var i = monthlyData.length; i < 4; i++) const DataCell(ReadingConsumptionElement()),
     ];
     return dataCells;
