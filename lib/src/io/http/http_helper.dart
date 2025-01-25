@@ -29,9 +29,9 @@ class HttpHelper {
     try {
       final result = await Socket.connect(host, port, timeout: const Duration(seconds: 5));
       result.destroy();
-      return true; // Server is reachable
+      return true; 
     } catch (e) {
-      return false; // Server is not reachable
+      return false; 
     }
   }
 
