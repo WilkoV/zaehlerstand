@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
+import 'package:zaehlerstand/src/widgets/dialogs/dashboard_configuration_dialog.dart';
 import 'package:zaehlerstand/src/widgets/dialogs/server_configuration_dialog.dart';
 import 'package:zaehlerstand/src/widgets/labeled_divider.dart';
 
@@ -59,6 +60,24 @@ class ZaehlerstandDrawer extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 100),
+                  const LabeledDivider(message: 'Dashboard', spacing: 8, thickness: 2),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => const DashboardConfigurationDialog(),
+                        );
+                      },
+                      child: Text(
+                        'Versatz konfigurieren',
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                              color: Theme.of(context).indicatorColor,
+                            ),
+                      ),
+                    ),
+                  ),
                   const LabeledDivider(message: 'Server', spacing: 8, thickness: 2),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -67,8 +86,11 @@ class ZaehlerstandDrawer extends StatelessWidget {
                         _showServerDialog(context);
                       },
                       child: Text(
-                        'Konfigurieren',
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: Theme.of(context).indicatorColor),
+                        'Verbindung konfigurieren',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyLarge!
+                            .copyWith(color: Theme.of(context).indicatorColor),
                       ),
                     ),
                   ),
@@ -81,6 +103,7 @@ class ZaehlerstandDrawer extends StatelessWidget {
     );
   }
 
+  
   void _showServerDialog(BuildContext context) {
     showDialog(
       context: context,

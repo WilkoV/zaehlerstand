@@ -17,8 +17,8 @@ class ReadingConsumptionDashboard extends StatelessWidget {
         double factor = getRowHeightFactor(1.2, settingsProvider.showConsumption, settingsProvider.showReading, settingsProvider.showTemperature, settingsProvider.showFeelsLike);
         return Consumer<DataProvider>(
           builder: (context, dataProvider, child) {
-            List<ReadingDetail> dailyRowData = _getDailyReadingDetails(dataProvider);
-            List<ReadingDetailAggregation> monthlyRow = _getMonthlyAggregations(dataProvider);
+            List<ReadingDetail> dailyRowData = _getDailyReadingDetails(dataProvider, settingsProvider.dashboardDays);
+            List<ReadingDetailAggregation> monthlyRow = _getMonthlyAggregations(dataProvider, settingsProvider.dashboardMonths);
 
             if (dailyRowData.isEmpty) {
               return Center(
@@ -144,38 +144,25 @@ class ReadingConsumptionDashboard extends StatelessWidget {
     return factor;
   }
 
-  List<ReadingDetail> _getDailyReadingDetails(DataProvider dataProvider) {
+  List<ReadingDetail> _getDailyReadingDetails(DataProvider dataProvider, List<int> indices) {
     List<ReadingDetail> daily = [];
 
-    if (dataProvider.readingsDetails.isNotEmpty) {
-      daily.add(dataProvider.readingsDetails.first);
+    for (int index in indices) {
+      if (dataProvider.readingsDetails.length >= index) {
+        daily.add(dataProvider.readingsDetails[index - 1]);
+      }
     }
-    if (dataProvider.readingsDetails.length >= 7) {
-      daily.add(dataProvider.readingsDetails[6]);
-    }
-    if (dataProvider.readingsDetails.length >= 30) {
-      daily.add(dataProvider.readingsDetails[29]);
-    }
-    if (dataProvider.readingsDetails.length >= 365) {
-      daily.add(dataProvider.readingsDetails[364]);
-    }
+
     return daily;
   }
 
-  List<ReadingDetailAggregation> _getMonthlyAggregations(DataProvider dataProvider) {
+  List<ReadingDetailAggregation> _getMonthlyAggregations(DataProvider dataProvider, List<int> indices) {
     List<ReadingDetailAggregation> monthly = [];
 
-    if (dataProvider.monthlyAggregationViewDataList.isNotEmpty) {
-      monthly.add(dataProvider.monthlyAggregationViewDataList.first);
-    }
-    if (dataProvider.monthlyAggregationViewDataList.length >= 2) {
-      monthly.add(dataProvider.monthlyAggregationViewDataList[1]);
-    }
-    if (dataProvider.monthlyAggregationViewDataList.length >= 12) {
-      monthly.add(dataProvider.monthlyAggregationViewDataList[11]);
-    }
-    if (dataProvider.monthlyAggregationViewDataList.length >= 25) {
-      monthly.add(dataProvider.monthlyAggregationViewDataList[24]);
+    for (int index in indices) {
+      if (dataProvider.monthlyAggregationViewDataList.length >= index) {
+        monthly.add(dataProvider.monthlyAggregationViewDataList[index - 1]);
+      }
     }
 
     return monthly;
