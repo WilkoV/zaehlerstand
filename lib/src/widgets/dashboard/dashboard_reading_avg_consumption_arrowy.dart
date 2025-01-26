@@ -4,9 +4,11 @@ import 'package:zaehlerstand/src/app/app_colors.dart' as app_colors;
 class DashboardReadingAvgConsumptionArrow extends StatelessWidget {
   final double? consumption;
   final double? compareConsumptionWith;
+  final bool isTablet;
 
   const DashboardReadingAvgConsumptionArrow({
     super.key,
+    required this.isTablet,
     this.consumption,
     this.compareConsumptionWith,
   });
@@ -26,8 +28,9 @@ class DashboardReadingAvgConsumptionArrow extends StatelessWidget {
                   )
         : Row(
             children: [
-              Icon(Icons.arrow_upward, color: _getArrowColor(), size: Theme.of(context).textTheme.bodyLarge!.fontSize!),
-              Icon(Icons.arrow_downward, color: _getArrowColor(), size: Theme.of(context).textTheme.bodyLarge!.fontSize!),
+              // Icon(Icons.arrow_upward, color: _getArrowColor(), size: Theme.of(context).textTheme.bodyLarge!.fontSize!),
+              // Icon(Icons.arrow_downward, color: _getArrowColor(), size: Theme.of(context).textTheme.bodyLarge!.fontSize!),
+            Text('', style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: _getArrowColor())),
             ],
           );
   }

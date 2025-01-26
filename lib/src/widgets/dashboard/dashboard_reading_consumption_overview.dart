@@ -9,6 +9,7 @@ import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
 class DashboardReadingConsumptionOverview extends StatelessWidget {
   final bool isTablet;
+
   const DashboardReadingConsumptionOverview({
     super.key,
     required this.isTablet,
@@ -63,6 +64,7 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
       for (final data in dailyData)
         DataCell(
           DashboardReadingConsumptionElement(
+            isTablet: isTablet,
             consumption: data.consumption?.consumption,
             reading: data.reading.reading,
             minTemperature: data.weatherInfo?.minTemperature,
@@ -73,7 +75,7 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
             label: data.reading.getFormattedDate(),
           ),
         ),
-      for (var i = dailyData.length; i < maxElements; i++) const DataCell(DashboardReadingConsumptionElement()),
+      for (var i = dailyData.length; i < maxElements; i++) DataCell(DashboardReadingConsumptionElement(isTablet: isTablet,)),
     ];
     return dataCells;
   }
@@ -86,6 +88,7 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
       for (final data in monthlyData)
         DataCell(
           DashboardReadingConsumptionElement(
+            isTablet: isTablet,
             consumption: data.consumptionSum,
             minReading: data.minReading,
             maxReading: data.maxReading,
@@ -97,7 +100,7 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
             label: '${data.year}.${data.month.toString().padLeft(2, '0')}',
           ),
         ),
-      for (var i = monthlyData.length; i < maxElements; i++) const DataCell(DashboardReadingConsumptionElement()),
+      for (var i = monthlyData.length; i < maxElements; i++) DataCell(DashboardReadingConsumptionElement(isTablet: isTablet)),
     ];
     return dataCells;
   }
@@ -110,6 +113,7 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
       for (final data in monthlyData)
         DataCell(
           DashboardReadingAvgConsumptionElement(
+            isTablet: isTablet,
             consumption: data.consumptionAvg,
             minReading: data.minReading,
             maxReading: data.maxReading,
@@ -121,7 +125,7 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
             label: '${data.year}.${data.month.toString().padLeft(2, '0')}',
           ),
         ),
-      for (var i = monthlyData.length; i < maxElements; i++) const DataCell(DashboardReadingConsumptionElement()),
+      for (var i = monthlyData.length; i < maxElements; i++) DataCell(DashboardReadingConsumptionElement(isTablet: isTablet)),
     ];
     return dataCells;
   }
@@ -134,6 +138,7 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
       for (final data in yearlyData)
         DataCell(
           DashboardReadingConsumptionElement(
+            isTablet: isTablet,
             consumption: data.consumptionSum,
             minReading: data.minReading,
             maxReading: data.maxReading,
@@ -145,7 +150,7 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
             label: '${data.year}',
           ),
         ),
-      for (var i = yearlyData.length; i < maxElements; i++) const DataCell(DashboardReadingConsumptionElement()),
+      for (var i = yearlyData.length; i < maxElements; i++) DataCell(DashboardReadingConsumptionElement(isTablet: isTablet)),
     ];
     return dataCells;
   }
@@ -156,8 +161,8 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
     }
 
     if (showReading) {
-      factor += 1.2;
-      factor += 1.2;
+      factor += 1.5;
+      factor += 1.5;
     }
 
     if (showTemperature) {

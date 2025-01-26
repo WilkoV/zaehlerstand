@@ -10,9 +10,11 @@ class DashboardReadingBaseElement extends StatelessWidget {
   final double? maxTemperature;
   final double? minFeelsLike;
   final double? maxFeelsLike;
+  final bool isTablet;
 
   const DashboardReadingBaseElement({
     super.key,
+    required this.isTablet,
     this.label,
     this.reading,
     this.minReading,
@@ -29,28 +31,31 @@ class DashboardReadingBaseElement extends StatelessWidget {
   }
 
   List<Widget> buildSecondaryElements(BuildContext context, SettingsProvider settingsProvider) {
+    final String temperatureUnit = isTablet ? '°C' : '°';
+    final String readingUnit = isTablet ? 'm³' : 'm³';
+
     return [
       if (settingsProvider.showReading && reading != null)
         Text(
-          '${reading.toString().padLeft(6)}m³',
+          '${reading.toString().padLeft(6)}$readingUnit',
           style: Theme.of(context).textTheme.bodyMedium,
           textAlign: TextAlign.center,
         ),
       if (settingsProvider.showReading && minReading != null && maxReading != null)
         Text(
-          '${minReading.toString().padLeft(6)} - ${maxReading.toString().padLeft(6)}m³',
+          '${minReading.toString().padLeft(6)} - ${maxReading.toString().padLeft(6)}$readingUnit',
           style: Theme.of(context).textTheme.bodyMedium,
           textAlign: TextAlign.center,
         ),
       if (settingsProvider.showTemperature && minTemperature != null && maxTemperature != null)
         Text(
-          '${minTemperature!.toStringAsFixed(1)} - ${maxTemperature!.toStringAsFixed(1)}°',
+          '${minTemperature!.toStringAsFixed(1)} - ${maxTemperature!.toStringAsFixed(1)}$temperatureUnit',
           style: Theme.of(context).textTheme.bodyMedium,
           textAlign: TextAlign.center,
         ),
       if (settingsProvider.showFeelsLike && minFeelsLike != null && maxFeelsLike != null)
         Text(
-          '${minFeelsLike!.toStringAsFixed(1)} - ${maxFeelsLike!.toStringAsFixed(1)}°',
+          '${minFeelsLike!.toStringAsFixed(1)} - ${maxFeelsLike!.toStringAsFixed(1)}$temperatureUnit',
           style: Theme.of(context).textTheme.bodyMedium,
           textAlign: TextAlign.center,
         ),

@@ -11,6 +11,7 @@ class DashboardReadingConsumptionElement extends DashboardReadingBaseElement {
 
   const DashboardReadingConsumptionElement({
     super.key,
+    required super.isTablet,
     super.label,
     this.consumption,
     this.compareConsumptionWith,
@@ -38,7 +39,7 @@ class DashboardReadingConsumptionElement extends DashboardReadingBaseElement {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildConsumptionElement(context),
+            if (settingsProvider.showReading) _buildConsumptionElement(context),
             ...buildSecondaryElements(context, settingsProvider),
           ],
         );
@@ -60,6 +61,7 @@ class DashboardReadingConsumptionElement extends DashboardReadingBaseElement {
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
         DashboardReadingConsumptionArrow(
+          isTablet: isTablet,
           consumption: consumption,
           compareConsumptionWith: compareConsumptionWith,
         ),

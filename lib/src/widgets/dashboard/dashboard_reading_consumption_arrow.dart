@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:zaehlerstand/src/app/app_colors.dart' as app_colors;
 
 class DashboardReadingConsumptionArrow extends StatelessWidget {
+  final int? consumption;
+  final int? compareConsumptionWith;
+  final bool isTablet;
+
   const DashboardReadingConsumptionArrow({
     super.key,
+    required this.isTablet,
     this.consumption,
     this.compareConsumptionWith,
   });
-
-  final int? consumption;
-  final int? compareConsumptionWith;
-
   @override
   Widget build(BuildContext context) {
     return consumption != null && compareConsumptionWith != null
@@ -26,8 +27,9 @@ class DashboardReadingConsumptionArrow extends StatelessWidget {
                   )
         : Row(
             children: [
-              Icon(Icons.arrow_upward, color: _getArrowColor(), size: Theme.of(context).textTheme.bodyLarge!.fontSize!),
-              Icon(Icons.arrow_downward, color: _getArrowColor(), size: Theme.of(context).textTheme.bodyLarge!.fontSize!),
+              // Icon(Icons.arrow_upward, color: _getArrowColor(), size: Theme.of(context).textTheme.bodyLarge!.fontSize!),
+              // Icon(Icons.arrow_downward, color: _getArrowColor(), size: Theme.of(context).textTheme.bodyLarge!.fontSize!),
+              Text('', style: Theme.of(context).textTheme.bodyLarge!.copyWith(color: _getArrowColor())),
             ],
           );
   }

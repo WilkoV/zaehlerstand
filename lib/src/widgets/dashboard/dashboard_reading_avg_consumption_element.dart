@@ -10,6 +10,7 @@ class DashboardReadingAvgConsumptionElement extends DashboardReadingBaseElement 
 
   const DashboardReadingAvgConsumptionElement({
     super.key,
+    required super.isTablet,
     super.label,
     this.consumption,
     this.compareConsumptionWith,
@@ -37,7 +38,7 @@ class DashboardReadingAvgConsumptionElement extends DashboardReadingBaseElement 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildConsumptionElement(context),
+            if (settingsProvider.showReading) _buildConsumptionElement(context),
             ...buildSecondaryElements(context, settingsProvider),
           ],
         );
@@ -59,6 +60,7 @@ class DashboardReadingAvgConsumptionElement extends DashboardReadingBaseElement 
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
         DashboardReadingAvgConsumptionArrow(
+          isTablet: isTablet,
           consumption: consumption,
           compareConsumptionWith: compareConsumptionWith,
         ),
