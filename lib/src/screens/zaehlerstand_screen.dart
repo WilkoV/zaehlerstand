@@ -68,6 +68,12 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> with WidgetsBin
           appBar: AppBar(
             title: Text('Zählerstand', style: Theme.of(context).textTheme.headlineLarge),
             centerTitle: true,
+            actions: [
+              IconButton(
+                icon: Icon(Icons.refresh, size: Theme.of(context).textTheme.headlineLarge!.fontSize,),
+                onPressed: _refreshData,
+              ),
+            ],
           ),
           drawer: const ZaehlerstandDrawer(),
           body: Padding(
