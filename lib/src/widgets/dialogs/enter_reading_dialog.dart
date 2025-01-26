@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:zaehlerstand/src/models/base/reading_dialog_result.dart';
 
-class ReadingDialog extends StatefulWidget {
-  ReadingDialog({
+class EnterReadingDialog extends StatefulWidget {
+  EnterReadingDialog({
     super.key,
     required this.minimalReadingValue,
     required this.minimalDateValue,
@@ -18,10 +18,10 @@ class ReadingDialog extends StatefulWidget {
   final FocusNode zaehlerstandFocusNode = FocusNode();
 
   @override
-  State<ReadingDialog> createState() => _ReadingDialogState();
+  State<EnterReadingDialog> createState() => _EnterReadingDialogState();
 }
 
-class _ReadingDialogState extends State<ReadingDialog> {
+class _EnterReadingDialogState extends State<EnterReadingDialog> {
   @override
   Widget build(BuildContext context) {
     // Ensure the cursor is placed at the end of the initial value

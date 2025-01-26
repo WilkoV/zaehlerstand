@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/models/base/reading_dialog_result.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/dashboard/reading_consumption_dashboard.dart';
-import 'package:zaehlerstand/src/widgets/dialogs/reading_dialog.dart';
+import 'package:zaehlerstand/src/widgets/dialogs/enter_reading_dialog.dart';
 import 'package:zaehlerstand/src/widgets/responsive/daddys_view/daddys_view_responsive_layout.dart';
 import 'package:zaehlerstand/src/widgets/zaehlerstand_drawer.dart';
 import 'package:zaehlerstand_common/zaehlerstand_common.dart';
@@ -85,7 +85,7 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> with WidgetsBin
                   int numberOfDays = dataProvider.currentReading != null ? DateTime.now().difference(dataProvider.currentReading!.date).inDays : 0;
                   int avgDailyConsumption = dataProvider.last7ConsumptionAverage.round();
 
-                  return ReadingDialog(
+                  return EnterReadingDialog(
                     minimalReadingValue: minReadingValue,
                     minimalDateValue: minimalDateValue,
                     zaehlerstandController: TextEditingController(
