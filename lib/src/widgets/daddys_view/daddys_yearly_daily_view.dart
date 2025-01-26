@@ -46,10 +46,6 @@ class DaddysYearlyDailyView extends DaddysViewBase {
             final rowHeight = Theme.of(context).textTheme.bodyLarge!.fontSize! * factor;
             final targetScrollOffset = (currentIndex - 5) * rowHeight;
             verticalScrollController.jumpTo(targetScrollOffset);
-
-            print('xxx $currentIndex');
-            print('xxx $targetScrollOffset');
-            print('xxx $rowHeight');
           }
         });
 

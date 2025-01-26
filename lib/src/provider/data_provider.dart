@@ -139,7 +139,7 @@ class DataProvider extends ChangeNotifier {
     _log.fine('Initialization finished');
 
     isLoading = false;
-    notifyListeners(); // Notify UI listeners that state has changed
+    notifyListeners(); 
   }
 
   /// Adds a new reading to the database and refreshes the list of readings.
