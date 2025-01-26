@@ -38,6 +38,7 @@ class DataProvider extends ChangeNotifier {
   Map<String, Map<String, Map<String, WeeklyReadingDetail>>> weeklyAggregationViewData = <String, Map<String, Map<String, WeeklyReadingDetail>>>{};
 
   List<ReadingDetailAggregation> monthlyAggregationViewDataList = <ReadingDetailAggregation>[];
+  List<ReadingDetailAggregation> yearlyAggregationViewDataList = <ReadingDetailAggregation>[];
 
   /// List of all years that have data in reading
   List<int> availableYears = <int>[];
@@ -356,11 +357,13 @@ class DataProvider extends ChangeNotifier {
     readingsDetails.clear();
     availableYears.clear();
     monthlyAggregationViewDataList.clear();
+    yearlyAggregationViewDataList.clear();
 
     currentReading = await _dbHelper.getCurrentReading();
     readingsDetails = await _dbHelper.getAllReadingsDetailsDescDescDesc();
     availableYears = await _dbHelper.getReadingsDistinctYears();
     monthlyAggregationViewDataList = await _dbHelper.getMonthlyAggregationDescDesc();
+    yearlyAggregationViewDataList = await _dbHelper.getYearlyAggregationDesc();
 
     await _getYearlyDayViewData();
     await _getMonthlyDayViewData();
@@ -372,14 +375,6 @@ class DataProvider extends ChangeNotifier {
     } on Exception catch (e) {
       _log.severe(e);
     }
-
-    //  TODO: Implement
-    // await _getDataYears();
-    // await _getAllReadings();
-    // await _getAllConsumptions();
-    // await _getAllWeatherInfos();
-
-    // unsyncedCount = readings.where((reading) => !reading.isSynced).length;
 
     _log.fine('All lists updated.');
 

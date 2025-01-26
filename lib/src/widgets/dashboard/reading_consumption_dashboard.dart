@@ -19,6 +19,7 @@ class ReadingConsumptionDashboard extends StatelessWidget {
           builder: (context, dataProvider, child) {
             List<ReadingDetail> dailyRowData = _getDailyReadingDetails(dataProvider, settingsProvider.dashboardDays);
             List<ReadingDetailAggregation> monthlyRow = _getMonthlyAggregations(dataProvider, settingsProvider.dashboardMonths);
+            List<ReadingDetailAggregation> yearlyRow = _getYearlyAggregations(dataProvider, settingsProvider.dashboardYears);
 
             if (dailyRowData.isEmpty) {
               return Center(
@@ -39,15 +40,10 @@ class ReadingConsumptionDashboard extends StatelessWidget {
                 DataColumn2(label: Text(''), size: ColumnSize.L),
               ],
               rows: [
-                DataRow(
-                  cells: _buildDailyDataCells(context, dailyRowData),
-                ),
-                DataRow(
-                  cells: _buildMonthlyDataCells(context, monthlyRow),
-                ),
-                DataRow(
-                  cells: _buildAvgAggregationDataCells(context, monthlyRow),
-                ),
+                DataRow(cells: _buildDailyDataCells(context, dailyRowData)),
+                DataRow(cells: _buildMonthlySumDataCells(context, monthlyRow)),
+                DataRow(cells: _buildMonthlyAvgDataCells(context, monthlyRow)),
+                DataRow(cells: _buildYearlyDataCells(context, yearlyRow)),
               ],
             );
           },
@@ -77,9 +73,9 @@ class ReadingConsumptionDashboard extends StatelessWidget {
     return dataCells;
   }
 
-  List<DataCell> _buildMonthlyDataCells(BuildContext context, List<ReadingDetailAggregation> monthlyData) {
+  List<DataCell> _buildMonthlySumDataCells(BuildContext context, List<ReadingDetailAggregation> monthlyData) {
     List<DataCell> dataCells = [
-      DataCell(Text('Monat', style: Theme.of(context).textTheme.bodyLarge)),
+      DataCell(Text('Monat \u2211', style: Theme.of(context).textTheme.bodyLarge)),
       for (final data in monthlyData)
         DataCell(
           ReadingConsumptionElement(
@@ -99,9 +95,9 @@ class ReadingConsumptionDashboard extends StatelessWidget {
     return dataCells;
   }
 
-  List<DataCell> _buildAvgAggregationDataCells(BuildContext context, List<ReadingDetailAggregation> monthlyData) {
+  List<DataCell> _buildMonthlyAvgDataCells(BuildContext context, List<ReadingDetailAggregation> monthlyData) {
     List<DataCell> dataCells = [
-      DataCell(Text('Durch-schnitt', style: Theme.of(context).textTheme.bodyLarge)),
+      DataCell(Text('Monat \u2205', style: Theme.of(context).textTheme.bodyLarge)),
       for (final data in monthlyData)
         DataCell(
           ReadingAvgConsumptionElement(
@@ -117,6 +113,28 @@ class ReadingConsumptionDashboard extends StatelessWidget {
           ),
         ),
       for (var i = monthlyData.length; i < 4; i++) const DataCell(ReadingConsumptionElement()),
+    ];
+    return dataCells;
+  }
+
+  List<DataCell> _buildYearlyDataCells(BuildContext context, List<ReadingDetailAggregation> yearlyData) {
+    List<DataCell> dataCells = [
+      DataCell(Text('Jahr', style: Theme.of(context).textTheme.bodyLarge)),
+      for (final data in yearlyData)
+        DataCell(
+          ReadingConsumptionElement(
+            consumption: data.consumptionSum,
+            minReading: data.minReading,
+            maxReading: data.maxReading,
+            minTemperature: data.minTemperature,
+            maxTemperature: data.maxTemperature,
+            minFeelsLike: data.minFeelsLike,
+            maxFeelsLike: data.maxFeelsLike,
+            compareConsumptionWith: yearlyData.first == data ? null : yearlyData.first.consumptionSum,
+            label: '${data.year}',
+          ),
+        ),
+      for (var i = yearlyData.length; i < 4; i++) const DataCell(ReadingConsumptionElement()),
     ];
     return dataCells;
   }
@@ -166,5 +184,17 @@ class ReadingConsumptionDashboard extends StatelessWidget {
     }
 
     return monthly;
+  }
+
+  List<ReadingDetailAggregation> _getYearlyAggregations(DataProvider dataProvider, List<int> indices) {
+    List<ReadingDetailAggregation> yearly = [];
+
+    for (int index in indices) {
+      if (dataProvider.yearlyAggregationViewDataList.length >= index) {
+        yearly.add(dataProvider.yearlyAggregationViewDataList[index - 1]);
+      }
+    }
+
+    return yearly;
   }
 }
