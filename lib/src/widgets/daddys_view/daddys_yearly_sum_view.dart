@@ -18,28 +18,46 @@ class DaddysYearlySumView extends DaddysViewBase {
 
   @override
   Widget build(BuildContext context) {
+    final ScrollController verticalScrollController = ScrollController();
+
     return Consumer<DataProvider>(
       builder: (context, dataProvider, child) {
         final monthlyAggregationViewData = dataProvider.monthlyAggregationViewData;
 
         double factor = getRowHeightFactor(1.2);
 
-        // This view needs to rows for the reading
+        // Adjust row height if showing readings
         if (showReading) {
           factor += 1.2;
         }
 
         if (monthlyAggregationViewData.isEmpty) {
           return Center(
-            child: Text('Keine Daten gefunden', style: Theme.of(context).textTheme.bodyLarge),
+            child: Text(
+              'Keine Daten gefunden',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
           );
         }
 
         // Extract all unique years for the column headers
         final years = monthlyAggregationViewData.keys.toList();
 
-        // Generate all periods (days of the year)
+        // Generate all periods (months)
         final periods = _getMonthlySumPeriodLabels();
+
+        // Calculate the index for the current month
+        final today = DateTime.now();
+        final currentMonthIndex = today.month - 1;
+
+        // Scroll to the current month after the first frame
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (currentMonthIndex > 5) {
+            final rowHeight = Theme.of(context).textTheme.bodyLarge!.fontSize! * factor;
+            final targetScrollOffset = (currentMonthIndex - 5) * rowHeight;
+            verticalScrollController.jumpTo(targetScrollOffset);
+          }
+        });
 
         // Ensure data exists for all periods in all years
         for (final year in years) {
@@ -49,18 +67,20 @@ class DaddysYearlySumView extends DaddysViewBase {
           }
         }
 
-        // Calculate screen width based on the number of columns that needed to be displayed
+        // Calculate screen width based on the number of columns
         final double screenWidth = getMinWidth(context, years.length);
 
         return Column(
           children: [
             Expanded(
               child: DataTable2(
+                scrollController: verticalScrollController,
                 minWidth: screenWidth,
                 fixedLeftColumns: 1,
                 headingTextStyle: Theme.of(context).textTheme.bodyLarge,
                 dataTextStyle: Theme.of(context).textTheme.bodyLarge,
-                dataRowHeight: Theme.of(context).textTheme.bodyLarge!.fontSize! * factor,
+                dataRowHeight:
+                    Theme.of(context).textTheme.bodyLarge!.fontSize! * factor,
                 columns: [
                   const DataColumn2(label: Text(''), size: ColumnSize.S),
                   ...years.map((year) => DataColumn2(label: Text(year))),
@@ -68,9 +88,13 @@ class DaddysYearlySumView extends DaddysViewBase {
                 rows: periods.map((period) {
                   return DataRow(
                     cells: [
-                      DataCell(Text(getMonthName(period), style: Theme.of(context).textTheme.bodyLarge)),
-                      ...years.map((month) {
-                        final ReadingDetailAggregation? data = monthlyAggregationViewData[month]?[period]?['aggregation']!;
+                      DataCell(Text(
+                        getMonthName(period),
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      )),
+                      ...years.map((year) {
+                        final ReadingDetailAggregation? data =
+                            monthlyAggregationViewData[year]?[period]?['aggregation'];
 
                         if (data == null) {
                           return const DataCell(Text('-'));
@@ -81,11 +105,31 @@ class DaddysYearlySumView extends DaddysViewBase {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              if (showConsumption) Text('${data.consumptionSum}m³', style: Theme.of(context).textTheme.bodyLarge),
-                              if (showReading) Text('${data.minReading} -', style: Theme.of(context).textTheme.bodyMedium),
-                              if (showReading) Text('${data.maxReading}', style: Theme.of(context).textTheme.bodyMedium),
-                              if (showTemperature && data.minTemperature != null) Text('${data.minTemperature!.toStringAsFixed(1)}/${data.maxTemperature!.toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
-                              if (showFeelsLike && data.minFeelsLike != null) Text('${data.minFeelsLike!.toStringAsFixed(1)}/${data.maxFeelsLike!.toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showConsumption)
+                                Text(
+                                  '${data.consumptionSum}m³',
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              if (showReading)
+                                Text(
+                                  '${data.minReading} -',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              if (showReading)
+                                Text(
+                                  '${data.maxReading}',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              if (showTemperature && data.minTemperature != null)
+                                Text(
+                                  '${data.minTemperature!.toStringAsFixed(1)}/${data.maxTemperature!.toStringAsFixed(1)}°C',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              if (showFeelsLike && data.minFeelsLike != null)
+                                Text(
+                                  '${data.minFeelsLike!.toStringAsFixed(1)}/${data.maxFeelsLike!.toStringAsFixed(1)}°C',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
                             ],
                           ),
                         );
@@ -103,8 +147,8 @@ class DaddysYearlySumView extends DaddysViewBase {
 
   List<String> _getMonthlySumPeriodLabels() {
     return List.generate(12, (index) {
-      int day = index + 1;
-      return day.toString().padLeft(2, '0');
+      final month = index + 1;
+      return month.toString().padLeft(2, '0');
     });
   }
 }

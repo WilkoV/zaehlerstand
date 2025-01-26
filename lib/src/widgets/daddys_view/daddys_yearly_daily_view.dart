@@ -18,40 +18,50 @@ class DaddysYearlyDailyView extends DaddysViewBase {
 
   @override
   Widget build(BuildContext context) {
+    final ScrollController verticalScrollController = ScrollController();
+
     return Consumer<DataProvider>(
       builder: (context, dataProvider, child) {
         final yearlyDailyViewData = dataProvider.yearlyDayViewData;
-
+        final periods = _getYearlyDailyPeriodLabels();
         double factor = getRowHeightFactor(1.2);
 
         if (yearlyDailyViewData.isEmpty) {
           return Center(
-            child: Text('Keine Daten gefunden', style: Theme.of(context).textTheme.bodyLarge),
+            child: Text(
+              'Keine Daten gefunden',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
           );
         }
 
+        // Calculate the index of the current date
+        final today = DateTime.now();
+        final currentDateLabel = '${today.day.toString().padLeft(2, '0')}.${today.month.toString().padLeft(2, '0')}';
+        final currentIndex = periods.indexOf(currentDateLabel);
+
+        // Scroll to the current date after the first frame
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (currentIndex > 5) {
+            final rowHeight = Theme.of(context).textTheme.bodyLarge!.fontSize! * factor;
+            final targetScrollOffset = (currentIndex - 5) * rowHeight;
+            verticalScrollController.jumpTo(targetScrollOffset);
+
+            print('xxx $currentIndex');
+            print('xxx $targetScrollOffset');
+            print('xxx $rowHeight');
+          }
+        });
+
         // Extract all unique years for the column headers
         final years = yearlyDailyViewData.keys.toList();
-
-        // Generate all periods (days of the year)
-        final periods = _getYearlyDailyPeriodLabels();
-
-        // Ensure data exists for all periods in all years
-        for (final year in years) {
-          yearlyDailyViewData[year] ??= {};
-          for (final period in periods) {
-            yearlyDailyViewData[year]![period];
-          }
-        }
-
-        // Calculate screen width based on the number of columns that needed to be displayed
-        double screenWidth = getMinWidth(context, years.length);
 
         return Column(
           children: [
             Expanded(
               child: DataTable2(
-                minWidth: screenWidth,
+                scrollController: verticalScrollController,
+                minWidth: getMinWidth(context, years.length),
                 fixedLeftColumns: 1,
                 headingTextStyle: Theme.of(context).textTheme.bodyLarge,
                 dataTextStyle: Theme.of(context).textTheme.bodyLarge,
@@ -65,7 +75,7 @@ class DaddysYearlyDailyView extends DaddysViewBase {
                     cells: [
                       DataCell(Text(period)),
                       ...years.map((year) {
-                        final ReadingDetail? data = yearlyDailyViewData[year]![period];
+                        final ReadingDetail? data = yearlyDailyViewData[year]?[period];
 
                         if (data == null) {
                           return const DataCell(Text('-'));
@@ -76,12 +86,26 @@ class DaddysYearlyDailyView extends DaddysViewBase {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              if (showConsumption && data.consumption != null) Text('${data.consumption!.consumption}m³', style: Theme.of(context).textTheme.bodyLarge),
-                              if (showReading) Text('${data.reading.reading}', style: Theme.of(context).textTheme.bodyMedium),
+                              if (showConsumption && data.consumption != null)
+                                Text(
+                                  '${data.consumption!.consumption}m³',
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              if (showReading)
+                                Text(
+                                  '${data.reading.reading}',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
                               if (showTemperature && data.weatherInfo != null)
-                                Text('${data.weatherInfo!.minFeelsLike.toStringAsFixed(1)}/${data.weatherInfo!.maxTemperature.toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
-                              if (showFeelsLike && data.weatherInfo != null) 
-                                Text('${data.weatherInfo!.minFeelsLike.toStringAsFixed(1)}/${data.weatherInfo!.maxFeelsLike.toStringAsFixed(1)}°C', style: Theme.of(context).textTheme.bodyMedium),
+                                Text(
+                                  '${data.weatherInfo!.minFeelsLike.toStringAsFixed(1)}/${data.weatherInfo!.maxTemperature.toStringAsFixed(1)}°C',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              if (showFeelsLike && data.weatherInfo != null)
+                                Text(
+                                  '${data.weatherInfo!.minFeelsLike.toStringAsFixed(1)}/${data.weatherInfo!.maxFeelsLike.toStringAsFixed(1)}°C',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
                             ],
                           ),
                         );
