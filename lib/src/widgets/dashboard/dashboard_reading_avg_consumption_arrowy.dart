@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:zaehlerstand/src/app/app_colors.dart' as app_colors;
 
-class ReadingConsumptionArrow extends StatelessWidget {
-  const ReadingConsumptionArrow({
+class DashboardReadingAvgConsumptionArrow extends StatelessWidget {
+  final double? consumption;
+  final double? compareConsumptionWith;
+
+  const DashboardReadingAvgConsumptionArrow({
     super.key,
     this.consumption,
     this.compareConsumptionWith,
   });
-
-  final int? consumption;
-  final int? compareConsumptionWith;
 
   @override
   Widget build(BuildContext context) {

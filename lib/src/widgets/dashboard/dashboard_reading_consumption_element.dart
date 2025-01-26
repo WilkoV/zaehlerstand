@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/models/logic/daily_consumption_logic.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
-import 'package:zaehlerstand/src/widgets/dashboard/base_reading_element.dart';
-import 'package:zaehlerstand/src/widgets/dashboard/reading_consumption_arrow.dart';
+import 'package:zaehlerstand/src/widgets/dashboard/dashboard_reading_base_element.dart';
+import 'package:zaehlerstand/src/widgets/dashboard/dashboard_reading_consumption_arrow.dart';
 
-class ReadingConsumptionElement extends BaseReadingElement {
+class DashboardReadingConsumptionElement extends DashboardReadingBaseElement {
   final int? consumption;
   final int? compareConsumptionWith;
 
-  const ReadingConsumptionElement({
+  const DashboardReadingConsumptionElement({
     super.key,
     super.label,
     this.consumption,
@@ -59,7 +59,7 @@ class ReadingConsumptionElement extends BaseReadingElement {
                 "--".padLeft(6),
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
-        ReadingConsumptionArrow(
+        DashboardReadingConsumptionArrow(
           consumption: consumption,
           compareConsumptionWith: compareConsumptionWith,
         ),

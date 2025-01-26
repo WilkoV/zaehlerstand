@@ -15,9 +15,13 @@ class SettingsProvider extends ChangeNotifier {
   static const daddysSelectedViewKey = 'daddysSelectedView';
   static const daddysAggregationKey = 'daddysAggregation';
 
-  static const dashboardDaysKey = 'dashboardDays';
-  static const dashboardMonthsKey = 'dashboardMonths';
-  static const dashboardYearsKey = 'dashboardYears';
+  static const dashboardDaysTabletKey = 'dashboardTabletDays';
+  static const dashboardMonthsTabletKey = 'dashboardTabletMonths';
+  static const dashboardYearsTabletKey = 'dashboardTabletYears';
+
+  static const dashboardDaysMobileKey = 'dashboardMobileDays';
+  static const dashboardMonthsMobileKey = 'dashboardMobileMonths';
+  static const dashboardYearsMobileKey = 'dashboardMobileYears';
 
   // Fields for theme
   bool _isDarkMode = false;
@@ -31,25 +35,39 @@ class SettingsProvider extends ChangeNotifier {
   bool _consumption = true;
   bool _showTemperature = true;
   bool _showFeelsLike = false;
+  
   String _daddysSelectedView = 'Jahr';
   String _daddysAggregation = 'Tag';
-  List<int> _dashboardDays = [1, 7, 30, 365];
-  List<int> _dashboardMonths = [1, 2, 6, 13];
-  List<int> _dashboardYears = [1, 2, 3, 4];
+
+  List<int> _dashboardDaysTablet = [1, 7, 30, 365];
+  List<int> _dashboardMonthsTablet = [1, 2, 6, 13];
+  List<int> _dashboardYearsTablet = [1, 2, 3, 4];
+
+  List<int> _dashboardDaysMobile = [1, 30, 365];
+  List<int> _dashboardMonthsMobile = [1, 6, 13];
+  List<int> _dashboardYearsMobile = [1, 3, 4];
 
   // Getters
   bool get isDarkMode => _isDarkMode;
+  
   String get serverAddress => _serverAddress;
   String get serverPort => _serverPort;
+  
   bool get showReading => _showReading;
   bool get showConsumption => _consumption;
   bool get showTemperature => _showTemperature;
   bool get showFeelsLike => _showFeelsLike;
+  
   String get daddysSelectedView => _daddysSelectedView;
   String get daddysAggregation => _daddysAggregation;
-  List<int> get dashboardDays => _dashboardDays;
-  List<int> get dashboardMonths => _dashboardMonths;
-  List<int> get dashboardYears => _dashboardYears;
+  
+  List<int> get dashboardDaysTablet => _dashboardDaysTablet;
+  List<int> get dashboardMonthsTablet => _dashboardMonthsTablet;
+  List<int> get dashboardYearsTablet => _dashboardYearsTablet;
+
+  List<int> get dashboardDaysMobile => _dashboardDaysMobile;
+  List<int> get dashboardMonthsMobile => _dashboardMonthsMobile;
+  List<int> get dashboardYearsMobile => _dashboardYearsMobile;
 
   // Helper method to convert comma-separated string to int list
   List<int> _stringToIntList(String? value) {
@@ -77,9 +95,13 @@ class SettingsProvider extends ChangeNotifier {
     _daddysSelectedView = preferences.getString(daddysSelectedViewKey) ?? _daddysSelectedView;
     _daddysAggregation = preferences.getString(daddysAggregationKey) ?? _daddysAggregation;
 
-    _dashboardDays = _stringToIntList(preferences.getString(dashboardDaysKey) ?? _intListToString(_dashboardDays));
-    _dashboardMonths = _stringToIntList(preferences.getString(dashboardMonthsKey) ?? _intListToString(_dashboardMonths));
-    _dashboardYears = _stringToIntList(preferences.getString(dashboardYearsKey) ?? _intListToString(_dashboardYears));
+    _dashboardDaysTablet = _stringToIntList(preferences.getString(dashboardDaysTabletKey) ?? _intListToString(_dashboardDaysTablet));
+    _dashboardMonthsTablet = _stringToIntList(preferences.getString(dashboardMonthsTabletKey) ?? _intListToString(_dashboardMonthsTablet));
+    _dashboardYearsTablet = _stringToIntList(preferences.getString(dashboardYearsTabletKey) ?? _intListToString(_dashboardYearsTablet));
+
+    _dashboardDaysTablet = _stringToIntList(preferences.getString(dashboardDaysTabletKey) ?? _intListToString(_dashboardDaysTablet));
+    _dashboardMonthsTablet = _stringToIntList(preferences.getString(dashboardMonthsTabletKey) ?? _intListToString(_dashboardMonthsTablet));
+    _dashboardYearsTablet = _stringToIntList(preferences.getString(dashboardYearsTabletKey) ?? _intListToString(_dashboardYearsTablet));
 
     notifyListeners();
   }
@@ -165,26 +187,50 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   // Update dashboard days
-  Future<void> updateDashboardDays(List<int> days) async {
-    _dashboardDays = days;
+  Future<void> updateDashboardDaysTablet(List<int> days) async {
+    _dashboardDaysTablet = days;
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setString(dashboardDaysKey, _intListToString(days));
+    await preferences.setString(dashboardDaysTabletKey, _intListToString(days));
     notifyListeners();
   }
 
   // Update dashboard months
-  Future<void> updateDashboardMonths(List<int> months) async {
-    _dashboardMonths = months;
+  Future<void> updateDashboardMonthsTablet(List<int> months) async {
+    _dashboardMonthsTablet = months;
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setString(dashboardMonthsKey, _intListToString(months));
+    await preferences.setString(dashboardMonthsTabletKey, _intListToString(months));
     notifyListeners();
   }
 
   // Update dashboard years
-  Future<void> updateDashboardYears(List<int> years) async {
-    _dashboardYears = years;
+  Future<void> updateDashboardYearsTablet(List<int> years) async {
+    _dashboardYearsTablet = years;
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setString(dashboardYearsKey, _intListToString(years));
+    await preferences.setString(dashboardYearsTabletKey, _intListToString(years));
+    notifyListeners();
+  }
+
+  // Update dashboard days
+  Future<void> updateDashboardDaysMobile(List<int> days) async {
+    _dashboardDaysMobile = days;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(dashboardDaysMobileKey, _intListToString(days));
+    notifyListeners();
+  }
+
+  // Update dashboard months
+  Future<void> updateDashboardMonthsMobile(List<int> months) async {
+    _dashboardMonthsMobile = months;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(dashboardMonthsMobileKey, _intListToString(months));
+    notifyListeners();
+  }
+
+  // Update dashboard years
+  Future<void> updateDashboardYearsMobile(List<int> years) async {
+    _dashboardYearsMobile = years;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(dashboardYearsMobileKey, _intListToString(years));
     notifyListeners();
   }
 }

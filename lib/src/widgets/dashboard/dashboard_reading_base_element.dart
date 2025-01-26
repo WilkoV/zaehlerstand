@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
 
-class BaseReadingElement extends StatelessWidget {
+class DashboardReadingBaseElement extends StatelessWidget {
   final String? label;
   final int? reading;
   final int? minReading;
@@ -11,7 +11,7 @@ class BaseReadingElement extends StatelessWidget {
   final double? minFeelsLike;
   final double? maxFeelsLike;
 
-  const BaseReadingElement({
+  const DashboardReadingBaseElement({
     super.key,
     this.label,
     this.reading,
@@ -44,13 +44,13 @@ class BaseReadingElement extends StatelessWidget {
         ),
       if (settingsProvider.showTemperature && minTemperature != null && maxTemperature != null)
         Text(
-          '${minTemperature!.toStringAsFixed(1)} - ${maxTemperature!.toStringAsFixed(1)}°C',
+          '${minTemperature!.toStringAsFixed(1)} - ${maxTemperature!.toStringAsFixed(1)}°',
           style: Theme.of(context).textTheme.bodyMedium,
           textAlign: TextAlign.center,
         ),
       if (settingsProvider.showFeelsLike && minFeelsLike != null && maxFeelsLike != null)
         Text(
-          '${minFeelsLike!.toStringAsFixed(1)} - ${maxFeelsLike!.toStringAsFixed(1)}°C',
+          '${minFeelsLike!.toStringAsFixed(1)} - ${maxFeelsLike!.toStringAsFixed(1)}°',
           style: Theme.of(context).textTheme.bodyMedium,
           textAlign: TextAlign.center,
         ),

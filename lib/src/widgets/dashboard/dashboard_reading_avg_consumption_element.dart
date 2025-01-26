@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
-import 'package:zaehlerstand/src/widgets/dashboard/base_reading_element.dart';
-import 'package:zaehlerstand/src/widgets/dashboard/reading_avg_consumption_arrowy.dart';
+import 'package:zaehlerstand/src/widgets/dashboard/dashboard_reading_base_element.dart';
+import 'package:zaehlerstand/src/widgets/dashboard/dashboard_reading_avg_consumption_arrowy.dart';
 
-class ReadingAvgConsumptionElement extends BaseReadingElement {
+class DashboardReadingAvgConsumptionElement extends DashboardReadingBaseElement {
   final double? consumption;
   final double? compareConsumptionWith;
 
-  const ReadingAvgConsumptionElement({
+  const DashboardReadingAvgConsumptionElement({
     super.key,
     super.label,
     this.consumption,
@@ -58,7 +58,7 @@ class ReadingAvgConsumptionElement extends BaseReadingElement {
                 "--".padLeft(6),
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
-        ReadingAvgConsumptionArrow(
+        DashboardReadingAvgConsumptionArrow(
           consumption: consumption,
           compareConsumptionWith: compareConsumptionWith,
         ),

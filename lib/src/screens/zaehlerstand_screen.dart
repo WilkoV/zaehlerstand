@@ -3,9 +3,9 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/models/base/reading_dialog_result.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
-import 'package:zaehlerstand/src/widgets/dashboard/reading_consumption_dashboard.dart';
 import 'package:zaehlerstand/src/widgets/dialogs/enter_reading_dialog.dart';
 import 'package:zaehlerstand/src/widgets/responsive/daddys_view/daddys_view_responsive_layout.dart';
+import 'package:zaehlerstand/src/widgets/responsive/dashboard/dashboard_responsive_layout.dart';
 import 'package:zaehlerstand/src/widgets/zaehlerstand_drawer.dart';
 import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
@@ -22,9 +22,9 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> with WidgetsBin
   int _selectedIndex = 0;
 
   final List<Widget> _views = [
-    const ReadingConsumptionDashboard(),
-    const Center(child: Text('Diagramme')),
+    const DashboardResponsiveLayout(),
     const DaddysViewResponsiveLayout(),
+    const Center(child: Text('Diagramme')),
   ];
 
   @override
@@ -111,18 +111,12 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> with WidgetsBin
           ),
           bottomNavigationBar: BottomNavigationBar(
             items: <BottomNavigationBarItem>[
-              const BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.dashboard,
-                ),
-                label: 'Dashboard',
-              ),
               BottomNavigationBarItem(
                 icon: Icon(
-                  Icons.bar_chart,
+                  Icons.dashboard,
                   size: Theme.of(context).textTheme.headlineLarge!.fontSize,
                 ),
-                label: 'Diagramme',
+                label: 'Dashboard',
               ),
               BottomNavigationBarItem(
                 icon: Icon(
@@ -130,6 +124,13 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> with WidgetsBin
                   size: Theme.of(context).textTheme.headlineLarge!.fontSize,
                 ),
                 label: 'Daten',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.bar_chart,
+                  size: Theme.of(context).textTheme.headlineLarge!.fontSize,
+                ),
+                label: 'Diagramme',
               ),
             ],
             currentIndex: _selectedIndex,

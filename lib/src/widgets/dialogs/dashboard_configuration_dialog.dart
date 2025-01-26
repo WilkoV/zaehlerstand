@@ -9,18 +9,18 @@ class DashboardConfigurationDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<SettingsProvider>(
       builder: (context, settingsProvider, child) {
-        final daysController = TextEditingController(text: settingsProvider.dashboardDays.join(', '));
-        final monthsController = TextEditingController(text: settingsProvider.dashboardMonths.join(', '));
-        final yearsController = TextEditingController(text: settingsProvider.dashboardYears.join(', '));
+        final daysController = TextEditingController(text: settingsProvider.dashboardDaysTablet.join(', '));
+        final monthsController = TextEditingController(text: settingsProvider.dashboardMonthsTablet.join(', '));
+        final yearsController = TextEditingController(text: settingsProvider.dashboardYearsTablet.join(', '));
 
         void saveAndClose() {
-          settingsProvider.updateDashboardDays(
+          settingsProvider.updateDashboardDaysTablet(
             _parseListFromString(daysController.text),
           );
-          settingsProvider.updateDashboardMonths(
+          settingsProvider.updateDashboardMonthsTablet(
             _parseListFromString(monthsController.text),
           );
-          settingsProvider.updateDashboardYears(
+          settingsProvider.updateDashboardYearsTablet(
             _parseListFromString(yearsController.text),
           );
           Navigator.of(context).pop();

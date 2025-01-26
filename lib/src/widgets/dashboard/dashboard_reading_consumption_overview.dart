@@ -3,12 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
-import 'package:zaehlerstand/src/widgets/dashboard/reading_avg_consumption_element.dart';
-import 'package:zaehlerstand/src/widgets/dashboard/reading_consumption_element.dart';
+import 'package:zaehlerstand/src/widgets/dashboard/dashboard_reading_avg_consumption_element.dart';
+import 'package:zaehlerstand/src/widgets/dashboard/dashboard_reading_consumption_element.dart';
 import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
-class ReadingConsumptionDashboard extends StatelessWidget {
-  const ReadingConsumptionDashboard({super.key});
+class DashboardReadingConsumptionOverview extends StatelessWidget {
+  final bool isTablet;
+  const DashboardReadingConsumptionOverview({
+    super.key,
+    required this.isTablet,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,9 +21,9 @@ class ReadingConsumptionDashboard extends StatelessWidget {
         double factor = getRowHeightFactor(1.2, settingsProvider.showConsumption, settingsProvider.showReading, settingsProvider.showTemperature, settingsProvider.showFeelsLike);
         return Consumer<DataProvider>(
           builder: (context, dataProvider, child) {
-            List<ReadingDetail> dailyRowData = _getDailyReadingDetails(dataProvider, settingsProvider.dashboardDays);
-            List<ReadingDetailAggregation> monthlyRow = _getMonthlyAggregations(dataProvider, settingsProvider.dashboardMonths);
-            List<ReadingDetailAggregation> yearlyRow = _getYearlyAggregations(dataProvider, settingsProvider.dashboardYears);
+            List<ReadingDetail> dailyRowData = _getDailyReadingDetails(dataProvider, isTablet ? settingsProvider.dashboardDaysTablet : settingsProvider.dashboardDaysMobile);
+            List<ReadingDetailAggregation> monthlyRow = _getMonthlyAggregations(dataProvider, isTablet ? settingsProvider.dashboardMonthsTablet : settingsProvider.dashboardMonthsMobile);
+            List<ReadingDetailAggregation> yearlyRow = _getYearlyAggregations(dataProvider, isTablet ? settingsProvider.dashboardYearsTablet : settingsProvider.dashboardYearsMobile);
 
             if (dailyRowData.isEmpty) {
               return Center(
@@ -27,17 +31,16 @@ class ReadingConsumptionDashboard extends StatelessWidget {
               );
             }
 
+            int maxElements = isTablet ? 4 : 3;
+
             return DataTable2(
               columnSpacing: 12,
               horizontalMargin: 12,
               dataTextStyle: Theme.of(context).textTheme.bodyLarge,
               dataRowHeight: Theme.of(context).textTheme.bodyLarge!.fontSize! * factor,
-              columns: const [
-                DataColumn2(label: Text(''), size: ColumnSize.S),
-                DataColumn2(label: Text(''), size: ColumnSize.L),
-                DataColumn2(label: Text(''), size: ColumnSize.L),
-                DataColumn2(label: Text(''), size: ColumnSize.L),
-                DataColumn2(label: Text(''), size: ColumnSize.L),
+              columns: [
+                const DataColumn2(label: Text(''), size: ColumnSize.S),
+                for (var i = 0; i < maxElements; i++) const DataColumn2(label: Text(''), size: ColumnSize.L),
               ],
               rows: [
                 DataRow(cells: _buildDailyDataCells(context, dailyRowData)),
@@ -53,11 +56,13 @@ class ReadingConsumptionDashboard extends StatelessWidget {
   }
 
   List<DataCell> _buildDailyDataCells(BuildContext context, List<ReadingDetail> dailyData) {
+    int maxElements = isTablet ? 4 : 3;
+
     List<DataCell> dataCells = [
       DataCell(Text('Tag', style: Theme.of(context).textTheme.bodyLarge)),
       for (final data in dailyData)
         DataCell(
-          ReadingConsumptionElement(
+          DashboardReadingConsumptionElement(
             consumption: data.consumption?.consumption,
             reading: data.reading.reading,
             minTemperature: data.weatherInfo?.minTemperature,
@@ -68,17 +73,19 @@ class ReadingConsumptionDashboard extends StatelessWidget {
             label: data.reading.getFormattedDate(),
           ),
         ),
-      for (var i = dailyData.length; i < 4; i++) const DataCell(ReadingConsumptionElement()),
+      for (var i = dailyData.length; i < maxElements; i++) const DataCell(DashboardReadingConsumptionElement()),
     ];
     return dataCells;
   }
 
   List<DataCell> _buildMonthlySumDataCells(BuildContext context, List<ReadingDetailAggregation> monthlyData) {
+    int maxElements = isTablet ? 4 : 3;
+
     List<DataCell> dataCells = [
       DataCell(Text('Monat \u2211', style: Theme.of(context).textTheme.bodyLarge)),
       for (final data in monthlyData)
         DataCell(
-          ReadingConsumptionElement(
+          DashboardReadingConsumptionElement(
             consumption: data.consumptionSum,
             minReading: data.minReading,
             maxReading: data.maxReading,
@@ -90,17 +97,19 @@ class ReadingConsumptionDashboard extends StatelessWidget {
             label: '${data.year}.${data.month.toString().padLeft(2, '0')}',
           ),
         ),
-      for (var i = monthlyData.length; i < 4; i++) const DataCell(ReadingConsumptionElement()),
+      for (var i = monthlyData.length; i < maxElements; i++) const DataCell(DashboardReadingConsumptionElement()),
     ];
     return dataCells;
   }
 
   List<DataCell> _buildMonthlyAvgDataCells(BuildContext context, List<ReadingDetailAggregation> monthlyData) {
+    int maxElements = isTablet ? 4 : 3;
+
     List<DataCell> dataCells = [
       DataCell(Text('Monat \u2205', style: Theme.of(context).textTheme.bodyLarge)),
       for (final data in monthlyData)
         DataCell(
-          ReadingAvgConsumptionElement(
+          DashboardReadingAvgConsumptionElement(
             consumption: data.consumptionAvg,
             minReading: data.minReading,
             maxReading: data.maxReading,
@@ -112,17 +121,19 @@ class ReadingConsumptionDashboard extends StatelessWidget {
             label: '${data.year}.${data.month.toString().padLeft(2, '0')}',
           ),
         ),
-      for (var i = monthlyData.length; i < 4; i++) const DataCell(ReadingConsumptionElement()),
+      for (var i = monthlyData.length; i < maxElements; i++) const DataCell(DashboardReadingConsumptionElement()),
     ];
     return dataCells;
   }
 
   List<DataCell> _buildYearlyDataCells(BuildContext context, List<ReadingDetailAggregation> yearlyData) {
+    int maxElements = isTablet ? 4 : 3;
+
     List<DataCell> dataCells = [
       DataCell(Text('Jahr', style: Theme.of(context).textTheme.bodyLarge)),
       for (final data in yearlyData)
         DataCell(
-          ReadingConsumptionElement(
+          DashboardReadingConsumptionElement(
             consumption: data.consumptionSum,
             minReading: data.minReading,
             maxReading: data.maxReading,
@@ -134,7 +145,7 @@ class ReadingConsumptionDashboard extends StatelessWidget {
             label: '${data.year}',
           ),
         ),
-      for (var i = yearlyData.length; i < 4; i++) const DataCell(ReadingConsumptionElement()),
+      for (var i = yearlyData.length; i < maxElements; i++) const DataCell(DashboardReadingConsumptionElement()),
     ];
     return dataCells;
   }
