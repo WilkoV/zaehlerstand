@@ -23,6 +23,8 @@ class SettingsProvider extends ChangeNotifier {
   static const dashboardMonthsMobileKey = 'dashboardMobileMonths';
   static const dashboardYearsMobileKey = 'dashboardMobileYears';
 
+  static const lastSelectedViewIndexKey = 'lastSelectedViewIndex';
+
   // Fields for theme
   bool _isDarkMode = false;
 
@@ -35,7 +37,7 @@ class SettingsProvider extends ChangeNotifier {
   bool _consumption = true;
   bool _showTemperature = true;
   bool _showFeelsLike = false;
-  
+
   String _daddysSelectedView = 'Jahr';
   String _daddysAggregation = 'Tag';
 
@@ -47,20 +49,22 @@ class SettingsProvider extends ChangeNotifier {
   List<int> _dashboardMonthsMobile = [1, 6, 13];
   List<int> _dashboardYearsMobile = [1, 3, 4];
 
+  int _lastSelectedViewIndex = 0;
+
   // Getters
   bool get isDarkMode => _isDarkMode;
-  
+
   String get serverAddress => _serverAddress;
   String get serverPort => _serverPort;
-  
+
   bool get showReading => _showReading;
   bool get showConsumption => _consumption;
   bool get showTemperature => _showTemperature;
   bool get showFeelsLike => _showFeelsLike;
-  
+
   String get daddysSelectedView => _daddysSelectedView;
   String get daddysAggregation => _daddysAggregation;
-  
+
   List<int> get dashboardDaysTablet => _dashboardDaysTablet;
   List<int> get dashboardMonthsTablet => _dashboardMonthsTablet;
   List<int> get dashboardYearsTablet => _dashboardYearsTablet;
@@ -68,6 +72,8 @@ class SettingsProvider extends ChangeNotifier {
   List<int> get dashboardDaysMobile => _dashboardDaysMobile;
   List<int> get dashboardMonthsMobile => _dashboardMonthsMobile;
   List<int> get dashboardYearsMobile => _dashboardYearsMobile;
+
+  int get lastSelectedViewIndex => _lastSelectedViewIndex;
 
   // Helper method to convert comma-separated string to int list
   List<int> _stringToIntList(String? value) {
@@ -103,10 +109,11 @@ class SettingsProvider extends ChangeNotifier {
     _dashboardMonthsTablet = _stringToIntList(preferences.getString(dashboardMonthsTabletKey) ?? _intListToString(_dashboardMonthsTablet));
     _dashboardYearsTablet = _stringToIntList(preferences.getString(dashboardYearsTabletKey) ?? _intListToString(_dashboardYearsTablet));
 
+    _lastSelectedViewIndex = preferences.getInt(lastSelectedViewIndexKey) ?? _lastSelectedViewIndex;
+
     notifyListeners();
   }
 
-  // Toggle theme
   Future<void> toggleTheme() async {
     _isDarkMode = !_isDarkMode;
     final preferences = await SharedPreferences.getInstance();
@@ -114,7 +121,6 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Update server address
   Future<void> updateServerAddress(String address) async {
     _serverAddress = address;
     final preferences = await SharedPreferences.getInstance();
@@ -122,7 +128,6 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Update server port
   Future<void> updateServerPort(String port) async {
     _serverPort = port;
     final preferences = await SharedPreferences.getInstance();
@@ -130,7 +135,6 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Toggle showReading
   Future<void> toggleShowReading() async {
     _showReading = !_showReading;
     final preferences = await SharedPreferences.getInstance();
@@ -138,7 +142,6 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Toggle showConsumption
   Future<void> toggleShowConsumption() async {
     _consumption = !_consumption;
     final preferences = await SharedPreferences.getInstance();
@@ -146,7 +149,6 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Toggle showTemperature
   Future<void> toggleShowTemperature() async {
     _showTemperature = !_showTemperature;
     final preferences = await SharedPreferences.getInstance();
@@ -154,7 +156,6 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Toggle showFeelsLike
   Future<void> toggleShowFeelsLike() async {
     _showFeelsLike = !_showFeelsLike;
     final preferences = await SharedPreferences.getInstance();
@@ -162,7 +163,6 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Toggle showAverage
   Future<void> setShowDaddysAggregation(String newValue) async {
     _daddysAggregation = newValue;
     final preferences = await SharedPreferences.getInstance();
@@ -170,7 +170,6 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Update daddy's selected view
   Future<void> updateDaddysSelectedView(String selectedView) async {
     _daddysSelectedView = selectedView;
     final preferences = await SharedPreferences.getInstance();
@@ -178,7 +177,6 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Update daddy's selected view
   Future<void> setDaddysSelectedView(String selectedView) async {
     _daddysSelectedView = selectedView;
     final preferences = await SharedPreferences.getInstance();
@@ -186,7 +184,6 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Update dashboard days
   Future<void> updateDashboardDaysTablet(List<int> days) async {
     _dashboardDaysTablet = days;
     final preferences = await SharedPreferences.getInstance();
@@ -194,7 +191,6 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Update dashboard months
   Future<void> updateDashboardMonthsTablet(List<int> months) async {
     _dashboardMonthsTablet = months;
     final preferences = await SharedPreferences.getInstance();
@@ -202,7 +198,6 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Update dashboard years
   Future<void> updateDashboardYearsTablet(List<int> years) async {
     _dashboardYearsTablet = years;
     final preferences = await SharedPreferences.getInstance();
@@ -210,7 +205,6 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Update dashboard days
   Future<void> updateDashboardDaysMobile(List<int> days) async {
     _dashboardDaysMobile = days;
     final preferences = await SharedPreferences.getInstance();
@@ -218,7 +212,6 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Update dashboard months
   Future<void> updateDashboardMonthsMobile(List<int> months) async {
     _dashboardMonthsMobile = months;
     final preferences = await SharedPreferences.getInstance();
@@ -226,11 +219,23 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Update dashboard years
   Future<void> updateDashboardYearsMobile(List<int> years) async {
     _dashboardYearsMobile = years;
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(dashboardYearsMobileKey, _intListToString(years));
+    notifyListeners();
+  }
+
+  Future<void> updateLastSelectedViewIndex(int index) async {
+    _lastSelectedViewIndex = index;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setInt(lastSelectedViewIndexKey, _lastSelectedViewIndex);
+    notifyListeners();
+  }
+
+  Future<void> loadLastSelectedViewIndex() async {
+    final preferences = await SharedPreferences.getInstance();
+    _lastSelectedViewIndex = preferences.getInt(lastSelectedViewIndexKey) ?? 0;
     notifyListeners();
   }
 }

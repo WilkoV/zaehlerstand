@@ -3,6 +3,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/models/base/reading_dialog_result.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
+import 'package:zaehlerstand/src/provider/settings_provider.dart';
 import 'package:zaehlerstand/src/widgets/dialogs/enter_reading_dialog.dart';
 import 'package:zaehlerstand/src/widgets/responsive/daddys_view/daddys_view_responsive_layout.dart';
 import 'package:zaehlerstand/src/widgets/responsive/dashboard/dashboard_responsive_layout.dart';
@@ -32,6 +33,14 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> with WidgetsBin
     super.initState();
     FlutterNativeSplash.remove();
     WidgetsBinding.instance.addObserver(this);
+
+    // Load the last selected view index
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    settingsProvider.loadLastSelectedViewIndex().then((_) {
+      setState(() {
+        _selectedIndex = settingsProvider.lastSelectedViewIndex;
+      });
+    });
   }
 
   @override
@@ -58,6 +67,10 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> with WidgetsBin
     setState(() {
       _selectedIndex = index;
     });
+
+    // Persist the selected index
+    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    settingsProvider.updateLastSelectedViewIndex(index);
   }
 
   @override
@@ -70,7 +83,10 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> with WidgetsBin
             centerTitle: true,
             actions: [
               IconButton(
-                icon: Icon(Icons.refresh, size: Theme.of(context).textTheme.headlineLarge!.fontSize,),
+                icon: Icon(
+                  Icons.refresh,
+                  size: Theme.of(context).textTheme.headlineLarge!.fontSize,
+                ),
                 onPressed: _refreshData,
               ),
             ],
