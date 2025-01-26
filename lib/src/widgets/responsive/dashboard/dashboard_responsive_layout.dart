@@ -8,7 +8,10 @@ class DashboardResponsiveLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenTypeLayout.builder(
-      mobile: (_) => const DashboardReadingConsumptionOverview(isTablet: false),
+      mobile: (_) => OrientationLayoutBuilder(
+        portrait: (context) => const DashboardReadingConsumptionOverview(isTablet: false),
+        landscape: (context) => const DashboardReadingConsumptionOverview(isTablet: true),
+      ),
       tablet: (_) => const DashboardReadingConsumptionOverview(isTablet: true),
     );
   }
