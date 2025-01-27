@@ -39,7 +39,7 @@ class DashboardReadingConsumptionElement extends DashboardReadingBaseElement {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (settingsProvider.showReading) _buildConsumptionElement(context),
+            if (settingsProvider.showConsumption) _buildConsumptionElement(context),
             ...buildSecondaryElements(context, settingsProvider),
           ],
         );
