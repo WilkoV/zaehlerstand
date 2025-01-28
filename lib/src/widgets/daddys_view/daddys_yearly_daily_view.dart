@@ -38,13 +38,14 @@ class DaddysYearlyDailyView extends DaddysViewBase {
         // Calculate the index of the current date
         final today = DateTime.now();
         final currentDateLabel = '${today.day.toString().padLeft(2, '0')}.${today.month.toString().padLeft(2, '0')}';
-        final currentIndex = periods.indexOf(currentDateLabel);
+        const int offset = 5;
+        final currentIndex = periods.indexOf(currentDateLabel) - offset;
 
         // Scroll to the current date after the first frame
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (currentIndex > 5) {
             final rowHeight = Theme.of(context).textTheme.bodyLarge!.fontSize! * factor;
-            final targetScrollOffset = (currentIndex - 5) * rowHeight;
+            final targetScrollOffset = currentIndex * rowHeight;
             verticalScrollController.jumpTo(targetScrollOffset);
           }
         });

@@ -18,6 +18,8 @@ class DaddysMonthlyDailyView extends DaddysViewBase {
 
   @override
   Widget build(BuildContext context) {
+    final ScrollController verticalScrollController = ScrollController();
+
     return Consumer<DataProvider>(
       builder: (context, dataProvider, child) {
         final monthlyDailyViewData = dataProvider.monthlyDayViewData;
@@ -44,6 +46,18 @@ class DaddysMonthlyDailyView extends DaddysViewBase {
           }
         }
 
+        final today = DateTime.now();
+        final currentDateLabel = today.day.toString().padLeft(2, '0');
+        const int offset = 5;
+        final currentIndex = periods.indexOf(currentDateLabel) - offset;
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (currentIndex >= 0 && currentIndex < periods.length) {
+            final rowHeight = Theme.of(context).textTheme.bodyLarge!.fontSize! * factor;
+            final targetScrollOffset = currentIndex * rowHeight;
+            verticalScrollController.jumpTo(targetScrollOffset);
+          }
+        });
         // Calculate screen width based on the number of columns that needed to be displayed
         final double screenWidth = getMinWidth(context, months.length);
 
@@ -52,6 +66,7 @@ class DaddysMonthlyDailyView extends DaddysViewBase {
             Expanded(
               child: DataTable2(
                 minWidth: screenWidth,
+                scrollController: verticalScrollController,
                 fixedLeftColumns: 1,
                 headingTextStyle: Theme.of(context).textTheme.bodyLarge,
                 dataTextStyle: Theme.of(context).textTheme.bodyLarge,
