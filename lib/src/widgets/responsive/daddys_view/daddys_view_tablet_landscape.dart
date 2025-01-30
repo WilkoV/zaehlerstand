@@ -30,7 +30,7 @@ class _DaddysViewTabletLandscapeState extends State<DaddysViewTabletLandscape> {
     super.initState();
     // Initialize default values to avoid null issues
     final settingsProvider = context.read<SettingsProvider>();
-    daddysSelectedView = settingsProvider.daddysSelectedView;
+    daddysSelectedView = settingsProvider.chartsSelectedView;
     daddysAggregation = settingsProvider.daddysAggregation;
   }
 
@@ -88,7 +88,7 @@ class _DaddysViewTabletLandscapeState extends State<DaddysViewTabletLandscape> {
                 ),
               ),
               const SizedBox(width: 16),
-              settingsProvider.daddysSelectedView == groupSelectionValueYear
+              settingsProvider.chartsSelectedView == groupSelectionValueYear
                   ? Row(
                       children: [aggregationSelectionValueDay, aggregationSelectionValueSum, aggregationSelectionValueAvg]
                           .map(

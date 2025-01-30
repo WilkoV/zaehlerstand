@@ -25,6 +25,8 @@ class SettingsProvider extends ChangeNotifier {
 
   static const lastSelectedViewIndexKey = 'lastSelectedViewIndex';
 
+  static const chartsSelectedViewKey = 'chartsSelectedView';
+
   // Fields for theme
   bool _isDarkMode = false;
 
@@ -49,6 +51,8 @@ class SettingsProvider extends ChangeNotifier {
   List<int> _dashboardMonthsMobile = [1, 6, 13];
   List<int> _dashboardYearsMobile = [1, 3, 4];
 
+  String _chartsSelectedView = 'Monat';
+
   int _lastSelectedViewIndex = 0;
 
   // Getters
@@ -72,6 +76,8 @@ class SettingsProvider extends ChangeNotifier {
   List<int> get dashboardDaysMobile => _dashboardDaysMobile;
   List<int> get dashboardMonthsMobile => _dashboardMonthsMobile;
   List<int> get dashboardYearsMobile => _dashboardYearsMobile;
+
+  String get chartsSelectedView => _chartsSelectedView;
 
   int get lastSelectedViewIndex => _lastSelectedViewIndex;
 
@@ -98,6 +104,7 @@ class SettingsProvider extends ChangeNotifier {
     _consumption = preferences.getBool(showConsumptionKey) ?? _consumption;
     _showTemperature = preferences.getBool(showTemperatureKey) ?? _showTemperature;
     _showFeelsLike = preferences.getBool(showFeelsLikeKey) ?? _showFeelsLike;
+
     _daddysSelectedView = preferences.getString(daddysSelectedViewKey) ?? _daddysSelectedView;
     _daddysAggregation = preferences.getString(daddysAggregationKey) ?? _daddysAggregation;
 
@@ -108,6 +115,8 @@ class SettingsProvider extends ChangeNotifier {
     _dashboardDaysTablet = _stringToIntList(preferences.getString(dashboardDaysTabletKey) ?? _intListToString(_dashboardDaysTablet));
     _dashboardMonthsTablet = _stringToIntList(preferences.getString(dashboardMonthsTabletKey) ?? _intListToString(_dashboardMonthsTablet));
     _dashboardYearsTablet = _stringToIntList(preferences.getString(dashboardYearsTabletKey) ?? _intListToString(_dashboardYearsTablet));
+
+    _chartsSelectedView = preferences.getString(chartsSelectedViewKey) ?? _chartsSelectedView;
 
     _lastSelectedViewIndex = preferences.getInt(lastSelectedViewIndexKey) ?? _lastSelectedViewIndex;
 
@@ -230,6 +239,20 @@ class SettingsProvider extends ChangeNotifier {
     _lastSelectedViewIndex = index;
     final preferences = await SharedPreferences.getInstance();
     await preferences.setInt(lastSelectedViewIndexKey, _lastSelectedViewIndex);
+    notifyListeners();
+  }
+
+  Future<void> updateChartsSelectedView(String selectedView) async {
+    _daddysSelectedView = selectedView;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(chartsSelectedViewKey, _chartsSelectedView);
+    notifyListeners();
+  }
+
+  Future<void> setChartsSelectedView(String selectedView) async {
+    _daddysSelectedView = selectedView;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(chartsSelectedViewKey, _chartsSelectedView);
     notifyListeners();
   }
 

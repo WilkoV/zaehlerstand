@@ -45,7 +45,7 @@ abstract class DaddysViewBase extends StatelessWidget {
   }
 
   String getMonthName(String month) {
-    DateTime date = DateTime(2024, int.parse(month));
+    DateTime date = DateTime(2023, int.parse(month), 1);
     return showLongNames ? DateFormat.MMMM('de_DE').format(date) : DateFormat.MMM('de_DE').format(date);
   }
 

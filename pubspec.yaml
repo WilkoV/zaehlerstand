@@ -33,6 +33,7 @@ dependencies:
   android_alarm_manager_plus: ^4.0.6
   connectivity_plus: ^6.1.1
   data_table_2: ^2.5.18
+  fl_chart: ^0.70.2
   flutter_native_splash: ^2.4.2
   freezed_annotation: ^2.4.4
   gsheets: ^0.5.0

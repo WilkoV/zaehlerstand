@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/models/base/reading_dialog_result.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
+import 'package:zaehlerstand/src/widgets/charts/charts_view.dart';
 import 'package:zaehlerstand/src/widgets/dialogs/enter_reading_dialog.dart';
 import 'package:zaehlerstand/src/widgets/responsive/daddys_view/daddys_view_responsive_layout.dart';
 import 'package:zaehlerstand/src/widgets/responsive/dashboard/dashboard_responsive_layout.dart';
@@ -25,7 +26,7 @@ class _ZaehlerstandScreenState extends State<ZaehlerstandScreen> with WidgetsBin
   final List<Widget> _views = [
     const DashboardResponsiveLayout(),
     const DaddysViewResponsiveLayout(),
-    const Center(child: Text('Diagramme')),
+    const ChartsView(),
   ];
 
   @override

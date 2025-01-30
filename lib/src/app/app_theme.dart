@@ -121,4 +121,13 @@ class AppTheme {
       return deviceType == DeviceScreenType.tablet ? tabletLightTheme : mobileLightTheme;
     }
   }
+
+  static List<Color> getChartColors({bool isDarkMode = false}) {
+
+    if (isDarkMode) {
+      return app_colors.darkBarChartColors;
+    } else {
+      return app_colors.lightBarChartColors;
+    }
+  }
 }

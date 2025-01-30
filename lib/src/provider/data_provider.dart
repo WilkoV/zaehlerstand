@@ -40,6 +40,8 @@ class DataProvider extends ChangeNotifier {
   List<ReadingDetailAggregation> monthlyAggregationViewDataList = <ReadingDetailAggregation>[];
   List<ReadingDetailAggregation> yearlyAggregationViewDataList = <ReadingDetailAggregation>[];
 
+  List<ReadingDetailAggregation> monthlyChartData = <ReadingDetailAggregation>[];
+
   /// List of all years that have data in reading
   List<int> availableYears = <int>[];
 
@@ -139,7 +141,7 @@ class DataProvider extends ChangeNotifier {
     _log.fine('Initialization finished');
 
     isLoading = false;
-    notifyListeners(); 
+    notifyListeners();
   }
 
   /// Adds a new reading to the database and refreshes the list of readings.
@@ -364,11 +366,13 @@ class DataProvider extends ChangeNotifier {
     availableYears = await _dbHelper.getReadingsDistinctYears();
     monthlyAggregationViewDataList = await _dbHelper.getMonthlyAggregationDescDesc();
     yearlyAggregationViewDataList = await _dbHelper.getYearlyAggregationDesc();
+    monthlyChartData = await _dbHelper.getMonthlyChartData();
 
     await _getYearlyDayViewData();
     await _getMonthlyDayViewData();
     await _getMonthlyAggregationViewData();
     await _getWeeklyAggregationViewData();
+
 
     try {
       last7ConsumptionAverage = await _dbHelper.getAverageConsumptionOfLast7Days();
