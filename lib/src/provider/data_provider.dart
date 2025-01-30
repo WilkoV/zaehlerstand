@@ -40,7 +40,7 @@ class DataProvider extends ChangeNotifier {
   List<ReadingDetailAggregation> monthlyAggregationViewDataList = <ReadingDetailAggregation>[];
   List<ReadingDetailAggregation> yearlyAggregationViewDataList = <ReadingDetailAggregation>[];
 
-  List<ReadingDetailAggregation> monthlyChartData = <ReadingDetailAggregation>[];
+  List<ChartBasicAggregation> monthlyChartData = <ChartBasicAggregation>[];
 
   /// List of all years that have data in reading
   List<int> availableYears = <int>[];
@@ -360,6 +360,7 @@ class DataProvider extends ChangeNotifier {
     availableYears.clear();
     monthlyAggregationViewDataList.clear();
     yearlyAggregationViewDataList.clear();
+    monthlyChartData.clear();
 
     currentReading = await _dbHelper.getCurrentReading();
     readingsDetails = await _dbHelper.getAllReadingsDetailsDescDescDesc();

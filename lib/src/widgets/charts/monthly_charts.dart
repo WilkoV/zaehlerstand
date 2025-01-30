@@ -2,17 +2,19 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:zaehlerstand/src/app/app_theme.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
-import 'package:zaehlerstand/src/widgets/charts/charts_base.dart';
+import 'package:zaehlerstand/src/app/app_theme.dart';
 import 'package:zaehlerstand_common/zaehlerstand_common.dart';
 
-class MonthlySumChart extends ChartsBase {
+class MonthlySumChart extends StatelessWidget {
+  final bool doRotate;
+  final double rodWidth;
+
   const MonthlySumChart({
     super.key,
-    required super.doRotate,
-    required super.rodWidth,
+    required this.doRotate,
+    required this.rodWidth,
   });
 
   @override
@@ -24,11 +26,6 @@ class MonthlySumChart extends ChartsBase {
     final settingsProvider = Provider.of<SettingsProvider>(context);
     bool isDarkMode = settingsProvider.isDarkMode;
 
-    if (monthlyChartData.isEmpty) {
-      return Center(
-        child: Text('Keine Daten gefunden', style: Theme.of(context).textTheme.bodyLarge),
-      );
-    }
     List<Color> colors = AppTheme.getChartColors(isDarkMode: isDarkMode);
     Map<int, Color> colorMap = _getColors(monthlyChartData, colors);
     Map<int, Map<int, ChartBasicAggregation>> groupedData = _createGroupedData(monthlyChartData, colorMap);
@@ -57,7 +54,6 @@ class MonthlySumChart extends ChartsBase {
         BarChartData(
           rotationQuarterTurns: rotationQuarterTurns,
           barGroups: barGroups,
-          alignment: BarChartAlignment.spaceEvenly,
           maxY: _getMaxY(barGroups),
           titlesData: FlTitlesData(
             leftTitles: AxisTitles(
