@@ -30,7 +30,7 @@ class _DaddysViewMobilePortraitState extends State<DaddysViewMobilePortrait> {
     super.initState();
     // Initialize default values to avoid null issues
     final settingsProvider = context.read<SettingsProvider>();
-    daddysSelectedView = settingsProvider.chartsSelectedView;
+    daddysSelectedView = settingsProvider.daddysSelectedView;
     daddysAggregation = settingsProvider.daddysAggregation;
   }
 
@@ -91,7 +91,7 @@ class _DaddysViewMobilePortraitState extends State<DaddysViewMobilePortrait> {
           Row(
             children: [
               const SizedBox(width: 16),
-              settingsProvider.chartsSelectedView == groupSelectionValueYear
+              settingsProvider.daddysSelectedView == groupSelectionValueYear
                   ? Row(
                       children: [aggregationSelectionValueDay, aggregationSelectionValueSum, aggregationSelectionValueAvg]
                           .map(
