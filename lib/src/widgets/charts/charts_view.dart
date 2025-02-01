@@ -24,18 +24,12 @@ class _ChartsViewState extends State<ChartsView> {
     // Initialize default values to avoid null issues
     final settingsProvider = context.read<SettingsProvider>();
     chartsSelectedView = settingsProvider.chartsSelectedView;
-
-    print('xxx chartsSelectedView $chartsSelectedView');
-
-
   }
 
   void _updateSelectedView(String newValue) {
     setState(() {
       chartsSelectedView = newValue;
     });
-
-    print('xxx newValue $newValue');
 
     context.read<SettingsProvider>().updateChartsSelectedView(newValue);
   }

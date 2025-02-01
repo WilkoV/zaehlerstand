@@ -32,24 +32,17 @@ class DataProvider extends ChangeNotifier {
   Reading? currentReading;
   List<ReadingDetail> readingsDetails = <ReadingDetail>[];
 
-  Map<String, Map<String, ReadingDetail>> yearlyDayViewData = {};
-  Map<String, Map<String, Map<String, ReadingDetail>>> monthlyDayViewData = <String, Map<String, Map<String, ReadingDetail>>>{};
-  Map<String, Map<String, Map<String, ReadingDetailAggregation>>> monthlyAggregationViewData = <String, Map<String, Map<String, ReadingDetailAggregation>>>{};
-  Map<String, Map<String, Map<String, WeeklyReadingDetail>>> weeklyAggregationViewData = <String, Map<String, Map<String, WeeklyReadingDetail>>>{};
+  Future<Map<String, Map<String, ReadingDetail>>> get yearlyDayViewData async => await _getYearlyDayViewData();
+  Future<Map<String, Map<String, Map<String, ReadingDetail>>>> get monthlyDayViewData async => await _getMonthlyDayViewData();
 
-  List<ReadingDetailAggregation> monthlyAggregationViewDataList = <ReadingDetailAggregation>[];
-  List<ReadingDetailAggregation> yearlyAggregationViewDataList = <ReadingDetailAggregation>[];
+  Future<Map<String, Map<String, Map<String, ReadingDetailAggregation>>>> get monthlyAggregationViewData async => await _getMonthlyAggregationViewData();
+  Future<Map<String, Map<String, Map<String, WeeklyReadingDetail>>>> get weeklyAggregationViewData async => await _getWeeklyAggregationViewData();
 
-  Future<List<ChartBasicAggregation>> get monthlyChartData async {
-    return await _dbHelper.getMonthlyChartData();
-  }
+  Future<List<ReadingDetailAggregation>> get yearlyAggregationViewDataList async => await _dbHelper.getYearlyAggregationDesc();
+  Future<List<ReadingDetailAggregation>> get monthlyAggregationViewDataList async => await _dbHelper.getMonthlyAggregationDescDesc();
 
-  Future<List<ChartBasicAggregation>> get weeklyChartData async {
-    return await _dbHelper.getWeeklyChartData();
-  }
-
-  /// List of all years that have data in reading
-  List<int> availableYears = <int>[];
+  Future<List<ChartBasicAggregation>> get monthlyChartData async => await _dbHelper.getMonthlyChartData();
+  Future<List<ChartBasicAggregation>> get weeklyChartData async => await _dbHelper.getWeeklyChartData();
 
   // Isolate name server
   static const String isolateNameServerPortName = 'zaehlerstandSyncPort';
@@ -274,8 +267,8 @@ class DataProvider extends ChangeNotifier {
     return intermediateReadingsDetails;
   }
 
-  Future<void> _getYearlyDayViewData() async {
-    yearlyDayViewData.clear();
+  Future<Map<String, Map<String, ReadingDetail>>> _getYearlyDayViewData() async {
+    Map<String, Map<String, ReadingDetail>> yearlyDayViewData = {};
 
     List<ReadingDetail> data = await _dbHelper.getAllReadingsDetailsDescAscAsc();
 
@@ -286,10 +279,12 @@ class DataProvider extends ChangeNotifier {
       yearlyDayViewData[year] ??= {};
       yearlyDayViewData[year]![dayMonth] = readingDetail;
     }
+
+    return yearlyDayViewData;
   }
 
-  Future<void> _getMonthlyDayViewData() async {
-    monthlyDayViewData.clear();
+  Future<Map<String, Map<String, Map<String, ReadingDetail>>>> _getMonthlyDayViewData() async {
+    Map<String, Map<String, Map<String, ReadingDetail>>> monthlyDayViewData = {};
 
     final currentYear = DateTime.now().year;
 
@@ -304,10 +299,12 @@ class DataProvider extends ChangeNotifier {
         monthlyDayViewData[month]![day] = {"readingDetail": readingDetail};
       }
     }
+
+    return monthlyDayViewData;
   }
 
-  Future<void> _getMonthlyAggregationViewData() async {
-    monthlyAggregationViewData.clear();
+  Future<Map<String, Map<String, Map<String, ReadingDetailAggregation>>>> _getMonthlyAggregationViewData() async {
+    Map<String, Map<String, Map<String, ReadingDetailAggregation>>> monthlyAggregationViewData = {};
 
     List<ReadingDetailAggregation> data = await _dbHelper.getMonthlyAggregationDescAsc();
 
@@ -318,10 +315,12 @@ class DataProvider extends ChangeNotifier {
       monthlyAggregationViewData[year] ??= {};
       monthlyAggregationViewData[year]![month] = {'aggregation': readingDetailAggregation};
     }
+
+    return monthlyAggregationViewData;
   }
 
-  Future<void> _getWeeklyAggregationViewData() async {
-    weeklyAggregationViewData.clear();
+  Future<Map<String, Map<String, Map<String, WeeklyReadingDetail>>>> _getWeeklyAggregationViewData() async {
+    Map<String, Map<String, Map<String, WeeklyReadingDetail>>> weeklyAggregationViewData = {};
 
     List<WeeklyReadingDetail> data = await _dbHelper.getWeeklyReadingDetailsDescAsc();
 
@@ -332,6 +331,8 @@ class DataProvider extends ChangeNotifier {
       weeklyAggregationViewData[week] ??= {};
       weeklyAggregationViewData[week]![dayInWeek] = {'aggregation': weeklyReadingDetailAggregation};
     }
+
+    return weeklyAggregationViewData;
   }
 
   Future<void> syncAndRefreshDisplay() async {
@@ -366,20 +367,9 @@ class DataProvider extends ChangeNotifier {
       }
 
       readingsDetails.clear();
-      availableYears.clear();
-      monthlyAggregationViewDataList.clear();
-      yearlyAggregationViewDataList.clear();
 
       currentReading = await _dbHelper.getCurrentReading();
       readingsDetails = await _dbHelper.getAllReadingsDetailsDescDescDesc();
-      availableYears = await _dbHelper.getReadingsDistinctYears();
-      monthlyAggregationViewDataList = await _dbHelper.getMonthlyAggregationDescDesc();
-      yearlyAggregationViewDataList = await _dbHelper.getYearlyAggregationDesc();
-
-      await _getYearlyDayViewData();
-      await _getMonthlyDayViewData();
-      await _getMonthlyAggregationViewData();
-      await _getWeeklyAggregationViewData();
 
       last7ConsumptionAverage = await _dbHelper.getAverageConsumptionOfLast7Days();
     } on Exception catch (e, stackTrace) {

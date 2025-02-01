@@ -22,124 +22,139 @@ class DaddysYearlyAvgView extends DaddysViewBase {
 
     return Consumer<DataProvider>(
       builder: (context, dataProvider, child) {
-        final monthlyAggregationViewData = dataProvider.monthlyAggregationViewData;
+        return FutureBuilder<Map<String, Map<String, Map<String, ReadingDetailAggregation?>>>>(
+          future: dataProvider.monthlyAggregationViewData,
+          builder: (context, snapshot) {
+            // While waiting for the data, show a loading indicator.
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-        double factor = getRowHeightFactor(1.2);
+            // Handle any errors that occurred.
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('Fehler: ${snapshot.error}', style: Theme.of(context).textTheme.bodyLarge),
+              );
+            }
 
-        // Adjust row height if showing readings
-        if (showReading) {
-          factor += 1.2;
-        }
+            // If there's no data or the data is empty, show a message.
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(
+                child: Text('Keine Daten gefunden', style: Theme.of(context).textTheme.bodyLarge),
+              );
+            }
 
-        if (monthlyAggregationViewData.isEmpty) {
-          return Center(
-            child: Text(
-              'Keine Daten gefunden',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          );
-        }
+            // Data is available.
+            final monthlyAggregationViewData = snapshot.data!;
+            double factor = getRowHeightFactor(1.2);
 
-        // Extract all unique years for the column headers
-        final years = monthlyAggregationViewData.keys.toList();
+            // Adjust row height if showing readings.
+            if (showReading) {
+              factor += 1.2;
+            }
 
-        // Generate all periods (months)
-        final periods = _getMonthlySumPeriodLabels();
+            // Extract all unique years for the column headers.
+            final years = monthlyAggregationViewData.keys.toList();
 
-        // Calculate the index for the current month
-        final today = DateTime.now();
-        final currentMonthIndex = today.month - 1;
+            // Generate all periods (months).
+            final periods = _getMonthlySumPeriodLabels();
 
-        // Scroll to the current month after the first frame
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (currentMonthIndex != -1) {
-            final rowHeight = Theme.of(context).textTheme.bodyLarge!.fontSize! * factor;
-            final targetScrollOffset = currentMonthIndex * rowHeight;
-            verticalScrollController.jumpTo(targetScrollOffset);
-          }
-        });
+            // Calculate the index for the current month.
+            final today = DateTime.now();
+            final currentMonthIndex = today.month - 1;
 
-        // Ensure data exists for all periods in all years
-        for (final year in years) {
-          monthlyAggregationViewData[year] ??= {};
-          for (final period in periods) {
-            monthlyAggregationViewData[year]![period];
-          }
-        }
+            // Scroll to the current month after the first frame.
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (currentMonthIndex > 5) {
+                final rowHeight = Theme.of(context).textTheme.bodyLarge!.fontSize! * factor;
+                final targetScrollOffset = currentMonthIndex * rowHeight;
+                verticalScrollController.jumpTo(targetScrollOffset);
+              }
+            });
 
-        // Calculate screen width based on the number of columns
-        final double screenWidth = getMinWidth(context, years.length);
+            // Ensure data exists for all periods in all years.
+            for (final year in years) {
+              monthlyAggregationViewData[year] ??= {};
+              for (final period in periods) {
+                monthlyAggregationViewData[year]![period];
+              }
+            }
 
-        return Column(
-          children: [
-            Expanded(
-              child: DataTable2(
-                scrollController: verticalScrollController,
-                minWidth: screenWidth,
-                fixedLeftColumns: 1,
-                headingTextStyle: Theme.of(context).textTheme.bodyLarge,
-                dataTextStyle: Theme.of(context).textTheme.bodyLarge,
-                dataRowHeight:
-                    Theme.of(context).textTheme.bodyLarge!.fontSize! * factor,
-                columns: [
-                  const DataColumn2(label: Text(''), size: ColumnSize.S),
-                  ...years.map((year) => DataColumn2(label: Text(year))),
-                ],
-                rows: periods.map((period) {
-                  return DataRow(
-                    cells: [
-                      DataCell(Text(
-                        getMonthName(period),
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      )),
-                      ...years.map((year) {
-                        final ReadingDetailAggregation? data =
-                            monthlyAggregationViewData[year]?[period]?['aggregation'];
+            // Calculate screen width based on the number of columns.
+            final double screenWidth = getMinWidth(context, years.length);
 
-                        if (data == null) {
-                          return const DataCell(Text('-'));
-                        }
-
-                        return DataCell(
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (showConsumption)
-                                Text(
-                                  '${data.consumptionAvg!.toStringAsFixed(1)}m³',
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                              if (showReading)
-                                Text(
-                                  '${data.minReading} -',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              if (showReading)
-                                Text(
-                                  '${data.maxReading}',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              if (showTemperature && data.minTemperature != null)
-                                Text(
-                                  '${data.avgMinTemperature!.toStringAsFixed(1)}/${data.avgMaxTemperature!.toStringAsFixed(1)}°C',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              if (showFeelsLike && data.minFeelsLike != null)
-                                Text(
-                                  '${data.avgMinFeelsLike!.toStringAsFixed(1)}/${data.avgMaxFeelsLike!.toStringAsFixed(1)}°C',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                            ],
-                          ),
-                        );
-                      }),
+            return Column(
+              children: [
+                Expanded(
+                  child: DataTable2(
+                    scrollController: verticalScrollController,
+                    minWidth: screenWidth,
+                    fixedLeftColumns: 1,
+                    headingTextStyle: Theme.of(context).textTheme.bodyLarge,
+                    dataTextStyle: Theme.of(context).textTheme.bodyLarge,
+                    dataRowHeight: Theme.of(context).textTheme.bodyLarge!.fontSize! * factor,
+                    columns: [
+                      const DataColumn2(label: Text(''), size: ColumnSize.S),
+                      ...years.map((year) => DataColumn2(label: Text(year))),
                     ],
-                  );
-                }).toList(),
-              ),
-            ),
-          ],
+                    rows: periods.map((period) {
+                      return DataRow(
+                        cells: [
+                          DataCell(
+                            Text(
+                              getMonthName(period),
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ),
+                          ...years.map((year) {
+                            final ReadingDetailAggregation? data = monthlyAggregationViewData[year]?[period]?['aggregation'];
+
+                            if (data == null) {
+                              return const DataCell(Text('-'));
+                            }
+
+                            return DataCell(
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  if (showConsumption)
+                                    Text(
+                                      '${data.consumptionAvg!.toStringAsFixed(1)}m³',
+                                      style: Theme.of(context).textTheme.bodyLarge,
+                                    ),
+                                  if (showReading)
+                                    Text(
+                                      '${data.minReading} -',
+                                      style: Theme.of(context).textTheme.bodyMedium,
+                                    ),
+                                  if (showReading)
+                                    Text(
+                                      '${data.maxReading}',
+                                      style: Theme.of(context).textTheme.bodyMedium,
+                                    ),
+                                  if (showTemperature && data.minTemperature != null)
+                                    Text(
+                                      '${data.avgMinTemperature!.toStringAsFixed(1)}/${data.avgMaxTemperature!.toStringAsFixed(1)}°C',
+                                      style: Theme.of(context).textTheme.bodyMedium,
+                                    ),
+                                  if (showFeelsLike && data.minFeelsLike != null)
+                                    Text(
+                                      '${data.avgMinFeelsLike!.toStringAsFixed(1)}/${data.avgMaxFeelsLike!.toStringAsFixed(1)}°C',
+                                      style: Theme.of(context).textTheme.bodyMedium,
+                                    ),
+                                ],
+                              ),
+                            );
+                          }),
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
