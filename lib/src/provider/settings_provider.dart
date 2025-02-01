@@ -243,14 +243,14 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   Future<void> updateChartsSelectedView(String selectedView) async {
-    _daddysSelectedView = selectedView;
+    _chartsSelectedView = selectedView;
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(chartsSelectedViewKey, _chartsSelectedView);
     notifyListeners();
   }
 
   Future<void> setChartsSelectedView(String selectedView) async {
-    _daddysSelectedView = selectedView;
+    _chartsSelectedView = selectedView;
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(chartsSelectedViewKey, _chartsSelectedView);
     notifyListeners();

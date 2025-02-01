@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
 import 'package:zaehlerstand/src/widgets/responsive/charts/monthly_charts_layout.dart';
+import 'package:zaehlerstand/src/widgets/responsive/charts/weekly_charts_layout.dart';
 
 class ChartsView extends StatefulWidget {
   const ChartsView({super.key});
@@ -23,12 +24,20 @@ class _ChartsViewState extends State<ChartsView> {
     // Initialize default values to avoid null issues
     final settingsProvider = context.read<SettingsProvider>();
     chartsSelectedView = settingsProvider.chartsSelectedView;
+
+    print('xxx chartsSelectedView $chartsSelectedView');
+
+
   }
 
   void _updateSelectedView(String newValue) {
     setState(() {
       chartsSelectedView = newValue;
     });
+
+    print('xxx newValue $newValue');
+
+    context.read<SettingsProvider>().updateChartsSelectedView(newValue);
   }
 
   @override
@@ -81,6 +90,6 @@ class _ChartsViewState extends State<ChartsView> {
       return const MonthlyChartsResponsiveLayout();
     }
 
-    return const Text('Bla bla bla');
+    return const WeeklyChartsResponsiveLayout();
   }
 }

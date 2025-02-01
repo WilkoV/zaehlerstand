@@ -40,7 +40,13 @@ class DataProvider extends ChangeNotifier {
   List<ReadingDetailAggregation> monthlyAggregationViewDataList = <ReadingDetailAggregation>[];
   List<ReadingDetailAggregation> yearlyAggregationViewDataList = <ReadingDetailAggregation>[];
 
-  List<ChartBasicAggregation> monthlyChartData = <ChartBasicAggregation>[];
+  Future<List<ChartBasicAggregation>> get monthlyChartData async {
+    return await _dbHelper.getMonthlyChartData();
+  }
+
+  Future<List<ChartBasicAggregation>> get weeklyChartData async {
+    return await _dbHelper.getWeeklyChartData();
+  }
 
   /// List of all years that have data in reading
   List<int> availableYears = <int>[];
@@ -347,38 +353,37 @@ class DataProvider extends ChangeNotifier {
   Future<bool> _syncAndRefreshLists() async {
     _log.fine('Refreshing data views.');
 
-    SyncManager syncManager = SyncManager();
-    await syncManager.initialize();
-    final bool fromServer = await syncManager.copyFromServer(_serverAddress, int.parse(_serverPort));
-    final bool toServer = await syncManager.syncUnsyncedData(_serverAddress, int.parse(_serverPort));
-
-    if (!fromServer && !toServer && readingsDetails.isNotEmpty) {
-      return false;
-    }
-
-    readingsDetails.clear();
-    availableYears.clear();
-    monthlyAggregationViewDataList.clear();
-    yearlyAggregationViewDataList.clear();
-    monthlyChartData.clear();
-
-    currentReading = await _dbHelper.getCurrentReading();
-    readingsDetails = await _dbHelper.getAllReadingsDetailsDescDescDesc();
-    availableYears = await _dbHelper.getReadingsDistinctYears();
-    monthlyAggregationViewDataList = await _dbHelper.getMonthlyAggregationDescDesc();
-    yearlyAggregationViewDataList = await _dbHelper.getYearlyAggregationDesc();
-    monthlyChartData = await _dbHelper.getMonthlyChartData();
-
-    await _getYearlyDayViewData();
-    await _getMonthlyDayViewData();
-    await _getMonthlyAggregationViewData();
-    await _getWeeklyAggregationViewData();
-
-
     try {
+      SyncManager syncManager = SyncManager();
+
+      await syncManager.initialize();
+
+      final bool fromServer = await syncManager.copyFromServer(_serverAddress, int.parse(_serverPort));
+      final bool toServer = await syncManager.syncUnsyncedData(_serverAddress, int.parse(_serverPort));
+
+      if (!fromServer && !toServer && readingsDetails.isNotEmpty) {
+        return false;
+      }
+
+      readingsDetails.clear();
+      availableYears.clear();
+      monthlyAggregationViewDataList.clear();
+      yearlyAggregationViewDataList.clear();
+
+      currentReading = await _dbHelper.getCurrentReading();
+      readingsDetails = await _dbHelper.getAllReadingsDetailsDescDescDesc();
+      availableYears = await _dbHelper.getReadingsDistinctYears();
+      monthlyAggregationViewDataList = await _dbHelper.getMonthlyAggregationDescDesc();
+      yearlyAggregationViewDataList = await _dbHelper.getYearlyAggregationDesc();
+
+      await _getYearlyDayViewData();
+      await _getMonthlyDayViewData();
+      await _getMonthlyAggregationViewData();
+      await _getWeeklyAggregationViewData();
+
       last7ConsumptionAverage = await _dbHelper.getAverageConsumptionOfLast7Days();
-    } on Exception catch (e) {
-      _log.severe(e);
+    } on Exception catch (e, stackTrace) {
+      _log.severe('error in _syncAndRefreshLists $e', e, stackTrace);
     }
 
     _log.fine('All lists updated.');

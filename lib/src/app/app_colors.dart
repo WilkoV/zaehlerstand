@@ -12,7 +12,7 @@ final Color darkPrimaryColor = Colors.blue[300]!;
 const Color darkTextLargeColor = Colors.white;
 const Color darkTextMediumColor = Colors.white70;
 
-final Color darkIndicatorColor = Colors.blue[300]!;
+final Color darkIndicatorColor = Colors.blue[800]!;
 final Color darkSelectedItemColor = Colors.blue[300]!;
 final Color darkUnselectedItemColor = Colors.grey[400]!;
 
@@ -20,6 +20,5 @@ const Color arrowUpColor = Colors.red;
 const Color arrowDownColor = Colors.green;
 const Color arrowNeutralColor = Colors.grey;
 
-// TODO Adjust colors
-List<Color> darkBarChartColors = [Colors.green[800]!, Colors.green[600]!, Colors.green[400]!, Colors.green[200]!];
 List<Color> lightBarChartColors = [Colors.blue[800]!, Colors.blue[600]!, Colors.blue[400]!, Colors.blue[200]!];
+List<Color> darkBarChartColors = [Colors.blue[800]!, Colors.blue[600]!, Colors.blue[400]!, Colors.blue[200]!];

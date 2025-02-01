@@ -19,36 +19,72 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<SettingsProvider>(
       builder: (context, settingsProvider, child) {
-        double factor = getRowHeightFactor(1.2, settingsProvider.showConsumption, settingsProvider.showReading, settingsProvider.showTemperature, settingsProvider.showFeelsLike);
+        double factor = getRowHeightFactor(
+          1.2,
+          settingsProvider.showConsumption,
+          settingsProvider.showReading,
+          settingsProvider.showTemperature,
+          settingsProvider.showFeelsLike,
+        );
         return Consumer<DataProvider>(
           builder: (context, dataProvider, child) {
-            List<ReadingDetail> dailyRowData = _getDailyReadingDetails(dataProvider, isTablet ? settingsProvider.dashboardDaysTablet : settingsProvider.dashboardDaysMobile);
-            List<ReadingDetailAggregation> monthlyRow = _getMonthlyAggregations(dataProvider, isTablet ? settingsProvider.dashboardMonthsTablet : settingsProvider.dashboardMonthsMobile);
-            List<ReadingDetailAggregation> yearlyRow = _getYearlyAggregations(dataProvider, isTablet ? settingsProvider.dashboardYearsTablet : settingsProvider.dashboardYearsMobile);
+            // Synchronously available data
+            List<ReadingDetail> dailyRowData = _getDailyReadingDetails(
+              dataProvider,
+              isTablet ? settingsProvider.dashboardDaysTablet : settingsProvider.dashboardDaysMobile,
+            );
+            List<ReadingDetailAggregation> yearlyRow = _getYearlyAggregations(
+              dataProvider,
+              isTablet ? settingsProvider.dashboardYearsTablet : settingsProvider.dashboardYearsMobile,
+            );
 
+            // If no daily data is available, show a "no data" message.
             if (dailyRowData.isEmpty) {
               return Center(
-                child: Text('Keine Daten gefunden', style: Theme.of(context).textTheme.bodyLarge),
+                child: Text(
+                  'Keine Daten gefunden',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
               );
             }
 
-            int maxElements = isTablet ? 4 : 3;
+            return FutureBuilder<List<ReadingDetailAggregation>>(
+              future: _getMonthlyAggregations(
+                dataProvider,
+                isTablet ? settingsProvider.dashboardMonthsTablet : settingsProvider.dashboardMonthsMobile,
+              ),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'Fehler beim Laden der Daten',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  );
+                }
+                List<ReadingDetailAggregation> monthlyRow = snapshot.data ?? [];
+                int maxElements = isTablet ? 4 : 3;
 
-            return DataTable2(
-              columnSpacing: 12,
-              horizontalMargin: 12,
-              dataTextStyle: Theme.of(context).textTheme.bodyLarge,
-              dataRowHeight: Theme.of(context).textTheme.bodyLarge!.fontSize! * factor,
-              columns: [
-                const DataColumn2(label: Text(''), size: ColumnSize.S),
-                for (var i = 0; i < maxElements; i++) const DataColumn2(label: Text(''), size: ColumnSize.L),
-              ],
-              rows: [
-                DataRow(cells: _buildDailyDataCells(context, dailyRowData)),
-                DataRow(cells: _buildMonthlySumDataCells(context, monthlyRow)),
-                DataRow(cells: _buildMonthlyAvgDataCells(context, monthlyRow)),
-                DataRow(cells: _buildYearlyDataCells(context, yearlyRow)),
-              ],
+                return DataTable2(
+                  columnSpacing: 12,
+                  horizontalMargin: 12,
+                  dataTextStyle: Theme.of(context).textTheme.bodyLarge,
+                  dataRowHeight: Theme.of(context).textTheme.bodyLarge!.fontSize! * factor,
+                  columns: [
+                    const DataColumn2(label: Text(''), size: ColumnSize.S),
+                    for (var i = 0; i < maxElements; i++) const DataColumn2(label: Text(''), size: ColumnSize.L),
+                  ],
+                  rows: [
+                    DataRow(cells: _buildDailyDataCells(context, dailyRowData)),
+                    DataRow(cells: _buildMonthlySumDataCells(context, monthlyRow)),
+                    DataRow(cells: _buildMonthlyAvgDataCells(context, monthlyRow)),
+                    DataRow(cells: _buildYearlyDataCells(context, yearlyRow)),
+                  ],
+                );
+              },
             );
           },
         );
@@ -75,7 +111,10 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
             label: data.reading.getFormattedDate(),
           ),
         ),
-      for (var i = dailyData.length; i < maxElements; i++) DataCell(DashboardReadingConsumptionElement(isTablet: isTablet,)),
+      for (var i = dailyData.length; i < maxElements; i++)
+        DataCell(DashboardReadingConsumptionElement(
+          isTablet: isTablet,
+        )),
     ];
     return dataCells;
   }
@@ -190,12 +229,13 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
     return daily;
   }
 
-  List<ReadingDetailAggregation> _getMonthlyAggregations(DataProvider dataProvider, List<int> indices) {
+  Future<List<ReadingDetailAggregation>> _getMonthlyAggregations(DataProvider dataProvider, List<int> indices) async {
     List<ReadingDetailAggregation> monthly = [];
+    List<ReadingDetailAggregation> monthlyAggregationViewDataList = await dataProvider.monthlyAggregationViewDataList;
 
     for (int index in indices) {
-      if (dataProvider.monthlyAggregationViewDataList.length >= index) {
-        monthly.add(dataProvider.monthlyAggregationViewDataList[index - 1]);
+      if (monthlyAggregationViewDataList.length >= index) {
+        monthly.add(monthlyAggregationViewDataList[index - 1]);
       }
     }
 
