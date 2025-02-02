@@ -30,7 +30,8 @@ class DataProvider extends ChangeNotifier {
   /// Data sets for the UI
   double last7ConsumptionAverage = 0;
   Reading? currentReading;
-  List<ReadingDetail> readingsDetails = <ReadingDetail>[];
+
+  Future<List<ReadingDetail>> get readingsDetails async => await _dbHelper.getAllReadingsDetailsDescDescDesc(); 
 
   Future<Map<String, Map<String, ReadingDetail>>> get yearlyDayViewData async => await _getYearlyDayViewData();
   Future<Map<String, Map<String, Map<String, ReadingDetail>>>> get monthlyDayViewData async => await _getMonthlyDayViewData();
@@ -167,12 +168,14 @@ class DataProvider extends ChangeNotifier {
     //
     int previousReadingValue = 0;
 
+    List<ReadingDetail> readingDetailsBeforeAdd = await readingsDetails;
+
     if (intermediateReadingsDetails.isNotEmpty) {
       previousReadingValue = intermediateReadingsDetails.last.reading.reading;
     } else if (currentReading != null && currentReading!.date != currentDate) {
       previousReadingValue = currentReading!.reading;
-    } else if (readingsDetails.isNotEmpty && readingsDetails.length > 2) {
-      previousReadingValue = readingsDetails[1].reading.reading;
+    } else if (readingDetailsBeforeAdd.isNotEmpty && readingDetailsBeforeAdd.length > 2) {
+      previousReadingValue = readingDetailsBeforeAdd[1].reading.reading;
     }
 
     // Add the entered reading to the intermediateReadings list
@@ -362,14 +365,11 @@ class DataProvider extends ChangeNotifier {
       final bool fromServer = await syncManager.copyFromServer(_serverAddress, int.parse(_serverPort));
       final bool toServer = await syncManager.syncUnsyncedData(_serverAddress, int.parse(_serverPort));
 
-      if (!fromServer && !toServer && readingsDetails.isNotEmpty) {
+      if (!fromServer && !toServer) {
         return false;
       }
 
-      readingsDetails.clear();
-
       currentReading = await _dbHelper.getCurrentReading();
-      readingsDetails = await _dbHelper.getAllReadingsDetailsDescDescDesc();
 
       last7ConsumptionAverage = await _dbHelper.getAverageConsumptionOfLast7Days();
     } on Exception catch (e, stackTrace) {

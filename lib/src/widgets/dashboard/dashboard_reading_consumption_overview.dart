@@ -29,60 +29,71 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
 
         return Consumer<DataProvider>(
           builder: (context, dataProvider, child) {
-            List<ReadingDetail> dailyRowData = _getDailyReadingDetails(dataProvider, isTablet ? settingsProvider.dashboardDaysTablet : settingsProvider.dashboardDaysMobile);
-
-            if (dailyRowData.isEmpty) {
-              return Center(
-                child: Text(
-                  'Keine Daten gefunden',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              );
-            }
-
-            int maxElements = isTablet ? 4 : 3;
-
             // Fetch futures before FutureBuilder
+            final Future<List<ReadingDetail>> dailyFuture = _getDailyReadingDetails(dataProvider, isTablet ? settingsProvider.dashboardDaysTablet : settingsProvider.dashboardDaysMobile);
             final Future<List<ReadingDetailAggregation>> monthlyFuture = _getMonthlyAggregations(dataProvider, isTablet ? settingsProvider.dashboardMonthsTablet : settingsProvider.dashboardMonthsMobile);
             final Future<List<ReadingDetailAggregation>> yearlyFuture = _getYearlyAggregations(dataProvider, isTablet ? settingsProvider.dashboardYearsTablet : settingsProvider.dashboardYearsMobile);
 
-            return FutureBuilder<List<ReadingDetailAggregation>>(
-              future: monthlyFuture,
-              builder: (context, monthlySnapshot) {
-                if (monthlySnapshot.connectionState == ConnectionState.waiting) {
+            return FutureBuilder<List<ReadingDetail>>(
+              future: dailyFuture,
+              builder: (context, dailySnapshot) {
+                if (dailySnapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
-                } else if (monthlySnapshot.hasError) {
-                  return const Center(child: Text('Fehler beim Laden der monatlichen Daten'));
+                } else if (dailySnapshot.hasError) {
+                  return const Center(child: Text('Fehler beim Laden der täglichen Daten'));
                 }
 
-                List<ReadingDetailAggregation> monthlyRow = monthlySnapshot.data ?? [];
+                List<ReadingDetail> dailyRowData = dailySnapshot.data ?? [];
+
+                if (dailyRowData.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'Keine Daten gefunden',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  );
+                }
 
                 return FutureBuilder<List<ReadingDetailAggregation>>(
-                  future: yearlyFuture,
-                  builder: (context, yearlySnapshot) {
-                    if (yearlySnapshot.connectionState == ConnectionState.waiting) {
+                  future: monthlyFuture,
+                  builder: (context, monthlySnapshot) {
+                    if (monthlySnapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
-                    } else if (yearlySnapshot.hasError) {
-                      return const Center(child: Text('Fehler beim Laden der jährlichen Daten'));
+                    } else if (monthlySnapshot.hasError) {
+                      return const Center(child: Text('Fehler beim Laden der monatlichen Daten'));
                     }
 
-                    List<ReadingDetailAggregation> yearlyRow = yearlySnapshot.data ?? [];
+                    List<ReadingDetailAggregation> monthlyRow = monthlySnapshot.data ?? [];
 
-                    return DataTable2(
-                      columnSpacing: 12,
-                      horizontalMargin: 12,
-                      dataTextStyle: Theme.of(context).textTheme.bodyLarge,
-                      dataRowHeight: Theme.of(context).textTheme.bodyLarge!.fontSize! * factor,
-                      columns: [
-                        const DataColumn2(label: Text(''), size: ColumnSize.S),
-                        for (var i = 0; i < maxElements; i++) const DataColumn2(label: Text(''), size: ColumnSize.L),
-                      ],
-                      rows: [
-                        DataRow(cells: _buildDailyDataCells(context, dailyRowData)),
-                        DataRow(cells: _buildMonthlySumDataCells(context, monthlyRow)),
-                        DataRow(cells: _buildMonthlyAvgDataCells(context, monthlyRow)),
-                        DataRow(cells: _buildYearlyDataCells(context, yearlyRow)),
-                      ],
+                    return FutureBuilder<List<ReadingDetailAggregation>>(
+                      future: yearlyFuture,
+                      builder: (context, yearlySnapshot) {
+                        if (yearlySnapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        } else if (yearlySnapshot.hasError) {
+                          return const Center(child: Text('Fehler beim Laden der jährlichen Daten'));
+                        }
+
+                        List<ReadingDetailAggregation> yearlyRow = yearlySnapshot.data ?? [];
+                        int maxElements = isTablet ? 4 : 3;
+
+                        return DataTable2(
+                          columnSpacing: 12,
+                          horizontalMargin: 12,
+                          dataTextStyle: Theme.of(context).textTheme.bodyLarge,
+                          dataRowHeight: Theme.of(context).textTheme.bodyLarge!.fontSize! * factor,
+                          columns: [
+                            const DataColumn2(label: Text(''), size: ColumnSize.S),
+                            for (var i = 0; i < maxElements; i++) const DataColumn2(label: Text(''), size: ColumnSize.L),
+                          ],
+                          rows: [
+                            DataRow(cells: _buildDailyDataCells(context, dailyRowData)),
+                            DataRow(cells: _buildMonthlySumDataCells(context, monthlyRow)),
+                            DataRow(cells: _buildMonthlyAvgDataCells(context, monthlyRow)),
+                            DataRow(cells: _buildYearlyDataCells(context, yearlyRow)),
+                          ],
+                        );
+                      },
                     );
                   },
                 );
@@ -150,7 +161,7 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
     int maxElements = isTablet ? 4 : 3;
     List<DataCell> dataCells = [
       DataCell(Text('Monat \u2205', style: Theme.of(context).textTheme.bodyLarge)),
-      for (final data in monthlyData)  
+      for (final data in monthlyData)
         DataCell(
           DashboardReadingAvgConsumptionElement(
             isTablet: isTablet,
@@ -218,12 +229,13 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
     return factor;
   }
 
-  List<ReadingDetail> _getDailyReadingDetails(DataProvider dataProvider, List<int> indices) {
+  Future<List<ReadingDetail>> _getDailyReadingDetails(DataProvider dataProvider, List<int> indices) async {
     List<ReadingDetail> daily = [];
+    List<ReadingDetail> allReadingDetails = await dataProvider.readingsDetails;
 
     for (int index in indices) {
-      if (dataProvider.readingsDetails.length >= index) {
-        daily.add(dataProvider.readingsDetails[index - 1]);
+      if (allReadingDetails.length >= index) {
+        daily.add(allReadingDetails[index - 1]);
       }
     }
 
