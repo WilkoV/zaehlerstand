@@ -92,7 +92,7 @@ void zaehlerstandCallbackDispatcher() async {
       String? serverAddress = preferences.getString(SettingsProvider.serverAdressKey);
       String? serverPort = preferences.getString(SettingsProvider.serverPortKey) ?? '8080';
 
-      if (serverAddress == null) {
+      if (serverAddress == null || serverAddress == '') {
         printLogRecord(isolateId, 'Server address or port not set. Skipping background sync.');
         return;
       }
