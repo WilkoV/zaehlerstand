@@ -8,11 +8,11 @@ class AppTheme {
     brightness: Brightness.light,
     primaryColor: app_colors.lightPrimaryColor,
     textTheme: const TextTheme(
-      headlineLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: app_colors.lightTextLargeColor),
-      headlineMedium: TextStyle(fontSize: 20, color: app_colors.lightTextMediumColor),
-      bodyLarge: TextStyle(fontSize: 18, color: app_colors.lightTextLargeColor),
-      bodyMedium: TextStyle(fontSize: 16, color: app_colors.lightTextMediumColor),
-      bodySmall: TextStyle(fontSize: 14, color: app_colors.lightTextMediumColor),
+      headlineLarge: TextStyle(fontSize: 23, fontWeight: FontWeight.bold, color: app_colors.lightTextLargeColor),
+      headlineMedium: TextStyle(fontSize: 21, color: app_colors.lightTextMediumColor),
+      bodyLarge: TextStyle(fontSize: 19, color: app_colors.lightTextLargeColor),
+      bodyMedium: TextStyle(fontSize: 17, color: app_colors.lightTextMediumColor),
+      bodySmall: TextStyle(fontSize: 15, color: app_colors.lightTextMediumColor),
     ),
     inputDecorationTheme: InputDecorationTheme(
       border: const OutlineInputBorder(),
@@ -62,11 +62,11 @@ class AppTheme {
     brightness: Brightness.dark,
     primaryColor: app_colors.darkPrimaryColor,
     textTheme: const TextTheme(
-      headlineLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: app_colors.darkTextLargeColor),
-      headlineMedium: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: app_colors.darkTextMediumColor),
-      bodyLarge: TextStyle(fontSize: 18, color: app_colors.darkTextLargeColor),
-      bodyMedium: TextStyle(fontSize: 16, color: app_colors.darkTextMediumColor),
-      bodySmall: TextStyle(fontSize: 14, color: app_colors.darkTextMediumColor),
+      headlineLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: app_colors.darkTextLargeColor),
+      headlineMedium: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: app_colors.darkTextMediumColor),
+      bodyLarge: TextStyle(fontSize: 20, color: app_colors.darkTextLargeColor),
+      bodyMedium: TextStyle(fontSize: 18, color: app_colors.darkTextMediumColor),
+      bodySmall: TextStyle(fontSize: 16, color: app_colors.darkTextMediumColor),
     ),
     inputDecorationTheme: InputDecorationTheme(
       border: const OutlineInputBorder(),

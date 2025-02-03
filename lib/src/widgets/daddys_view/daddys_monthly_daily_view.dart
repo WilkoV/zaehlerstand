@@ -14,6 +14,7 @@ class DaddysMonthlyDailyView extends DaddysViewBase {
     required super.showReading,
     required super.showTemperature,
     required super.showFeelsLike,
+    required super.isTablet,
   });
 
   @override

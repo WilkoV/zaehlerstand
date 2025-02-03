@@ -15,6 +15,7 @@ class DaddysYearlySumView extends DaddysViewBase {
     required super.showReading,
     required super.showTemperature,
     required super.showFeelsLike,
+    required super.isTablet,
   });
 
   @override
@@ -57,7 +58,7 @@ class DaddysYearlySumView extends DaddysViewBase {
 
             // Adjust row height if showing readings.
             if (showReading) {
-              factor += AppConfiguration.rowHeight;
+              factor += AppConfiguration.getRowHeightFactor(isTablet);
             }
 
             // Extract all unique years for the column headers.

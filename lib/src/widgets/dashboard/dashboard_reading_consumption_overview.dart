@@ -21,7 +21,7 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
     return Consumer<SettingsProvider>(
       builder: (context, settingsProvider, child) {
         double factor = getRowHeightFactor(
-          AppConfiguration.rowHeight,
+          AppConfiguration.getRowHeightFactor(isTablet),
           settingsProvider.showConsumption,
           settingsProvider.showReading,
           settingsProvider.showTemperature,
@@ -137,7 +137,7 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
     int maxElements = isTablet ? 4 : 3;
 
     List<DataCell> dataCells = [
-      DataCell(Text('Monat \u2211', style: Theme.of(context).textTheme.bodyLarge)),
+      DataCell(Text(isTablet ? 'Monat \u2211' : 'M. \u2211', style: Theme.of(context).textTheme.bodyLarge)),
       for (final data in monthlyData)
         DataCell(
           DashboardReadingConsumptionElement(
@@ -161,7 +161,7 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
   List<DataCell> _buildMonthlyAvgDataCells(BuildContext context, List<ReadingDetailAggregation> monthlyData) {
     int maxElements = isTablet ? 4 : 3;
     List<DataCell> dataCells = [
-      DataCell(Text('Monat \u2205', style: Theme.of(context).textTheme.bodyLarge)),
+      DataCell(Text(isTablet ? 'Monat \u2205' : 'M. \u2205', style: Theme.of(context).textTheme.bodyLarge)),
       for (final data in monthlyData)
         DataCell(
           DashboardReadingAvgConsumptionElement(
@@ -209,23 +209,23 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
 
   double getRowHeightFactor(double factor, bool showConsumption, bool showReading, bool showTemperature, bool showFeelsLike) {
     if (showConsumption) {
-      factor += AppConfiguration.rowHeight;
+      factor += AppConfiguration.getRowHeightFactor(isTablet);
     }
 
     if (showReading) {
-      factor += AppConfiguration.rowHeight;
-      factor += AppConfiguration.rowHeight;
+      factor += AppConfiguration.getRowHeightFactor(isTablet);
+      factor += AppConfiguration.getRowHeightFactor(isTablet);
     }
 
     if (showTemperature) {
-      factor += AppConfiguration.rowHeight;
+      factor += AppConfiguration.getRowHeightFactor(isTablet);
     }
 
     if (showFeelsLike) {
-      factor += AppConfiguration.rowHeight;
+      factor += AppConfiguration.getRowHeightFactor(isTablet);
     }
 
-    factor += AppConfiguration.rowHeight;
+    factor += AppConfiguration.getRowHeightFactor(isTablet);
 
     return factor;
   }

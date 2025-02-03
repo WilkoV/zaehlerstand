@@ -9,6 +9,7 @@ abstract class DaddysViewBase extends StatelessWidget {
   final bool showFeelsLike;
   final int minColumns;
   final bool showLongNames;
+  final bool isTablet;
 
   const DaddysViewBase({
     super.key,
@@ -18,6 +19,7 @@ abstract class DaddysViewBase extends StatelessWidget {
     required this.showReading,
     required this.showTemperature,
     required this.showFeelsLike,
+    required this.isTablet,
   });
 
   double getMinWidth(BuildContext context, int noOfColumns) {
@@ -27,22 +29,22 @@ abstract class DaddysViewBase extends StatelessWidget {
   }
 
   double getRowHeightFactor() {
-    double factor = AppConfiguration.rowHeight;
-    
+    double factor = AppConfiguration.getRowHeightFactor(isTablet);
+
     if (showConsumption) {
-      factor += AppConfiguration.rowHeight;
+      factor += AppConfiguration.getRowHeightFactor(isTablet);
     }
 
     if (showReading) {
-      factor += AppConfiguration.rowHeight;
+      factor += AppConfiguration.getRowHeightFactor(isTablet);
     }
 
     if (showTemperature) {
-      factor += AppConfiguration.rowHeight;
+      factor += AppConfiguration.getRowHeightFactor(isTablet);
     }
 
     if (showFeelsLike) {
-      factor += AppConfiguration.rowHeight;
+      factor += AppConfiguration.getRowHeightFactor(isTablet);
     }
     return factor;
   }
