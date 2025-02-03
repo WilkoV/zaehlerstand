@@ -1,6 +1,7 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zaehlerstand/src/app/app_configuration.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/widgets/daddys_view/daddys_view_base.dart';
 import 'package:zaehlerstand_common/zaehlerstand_common.dart';
@@ -52,11 +53,11 @@ class DaddysYearlySumView extends DaddysViewBase {
 
             // Data has been fetched successfully.
             final monthlyAggregationViewData = snapshot.data!;
-            double factor = getRowHeightFactor(1.2);
+            double factor = getRowHeightFactor();
 
             // Adjust row height if showing readings.
             if (showReading) {
-              factor += 1.2;
+              factor += AppConfiguration.rowHeight;
             }
 
             // Extract all unique years for the column headers.

@@ -37,9 +37,9 @@ class AppTheme {
     textTheme: const TextTheme(
       headlineLarge: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: app_colors.lightTextLargeColor),
       headlineMedium: TextStyle(fontSize: 32, fontWeight: FontWeight.w600, color: app_colors.lightTextMediumColor),
-      bodyLarge: TextStyle(fontSize: 28, color: app_colors.lightTextLargeColor),
-      bodyMedium: TextStyle(fontSize: 24, color: app_colors.lightTextMediumColor),
-      bodySmall: TextStyle(fontSize: 20, color: app_colors.lightTextMediumColor),
+      bodyLarge: TextStyle(fontSize: 22, color: app_colors.lightTextLargeColor),
+      bodyMedium: TextStyle(fontSize: 18, color: app_colors.lightTextMediumColor),
+      bodySmall: TextStyle(fontSize: 14, color: app_colors.lightTextMediumColor),
     ),
     inputDecorationTheme: InputDecorationTheme(
       border: const OutlineInputBorder(),
@@ -91,9 +91,9 @@ class AppTheme {
     textTheme: const TextTheme(
       headlineLarge: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: app_colors.darkTextLargeColor),
       headlineMedium: TextStyle(fontSize: 32, fontWeight: FontWeight.w600, color: app_colors.darkTextMediumColor),
-      bodyLarge: TextStyle(fontSize: 28, color: app_colors.darkTextLargeColor),
-      bodyMedium: TextStyle(fontSize: 24, color: app_colors.darkTextMediumColor),
-      bodySmall: TextStyle(fontSize: 20, color: app_colors.darkTextMediumColor),
+      bodyLarge: TextStyle(fontSize: 22, color: app_colors.darkTextLargeColor),
+      bodyMedium: TextStyle(fontSize: 18, color: app_colors.darkTextMediumColor),
+      bodySmall: TextStyle(fontSize: 14, color: app_colors.darkTextMediumColor),
     ),
     inputDecorationTheme: InputDecorationTheme(
       border: const OutlineInputBorder(),

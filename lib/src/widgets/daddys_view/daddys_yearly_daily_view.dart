@@ -14,6 +14,7 @@ class DaddysYearlyDailyView extends DaddysViewBase {
     required super.showReading,
     required super.showTemperature,
     required super.showFeelsLike,
+    
   });
   @override
   Widget build(BuildContext context) {
@@ -51,7 +52,7 @@ class DaddysYearlyDailyView extends DaddysViewBase {
 
             final yearlyDailyViewData = snapshot.data!;
             final periods = _getYearlyDailyPeriodLabels();
-            double factor = getRowHeightFactor(1.2);
+            double factor = getRowHeightFactor();
 
             // Calculate the index of the current date label
             final today = DateTime.now();

@@ -1,6 +1,7 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zaehlerstand/src/app/app_configuration.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
 import 'package:zaehlerstand/src/widgets/dashboard/dashboard_reading_avg_consumption_element.dart';
@@ -20,7 +21,7 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
     return Consumer<SettingsProvider>(
       builder: (context, settingsProvider, child) {
         double factor = getRowHeightFactor(
-          1.2,
+          AppConfiguration.rowHeight,
           settingsProvider.showConsumption,
           settingsProvider.showReading,
           settingsProvider.showTemperature,
@@ -208,23 +209,23 @@ class DashboardReadingConsumptionOverview extends StatelessWidget {
 
   double getRowHeightFactor(double factor, bool showConsumption, bool showReading, bool showTemperature, bool showFeelsLike) {
     if (showConsumption) {
-      factor += 1.2;
+      factor += AppConfiguration.rowHeight;
     }
 
     if (showReading) {
-      factor += 1.5;
-      factor += 1.5;
+      factor += AppConfiguration.rowHeight;
+      factor += AppConfiguration.rowHeight;
     }
 
     if (showTemperature) {
-      factor += 1.2;
+      factor += AppConfiguration.rowHeight;
     }
 
     if (showFeelsLike) {
-      factor += 1.2;
+      factor += AppConfiguration.rowHeight;
     }
 
-    factor += 1.2;
+    factor += AppConfiguration.rowHeight;
 
     return factor;
   }

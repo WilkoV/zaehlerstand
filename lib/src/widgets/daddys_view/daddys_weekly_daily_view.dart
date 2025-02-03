@@ -44,7 +44,7 @@ class DaddysWeeklyDailyView extends DaddysViewBase {
 
             // Data is available here.
             final weeklyDailyViewData = snapshot.data!;
-            double factor = getRowHeightFactor(1.2);
+            double factor = getRowHeightFactor();
 
             // Extract all unique weeks for the column headers
             final weeks = weeklyDailyViewData.keys.toList();

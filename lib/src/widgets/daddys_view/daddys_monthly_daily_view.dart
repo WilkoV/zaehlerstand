@@ -45,7 +45,7 @@ class DaddysMonthlyDailyView extends DaddysViewBase {
             }
 
             final monthlyDailyViewData = snapshot.data!;
-            double factor = getRowHeightFactor(1.2);
+            double factor = getRowHeightFactor();
 
             // Extract all unique months for the column headers.
             final months = monthlyDailyViewData.keys.toList();

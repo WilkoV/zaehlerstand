@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:zaehlerstand/src/app/app_configuration.dart';
 
 abstract class DaddysViewBase extends StatelessWidget {
   final bool showReading;
@@ -25,21 +26,23 @@ abstract class DaddysViewBase extends StatelessWidget {
     return newScreenWidth;
   }
 
-  double getRowHeightFactor(double factor) {
+  double getRowHeightFactor() {
+    double factor = AppConfiguration.rowHeight;
+    
     if (showConsumption) {
-      factor += 1.2;
+      factor += AppConfiguration.rowHeight;
     }
 
     if (showReading) {
-      factor += 1.2;
+      factor += AppConfiguration.rowHeight;
     }
 
     if (showTemperature) {
-      factor += 1.2;
+      factor += AppConfiguration.rowHeight;
     }
 
     if (showFeelsLike) {
-      factor += 1.2;
+      factor += AppConfiguration.rowHeight;
     }
     return factor;
   }
