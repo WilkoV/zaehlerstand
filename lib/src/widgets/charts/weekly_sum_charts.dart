@@ -129,6 +129,7 @@ class WeeklySumChart extends ChartsBase {
               barTouchData: BarTouchData(
                 enabled: true,
                 touchTooltipData: BarTouchTooltipData(
+                  getTooltipColor: (group) => AppTheme.getCharTooltipColor(isDarkMode: isDarkMode),
                   getTooltipItem: (group, groupIndex, rod, rodIndex) {
                     return BarTooltipItem(
                       'W${group.x}: ${rod.toY.toStringAsFixed(0)} m³',
