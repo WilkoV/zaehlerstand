@@ -9,8 +9,8 @@ class MonthlyChartsResponsiveLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScreenTypeLayout.builder(
       mobile: (_) => OrientationLayoutBuilder(
-        portrait: (context) => const MonthlySumChart(doRotate: true, rodWidth: 14),
-        landscape: (context) => const MonthlySumChart(doRotate: false, rodWidth: 14),
+        portrait: (context) => const MonthlySumChart(doRotate: true, rodWidth: 10),
+        landscape: (context) => const MonthlySumChart(doRotate: false, rodWidth: 12),
       ),
       tablet: (_) => OrientationLayoutBuilder(
         portrait: (context) => const MonthlySumChart(doRotate: false, rodWidth: 12),

@@ -14,7 +14,7 @@ class DaddysYearlyDailyView extends DaddysViewBase {
     required super.showReading,
     required super.showTemperature,
     required super.showFeelsLike,
-    
+    required super.isTablet,
   });
   @override
   Widget build(BuildContext context) {
