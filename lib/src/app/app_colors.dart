@@ -22,3 +22,5 @@ const Color arrowNeutralColor = Colors.grey;
 
 List<Color> lightBarChartColors = [Colors.blue[800]!, Colors.blue[600]!, Colors.blue[400]!, Colors.blue[200]!];
 List<Color> darkBarChartColors = [Colors.blue[800]!, Colors.blue[600]!, Colors.blue[400]!, Colors.blue[200]!];
+Color lightBarChartTooltipColor = Colors.grey[300]!;
+Color darkBarChartTooltipColor = Colors.grey[700]!;

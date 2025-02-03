@@ -114,6 +114,7 @@ class MonthlySumChart extends ChartsBase {
               barTouchData: BarTouchData(
                 enabled: true,
                 touchTooltipData: BarTouchTooltipData(
+                  getTooltipColor: (group) => AppTheme.getCharTooltipColor(isDarkMode: isDarkMode),
                   getTooltipItem: (group, groupIndex, rod, rodIndex) {
                     return BarTooltipItem(
                       '${rod.toY.toStringAsFixed(0)} m³',
@@ -134,8 +135,7 @@ class MonthlySumChart extends ChartsBase {
   }
 
   /// Groups the data by month (1-12) and then by year.
-  Map<int, Map<int, ChartBasicAggregation>> _createGroupedData(
-      List<ChartBasicAggregation> monthlyChartData, Map<int, Color> colorMap) {
+  Map<int, Map<int, ChartBasicAggregation>> _createGroupedData(List<ChartBasicAggregation> monthlyChartData, Map<int, Color> colorMap) {
     Map<int, Map<int, ChartBasicAggregation>> groupedData = {};
 
     // Determine all unique years in the dataset.

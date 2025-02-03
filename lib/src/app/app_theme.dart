@@ -123,11 +123,18 @@ class AppTheme {
   }
 
   static List<Color> getChartColors({bool isDarkMode = false}) {
-
     if (isDarkMode) {
       return app_colors.darkBarChartColors;
     } else {
       return app_colors.lightBarChartColors;
+    }
+  }
+
+  static Color getCharTooltipColor({bool isDarkMode = false}) {
+    if (isDarkMode) {
+      return app_colors.darkBarChartTooltipColor;
+    } else {
+      return app_colors.lightBarChartTooltipColor;
     }
   }
 }

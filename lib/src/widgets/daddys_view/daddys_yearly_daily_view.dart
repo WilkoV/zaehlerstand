@@ -113,7 +113,7 @@ class DaddysYearlyDailyView extends DaddysViewBase {
                                     ),
                                   if (showTemperature && data.weatherInfo != null)
                                     Text(
-                                      '${data.weatherInfo!.minFeelsLike.toStringAsFixed(1)}/${data.weatherInfo!.maxTemperature.toStringAsFixed(1)}°C',
+                                      '${data.weatherInfo!.minTemperature.toStringAsFixed(1)}/${data.weatherInfo!.maxTemperature.toStringAsFixed(1)}°C',
                                       style: Theme.of(context).textTheme.bodyMedium,
                                     ),
                                   if (showFeelsLike && data.weatherInfo != null)
