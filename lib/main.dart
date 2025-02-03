@@ -11,6 +11,7 @@ import 'package:zaehlerstand/src/app/zaehlerstand_app.dart';
 import 'package:zaehlerstand/src/io/sync/sync_manager.dart';
 import 'package:zaehlerstand/src/provider/data_provider.dart';
 import 'package:zaehlerstand/src/provider/settings_provider.dart';
+import 'dart:io';
 
 const int alarmManagerTaskId = 13297;
 
@@ -20,16 +21,12 @@ Future<void> main() async {
   final Duration alarmFrequency;
 
   if (kReleaseMode) {
-    // In release mode, set log level to WARNING
     Logger.root.level = Level.WARNING;
     log.fine('Running in release mode. Log level set to WARNING.');
-
     alarmFrequency = const Duration(hours: 8);
   } else {
-    // In debug mode, set log level to ALL
     Logger.root.level = Level.ALL;
     log.fine('Running in debug mode. Log level set to ALL.');
-
     alarmFrequency = const Duration(minutes: 15);
   }
 
@@ -40,8 +37,23 @@ Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  await AndroidAlarmManager.initialize();
-  log.info('AlarmManager initialized');
+  if (Platform.isAndroid) {
+    await AndroidAlarmManager.initialize();
+    log.info('AlarmManager initialized');
+
+    // Avoid duplicate registrations
+    await AndroidAlarmManager.cancel(alarmManagerTaskId);
+
+    // Initialize background task
+    await AndroidAlarmManager.periodic(
+      alarmFrequency,
+      alarmManagerTaskId,
+      zaehlerstandCallbackDispatcher,
+      rescheduleOnReboot: true,
+    );
+
+    log.info('AlarmManager periodic task registered with taskId = $alarmManagerTaskId.');
+  }
 
   await settingsProvider.loadSettings();
   log.fine('SettingsProvider initialized successfully.');
@@ -59,15 +71,8 @@ Future<void> main() async {
       child: const ZaehlerstandApp(),
     ),
   );
-
-  // Avoid duplicate registrations
-  await AndroidAlarmManager.cancel(alarmManagerTaskId);
-
-  // Initialize background task
-  await AndroidAlarmManager.periodic(alarmFrequency, alarmManagerTaskId, rescheduleOnReboot: true, zaehlerstandCallbackDispatcher);
-
-  log.info('AlarmManager periodic task registered with taskId = $alarmManagerTaskId.');
 }
+
 
 @pragma('vm:entry-point')
 void zaehlerstandCallbackDispatcher() async {
